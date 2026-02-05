@@ -42,12 +42,8 @@ export function ProductShowcase() {
               {/* Product Card */}
               <div className="relative flex items-center justify-center min-h-[250px] sm:min-h-[300px]">
                 {isMobile ? (
-                  // Mobile: Simple fade transition
-                  <motion.div
-                    key={activeFinish.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
+                  // Mobile: Completely static - no motion at all
+                  <div
                     className="w-full aspect-[1.6/1] relative rounded-2xl overflow-hidden"
                     style={{
                       background: `linear-gradient(145deg, ${activeFinish.color} 0%, ${activeFinish.colorEnd} 100%)`,
@@ -55,7 +51,7 @@ export function ProductShowcase() {
                     }}
                   >
                     <CardContent />
-                  </motion.div>
+                  </div>
                 ) : (
                   // Desktop: Full 3D animation with shine
                   <AnimatePresence mode="wait">

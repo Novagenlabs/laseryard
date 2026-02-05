@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion, useInView } from "motion/react";
 import { ReactNode, useRef } from "react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -13,9 +14,8 @@ interface ScrollRevealProps {
 }
 
 /**
- * Optimized scroll reveal using useInView instead of whileInView.
- * useInView uses Intersection Observer which runs off the main thread,
- * preventing scroll-triggered re-renders that cause jitter.
+ * Scroll reveal animation - DISABLED on mobile for performance.
+ * Mobile gets instant static content, desktop gets smooth animations.
  */
 export function ScrollReveal({
   children,
@@ -27,35 +27,26 @@ export function ScrollReveal({
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   const isInView = useInView(ref, { once, margin: "-50px 0px" });
 
-  // Only use vertical movement - horizontal transforms cause layout issues
+  // Mobile: No animations at all - just render children
+  if (isMobile || shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  // Desktop: Full animations
   const getOffset = () => {
     if (direction === "none") return {};
     return { y: direction === "down" ? -20 : 20 };
   };
 
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
   return (
     <motion.div
       ref={ref}
-      initial={{
-        opacity: 0,
-        ...getOffset(),
-      }}
+      initial={{ opacity: 0, ...getOffset() }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, ...getOffset() }}
-      transition={{
-        duration,
-        delay,
-        ease: "easeOut",
-      }}
-      style={{
-        // GPU acceleration hint - only when animating
-        willChange: isInView ? "auto" : "transform, opacity",
-      }}
+      transition={{ duration, delay, ease: "easeOut" }}
       className={className}
     >
       {children}
@@ -71,7 +62,7 @@ interface StaggerContainerProps {
 }
 
 /**
- * Optimized stagger container using useInView for better scroll performance.
+ * Stagger container - DISABLED on mobile for performance.
  */
 export function StaggerContainer({
   children,
@@ -81,9 +72,11 @@ export function StaggerContainer({
 }: StaggerContainerProps) {
   const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   const isInView = useInView(ref, { once, margin: "-30px 0px" });
 
-  if (shouldReduceMotion) {
+  // Mobile: No animations
+  if (isMobile || shouldReduceMotion) {
     return <div className={className}>{children}</div>;
   }
 
@@ -107,6 +100,9 @@ export function StaggerContainer({
   );
 }
 
+/**
+ * Stagger item - DISABLED on mobile for performance.
+ */
 export function StaggerItem({
   children,
   className,
@@ -115,8 +111,10 @@ export function StaggerItem({
   className?: string;
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
 
-  if (shouldReduceMotion) {
+  // Mobile: No animations
+  if (isMobile || shouldReduceMotion) {
     return <div className={className}>{children}</div>;
   }
 
