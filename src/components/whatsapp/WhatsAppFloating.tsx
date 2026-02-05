@@ -24,7 +24,7 @@ export function WhatsAppFloating() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)]">
       <AnimatePresence>
         {isExpanded && (
           <motion.div
@@ -32,7 +32,7 @@ export function WhatsAppFloating() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute bottom-20 right-0 w-80 bg-white rounded-2xl overflow-hidden"
+            className="absolute bottom-20 right-0 w-80 max-w-[calc(100vw-3rem)] bg-white rounded-2xl overflow-hidden overscroll-contain"
             style={{
               boxShadow: `
                 0 0 0 1px rgba(0, 0, 0, 0.04),
@@ -51,7 +51,7 @@ export function WhatsAppFloating() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-white" />
+                    <MessageCircle className="w-5 h-5 text-white" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="font-semibold text-white text-[15px]">Laser Yard</p>
@@ -62,9 +62,10 @@ export function WhatsAppFloating() {
                 </div>
                 <button
                   onClick={() => setIsExpanded(false)}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-white"
+                  aria-label="Close chat popup"
                 >
-                  <X className="w-4 h-4 text-white" />
+                  <X className="w-4 h-4 text-white" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -84,7 +85,7 @@ export function WhatsAppFloating() {
                 onClick={handleWhatsAppClick}
                 className="btn-apple btn-apple-whatsapp w-full"
               >
-                <MessageCircle className="w-[18px] h-[18px]" />
+                <MessageCircle className="w-[18px] h-[18px]" aria-hidden="true" />
                 <span>Start Conversation</span>
               </button>
             </div>
@@ -100,7 +101,7 @@ export function WhatsAppFloating() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300"
+        className="w-14 h-14 rounded-full flex items-center justify-center transition-shadow duration-300 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
         style={{
           background: "linear-gradient(180deg, #25D366 0%, #20BD5A 100%)",
           boxShadow: `
@@ -109,15 +110,17 @@ export function WhatsAppFloating() {
             inset 0 1px 0 rgba(255, 255, 255, 0.2)
           `,
         }}
+        aria-label={isExpanded ? "Close WhatsApp chat" : "Open WhatsApp chat"}
+        aria-expanded={isExpanded}
       >
         <motion.div
           animate={{ rotate: isExpanded ? 90 : 0 }}
           transition={{ duration: 0.2 }}
         >
           {isExpanded ? (
-            <X className="w-6 h-6 text-white" />
+            <X className="w-6 h-6 text-white" aria-hidden="true" />
           ) : (
-            <MessageCircle className="w-6 h-6 text-white" />
+            <MessageCircle className="w-6 h-6 text-white" aria-hidden="true" />
           )}
         </motion.div>
       </motion.button>

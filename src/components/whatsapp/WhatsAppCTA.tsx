@@ -65,7 +65,7 @@ export function WhatsAppCTA({
         className
       )}
     >
-      <MessageCircle className={cn(iconSizes[size], "flex-shrink-0")} />
+      <MessageCircle className={cn(iconSizes[size], "flex-shrink-0")} aria-hidden="true" />
       <span>{buttonText}</span>
     </motion.button>
   );

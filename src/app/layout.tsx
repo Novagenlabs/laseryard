@@ -80,6 +80,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#FAFAFA" />
+      </head>
       <body
         className={`${dmSans.variable} ${playfair.variable} font-sans antialiased`}
       >

@@ -31,7 +31,7 @@ export function Header() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-smooth",
+          "fixed top-0 left-0 right-0 z-50 transition-colors transition-shadow duration-500 ease-smooth",
           isScrolled
             ? "bg-background/80 backdrop-blur-xl border-b border-border"
             : "bg-transparent"
@@ -68,7 +68,7 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group"
+                  className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 rounded-md"
                 >
                   {link.label}
                   <span className="absolute bottom-1 left-4 right-4 h-px bg-gold scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
@@ -86,8 +86,9 @@ export function Header() {
               <button
                 onClick={handleWhatsAppClick}
                 className="btn-apple btn-apple-whatsapp !py-2.5 !px-5"
+                aria-label="Get quote via WhatsApp"
               >
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4" aria-hidden="true" />
                 <span>Get Quote</span>
               </button>
             </motion.div>
@@ -95,13 +96,14 @@ export function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden relative z-10 p-2 -mr-2 text-foreground"
-              aria-label="Toggle menu"
+              className="lg:hidden relative z-10 p-2 -mr-2 text-foreground min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-lg"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6" aria-hidden="true" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-6 h-6" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -163,8 +165,9 @@ export function Header() {
                   <button
                     onClick={handleWhatsAppClick}
                     className="btn-apple btn-apple-whatsapp w-full !py-4 !text-lg"
+                    aria-label="Chat with us on WhatsApp"
                   >
-                    <MessageCircle className="w-5 h-5" />
+                    <MessageCircle className="w-5 h-5" aria-hidden="true" />
                     <span>Chat on WhatsApp</span>
                   </button>
                 </motion.div>

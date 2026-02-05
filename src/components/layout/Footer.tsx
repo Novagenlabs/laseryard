@@ -36,6 +36,7 @@ export function Footer() {
                 width={2000}
                 height={2000}
                 className="h-56 w-auto"
+                loading="lazy"
               />
             </Link>
             <p className="mt-4 text-muted-foreground max-w-sm leading-relaxed">
@@ -49,20 +50,20 @@ export function Footer() {
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 text-muted-foreground hover:text-whatsapp transition-colors"
+                className="flex items-center gap-3 text-muted-foreground hover:text-whatsapp transition-colors focus-visible:text-whatsapp focus-visible:outline-none"
               >
-                <MessageCircle className="w-5 h-5" />
+                <MessageCircle className="w-5 h-5" aria-hidden="true" />
                 <span>+234 801 234 5678</span>
               </a>
               <a
                 href="mailto:hello@laseryard.com"
-                className="flex items-center gap-3 text-muted-foreground hover:text-gold transition-colors"
+                className="flex items-center gap-3 text-muted-foreground hover:text-gold transition-colors focus-visible:text-gold focus-visible:outline-none"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="w-5 h-5" aria-hidden="true" />
                 <span>hello@laseryard.com</span>
               </a>
               <div className="flex items-center gap-3 text-muted-foreground">
-                <MapPin className="w-5 h-5" />
+                <MapPin className="w-5 h-5" aria-hidden="true" />
                 <span>Lagos, Nigeria</span>
               </div>
             </div>

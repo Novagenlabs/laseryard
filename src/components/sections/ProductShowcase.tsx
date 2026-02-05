@@ -101,19 +101,20 @@ export function ProductShowcase() {
               </div>
 
               {/* Finish Selector */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 p-2 rounded-full bg-card border border-border">
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 p-2 rounded-full bg-card border border-border">
                 {finishes.map((finish) => (
                   <button
                     key={finish.id}
                     onClick={() => setActiveFinish(finish)}
                     className={cn(
-                      "w-8 h-8 rounded-full border-2 transition-all duration-300",
+                      "w-10 h-10 sm:w-8 sm:h-8 rounded-full border-2 transition-transform transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
                       activeFinish.id === finish.id
                         ? "border-gold scale-110"
                         : "border-transparent hover:border-slate-400"
                     )}
                     style={{ backgroundColor: finish.color }}
-                    title={finish.label}
+                    aria-label={`Select ${finish.label} finish`}
+                    aria-pressed={activeFinish.id === finish.id}
                   />
                 ))}
               </div>
