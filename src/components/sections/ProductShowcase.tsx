@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Ruler, Layers, Zap } from "lucide-react";
+import { motion } from "motion/react";
+import { Ruler, Layers, Zap } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { cn } from "@/lib/utils";
@@ -38,79 +38,51 @@ export function ProductShowcase() {
   const [activeFinish, setActiveFinish] = useState(finishes[0]);
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 sm:py-24 relative overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Product Visual */}
-          <ScrollReveal direction="left" className="relative">
-            <div className="relative aspect-square max-w-lg mx-auto">
-              {/* Ambient Glow */}
-              <div className="absolute inset-0 bg-gold/10 rounded-full blur-[100px]" />
-
-              {/* Product Card */}
-              <div className="relative h-full flex items-center justify-center">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeFinish.id}
-                    initial={{ opacity: 0, rotateY: -10 }}
-                    animate={{ opacity: 1, rotateY: 0 }}
-                    exit={{ opacity: 0, rotateY: 10 }}
-                    transition={{ duration: 0.5 }}
-                    className="w-full max-w-[400px] aspect-[1.6/1] relative"
-                  >
-                    <div
-                      className="absolute inset-0 rounded-2xl metal-texture overflow-hidden"
-                      style={{
-                        background: `linear-gradient(145deg, ${activeFinish.color} 0%, ${activeFinish.colorEnd} 100%)`,
-                        boxShadow: `
-                          0 50px 100px -20px rgba(0, 0, 0, 0.6),
-                          0 0 0 1px rgba(255, 255, 255, 0.15),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                        `,
-                      }}
-                    >
-                      {/* Shine sweep */}
-                      <motion.div
-                        animate={{ x: [-200, 500] }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          repeatDelay: 2,
-                        }}
-                        className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
-                      />
-
-                      {/* Content mockup */}
-                      <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="w-24 h-2 rounded mb-2 bg-white/80" />
-                            <div className="w-16 h-1.5 bg-white/40 rounded" />
-                          </div>
-                          <div className="w-12 h-12 rounded-lg border-2 border-white/30" />
-                        </div>
-                        <div>
-                          <div className="w-32 h-1.5 bg-white/30 rounded mb-2" />
-                          <div className="w-20 h-1 bg-white/20 rounded" />
-                        </div>
-                      </div>
-
+          <ScrollReveal direction="up" className="relative">
+            <div className="relative w-full max-w-md mx-auto">
+              {/* Product Card - simplified, no 3D transforms */}
+              <motion.div
+                key={activeFinish.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="w-full aspect-[1.6/1] relative rounded-2xl overflow-hidden"
+                style={{
+                  background: `linear-gradient(145deg, ${activeFinish.color} 0%, ${activeFinish.colorEnd} 100%)`,
+                  boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.4)`,
+                }}
+              >
+                {/* Content mockup */}
+                <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="w-20 sm:w-24 h-2 rounded mb-2 bg-white/80" />
+                      <div className="w-14 sm:w-16 h-1.5 bg-white/40 rounded" />
                     </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-white/30" />
+                  </div>
+                  <div>
+                    <div className="w-28 sm:w-32 h-1.5 bg-white/30 rounded mb-2" />
+                    <div className="w-16 sm:w-20 h-1 bg-white/20 rounded" />
+                  </div>
+                </div>
+              </motion.div>
 
               {/* Finish Selector */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 p-2 rounded-full bg-card border border-border">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 p-2 rounded-full bg-card border border-border w-fit mx-auto">
                 {finishes.map((finish) => (
                   <button
                     key={finish.id}
                     onClick={() => setActiveFinish(finish)}
                     className={cn(
-                      "w-10 h-10 sm:w-8 sm:h-8 rounded-full border-2 transition-transform transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+                      "w-8 h-8 sm:w-8 sm:h-8 rounded-full border-2 transition-transform duration-200",
                       activeFinish.id === finish.id
                         ? "border-gold scale-110"
-                        : "border-transparent hover:border-slate-400"
+                        : "border-transparent"
                     )}
                     style={{ backgroundColor: finish.color }}
                     aria-label={`Select ${finish.label} finish`}
@@ -122,17 +94,17 @@ export function ProductShowcase() {
           </ScrollReveal>
 
           {/* Content */}
-          <ScrollReveal direction="right">
-            <div className="space-y-8">
+          <ScrollReveal direction="up">
+            <div className="space-y-6 sm:space-y-8">
               <div>
                 <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
                   Featured Product
                 </p>
                 <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-                  Metal Business <br />
+                  Metal Business{" "}
                   <span className="text-gradient-gold">Cards</span>
                 </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed">
+                <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
                   Our most popular service. Laser-engraved aluminum cards that
                   make unforgettable first impressions. The tactile experience
                   paper simply cannot match.
@@ -140,17 +112,17 @@ export function ProductShowcase() {
               </div>
 
               {/* Specs */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 {specs.map((spec, index) => (
                   <div
                     key={index}
-                    className="p-4 rounded-xl bg-card border border-border text-center"
+                    className="p-3 sm:p-4 rounded-xl bg-card border border-border text-center"
                   >
-                    <spec.icon className="w-6 h-6 text-gold mx-auto mb-2" />
-                    <p className="text-xs text-muted-foreground mb-1">
+                    <spec.icon className="w-5 h-5 sm:w-6 sm:h-6 text-gold mx-auto mb-2" aria-hidden="true" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mb-1">
                       {spec.label}
                     </p>
-                    <p className="text-sm font-semibold">{spec.value}</p>
+                    <p className="text-xs sm:text-sm font-semibold">{spec.value}</p>
                   </div>
                 ))}
               </div>

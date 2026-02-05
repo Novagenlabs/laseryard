@@ -2,7 +2,6 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -16,19 +15,19 @@ interface ScrollRevealProps {
 export function ScrollReveal({
   children,
   delay = 0,
-  duration = 0.6,
+  duration = 0.5,
   direction = "up",
   className,
   once = true,
 }: ScrollRevealProps) {
   const shouldReduceMotion = useReducedMotion();
 
-  const directionOffset = {
-    up: { y: 40 },
-    down: { y: -40 },
-    left: { x: 40 },
-    right: { x: -40 },
-    none: {},
+  // Simplified: only use vertical movement on mobile-friendly animations
+  // Horizontal transforms can cause layout issues on mobile
+  const getOffset = () => {
+    if (direction === "none") return {};
+    // Use smaller offset for better mobile performance
+    return { y: direction === "down" ? -20 : 20 };
   };
 
   if (shouldReduceMotion) {
@@ -39,18 +38,17 @@ export function ScrollReveal({
     <motion.div
       initial={{
         opacity: 0,
-        ...directionOffset[direction],
+        ...getOffset(),
       }}
       whileInView={{
         opacity: 1,
-        x: 0,
         y: 0,
       }}
-      viewport={{ once, margin: "-80px" }}
+      viewport={{ once, margin: "-50px" }}
       transition={{
         duration,
         delay,
-        ease: [0.22, 1, 0.36, 1],
+        ease: "easeOut",
       }}
       className={className}
     >
@@ -69,14 +67,20 @@ interface StaggerContainerProps {
 export function StaggerContainer({
   children,
   className,
-  staggerDelay = 0.1,
+  staggerDelay = 0.08,
   once = true,
 }: StaggerContainerProps) {
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once, margin: "-50px" }}
+      viewport={{ once, margin: "-30px" }}
       variants={{
         hidden: {},
         visible: {
@@ -108,13 +112,13 @@ export function StaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 30 },
+        hidden: { opacity: 0, y: 15 },
         visible: {
           opacity: 1,
           y: 0,
           transition: {
-            duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
+            duration: 0.4,
+            ease: "easeOut",
           },
         },
       }}
