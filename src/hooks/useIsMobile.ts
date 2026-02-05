@@ -1,24 +1,26 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 
 /**
- * SSR-safe device detection using useSyncExternalStore.
+ * Device detection hook.
  *
- * - Server: returns true (mobile-first, prevents heavy animations in SSR)
- * - Client: immediately returns correct value based on window width
+ * - Default: false (desktop) - shows animations
+ * - After mount on mobile: switches to true - disables animations
  *
- * This ensures desktop users see animations immediately after hydration.
+ * Desktop gets animations immediately. Mobile briefly sees animations
+ * then they're disabled (better than freezing).
  */
 export function useIsMobile(breakpoint: number = 768) {
-  const isMobile = useSyncExternalStore(
-    // Subscribe (no-op since we don't need resize updates)
-    () => () => {},
-    // Client snapshot - check actual window width
-    () => window.innerWidth < breakpoint,
-    // Server snapshot - assume mobile (safer for performance)
-    () => true
-  );
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check immediately on mount
+    const checkMobile = window.innerWidth < breakpoint;
+    if (checkMobile) {
+      setIsMobile(true);
+    }
+  }, [breakpoint]);
 
   return isMobile;
 }
