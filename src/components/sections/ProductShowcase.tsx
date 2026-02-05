@@ -26,9 +26,12 @@ const specs = [
 ];
 
 const finishes = [
-  { id: "brushed", label: "Brushed Metal", color: "#2a2a2a" },
-  { id: "matte-black", label: "Matte Black", color: "#0a0a0a" },
-  { id: "gold-accent", label: "Gold Accent", color: "#1a1a1a" },
+  { id: "brushed", label: "Brushed Metal", color: "#2a2a2a", accent: null },
+  { id: "matte-black", label: "Matte Black", color: "#0a0a0a", accent: null },
+  { id: "gold", label: "Gold", color: "#1a1a1a", accent: "#D4AF37" },
+  { id: "red", label: "Red", color: "#1a0a0a", accent: "#DC2626" },
+  { id: "green", label: "Green", color: "#0a1a0a", accent: "#16A34A" },
+  { id: "blue", label: "Blue", color: "#0a0a1a", accent: "#2563EB" },
 ];
 
 export function ProductShowcase() {
@@ -81,10 +84,24 @@ export function ProductShowcase() {
                       <div className="absolute inset-0 p-8 flex flex-col justify-between">
                         <div className="flex justify-between items-start">
                           <div>
-                            <div className="w-24 h-2 bg-gold/60 rounded mb-2" />
+                            <div
+                              className="w-24 h-2 rounded mb-2"
+                              style={{
+                                backgroundColor: activeFinish.accent
+                                  ? `${activeFinish.accent}99`
+                                  : "rgba(212, 175, 55, 0.6)",
+                              }}
+                            />
                             <div className="w-16 h-1.5 bg-white/20 rounded" />
                           </div>
-                          <div className="w-12 h-12 rounded-lg border border-gold/30" />
+                          <div
+                            className="w-12 h-12 rounded-lg border"
+                            style={{
+                              borderColor: activeFinish.accent
+                                ? `${activeFinish.accent}50`
+                                : "rgba(212, 175, 55, 0.3)",
+                            }}
+                          />
                         </div>
                         <div>
                           <div className="w-32 h-1.5 bg-white/15 rounded mb-2" />
@@ -92,9 +109,14 @@ export function ProductShowcase() {
                         </div>
                       </div>
 
-                      {/* Gold accent line for gold-accent finish */}
-                      {activeFinish.id === "gold-accent" && (
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/50 via-gold to-gold/50" />
+                      {/* Accent line for colored finishes */}
+                      {activeFinish.accent && (
+                        <div
+                          className="absolute bottom-0 left-0 right-0 h-1"
+                          style={{
+                            background: `linear-gradient(to right, ${activeFinish.accent}50, ${activeFinish.accent}, ${activeFinish.accent}50)`,
+                          }}
+                        />
                       )}
                     </div>
                   </motion.div>
@@ -113,7 +135,9 @@ export function ProductShowcase() {
                         ? "border-gold scale-110"
                         : "border-transparent hover:border-slate-400"
                     )}
-                    style={{ backgroundColor: finish.color }}
+                    style={{
+                      backgroundColor: finish.accent || finish.color,
+                    }}
                     title={finish.label}
                   />
                 ))}
