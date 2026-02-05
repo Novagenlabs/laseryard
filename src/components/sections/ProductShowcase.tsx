@@ -26,12 +26,12 @@ const specs = [
 ];
 
 const finishes = [
-  { id: "brushed", label: "Brushed Metal", color: "#2a2a2a", accent: null },
-  { id: "matte-black", label: "Matte Black", color: "#0a0a0a", accent: null },
-  { id: "gold", label: "Gold", color: "#1a1a1a", accent: "#D4AF37" },
-  { id: "red", label: "Red", color: "#1a0a0a", accent: "#DC2626" },
-  { id: "green", label: "Green", color: "#0a1a0a", accent: "#16A34A" },
-  { id: "blue", label: "Blue", color: "#0a0a1a", accent: "#2563EB" },
+  { id: "brushed", label: "Brushed Metal", color: "#3a3a3a", colorEnd: "#1a1a1a" },
+  { id: "matte-black", label: "Matte Black", color: "#1a1a1a", colorEnd: "#0a0a0a" },
+  { id: "gold", label: "Gold", color: "#D4AF37", colorEnd: "#8B7355" },
+  { id: "red", label: "Red", color: "#DC2626", colorEnd: "#7F1D1D" },
+  { id: "green", label: "Green", color: "#16A34A", colorEnd: "#14532D" },
+  { id: "blue", label: "Blue", color: "#2563EB", colorEnd: "#1E3A8A" },
 ];
 
 export function ProductShowcase() {
@@ -61,11 +61,11 @@ export function ProductShowcase() {
                     <div
                       className="absolute inset-0 rounded-2xl metal-texture overflow-hidden"
                       style={{
-                        background: `linear-gradient(145deg, ${activeFinish.color} 0%, #0a0a0a 100%)`,
+                        background: `linear-gradient(145deg, ${activeFinish.color} 0%, ${activeFinish.colorEnd} 100%)`,
                         boxShadow: `
                           0 50px 100px -20px rgba(0, 0, 0, 0.6),
-                          0 0 0 1px rgba(255, 255, 255, 0.08),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                          0 0 0 1px rgba(255, 255, 255, 0.15),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.2)
                         `,
                       }}
                     >
@@ -84,40 +84,17 @@ export function ProductShowcase() {
                       <div className="absolute inset-0 p-8 flex flex-col justify-between">
                         <div className="flex justify-between items-start">
                           <div>
-                            <div
-                              className="w-24 h-2 rounded mb-2"
-                              style={{
-                                backgroundColor: activeFinish.accent
-                                  ? `${activeFinish.accent}99`
-                                  : "rgba(212, 175, 55, 0.6)",
-                              }}
-                            />
-                            <div className="w-16 h-1.5 bg-white/20 rounded" />
+                            <div className="w-24 h-2 rounded mb-2 bg-white/80" />
+                            <div className="w-16 h-1.5 bg-white/40 rounded" />
                           </div>
-                          <div
-                            className="w-12 h-12 rounded-lg border"
-                            style={{
-                              borderColor: activeFinish.accent
-                                ? `${activeFinish.accent}50`
-                                : "rgba(212, 175, 55, 0.3)",
-                            }}
-                          />
+                          <div className="w-12 h-12 rounded-lg border-2 border-white/30" />
                         </div>
                         <div>
-                          <div className="w-32 h-1.5 bg-white/15 rounded mb-2" />
-                          <div className="w-20 h-1 bg-white/10 rounded" />
+                          <div className="w-32 h-1.5 bg-white/30 rounded mb-2" />
+                          <div className="w-20 h-1 bg-white/20 rounded" />
                         </div>
                       </div>
 
-                      {/* Accent line for colored finishes */}
-                      {activeFinish.accent && (
-                        <div
-                          className="absolute bottom-0 left-0 right-0 h-1"
-                          style={{
-                            background: `linear-gradient(to right, ${activeFinish.accent}50, ${activeFinish.accent}, ${activeFinish.accent}50)`,
-                          }}
-                        />
-                      )}
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -135,9 +112,7 @@ export function ProductShowcase() {
                         ? "border-gold scale-110"
                         : "border-transparent hover:border-slate-400"
                     )}
-                    style={{
-                      backgroundColor: finish.accent || finish.color,
-                    }}
+                    style={{ backgroundColor: finish.color }}
                     title={finish.label}
                   />
                 ))}
