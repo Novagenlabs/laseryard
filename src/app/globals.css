@@ -1,26 +1,374 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ===== LASER YARD DESIGN SYSTEM ===== */
+/* Premium, Apple-esque aesthetic with West African executive sophistication */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-playfair);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /* Laser Yard Brand Colors */
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-light: var(--gold-light);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-dark: var(--whatsapp-dark);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.75rem;
+
+  /* Core Palette - Light Theme */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.13 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.13 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.13 0.02 260);
+
+  /* Primary - Laser Yard Signature Yellow */
+  --gold: oklch(0.85 0.19 95);
+  --gold-dark: oklch(0.75 0.18 90);
+  --gold-light: oklch(0.92 0.14 98);
+  --primary: var(--gold);
+  --primary-foreground: oklch(0.15 0.02 260);
+
+  /* Secondary */
+  --secondary: oklch(0.97 0.005 260);
+  --secondary-foreground: oklch(0.13 0.02 260);
+
+  /* Muted */
+  --muted: oklch(0.96 0.003 260);
+  --muted-foreground: oklch(0.50 0.01 260);
+
+  /* Accent */
+  --accent: oklch(0.97 0.005 260);
+  --accent-foreground: oklch(0.13 0.02 260);
+
+  /* WhatsApp */
+  --whatsapp: oklch(0.62 0.17 155);
+  --whatsapp-dark: oklch(0.55 0.15 155);
+
+  /* Borders & Inputs */
+  --border: oklch(0.13 0.02 260 / 8%);
+  --input: oklch(0.13 0.02 260 / 5%);
+  --ring: var(--gold);
+
+  /* Destructive */
+  --destructive: oklch(0.55 0.22 25);
+}
+
+/* Dark section variant */
+.dark-section {
+  --background: oklch(0.12 0.01 240);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.16 0.01 240);
+  --card-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.20 0.01 240);
+  --muted-foreground: oklch(0.65 0 0);
+  --border: oklch(1 0 0 / 10%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  ::selection {
+    background: oklch(0.85 0.19 95 / 35%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Premium Glass Effect */
+  .glass {
+    background: oklch(1 0 0 / 70%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid oklch(0 0 0 / 8%);
+  }
+
+  /* Gradient Text */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Apple-style Button */
+  .btn-apple {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+    border-radius: 980px;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+
+  .btn-apple:active {
+    transform: scale(0.97);
+  }
+
+  .btn-apple-primary {
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: var(--foreground);
+    box-shadow:
+      0 1px 3px oklch(0 0 0 / 12%),
+      0 4px 12px oklch(0.75 0.18 90 / 25%),
+      inset 0 1px 0 oklch(1 0 0 / 30%);
+  }
+
+  .btn-apple-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 8px oklch(0 0 0 / 15%),
+      0 8px 24px oklch(0.75 0.18 90 / 35%),
+      inset 0 1px 0 oklch(1 0 0 / 40%);
+  }
+
+  .btn-apple-secondary {
+    background: oklch(1 0 0);
+    color: var(--foreground);
+    box-shadow:
+      0 0 0 1px oklch(0 0 0 / 8%),
+      0 2px 8px oklch(0 0 0 / 6%);
+  }
+
+  .btn-apple-secondary:hover {
+    background: oklch(0.98 0 0);
+    box-shadow:
+      0 0 0 1px oklch(0 0 0 / 12%),
+      0 4px 16px oklch(0 0 0 / 10%);
+    transform: translateY(-1px);
+  }
+
+  .btn-apple-whatsapp {
+    background: linear-gradient(180deg, oklch(0.65 0.17 155) 0%, oklch(0.55 0.16 155) 100%);
+    color: white;
+    box-shadow:
+      0 1px 3px oklch(0 0 0 / 12%),
+      0 4px 12px oklch(0.55 0.16 155 / 30%),
+      inset 0 1px 0 oklch(1 0 0 / 20%);
+  }
+
+  .btn-apple-whatsapp:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 8px oklch(0 0 0 / 15%),
+      0 8px 24px oklch(0.55 0.16 155 / 40%),
+      inset 0 1px 0 oklch(1 0 0 / 25%);
+  }
+
+  /* Premium Card Hover */
+  .card-premium {
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .card-premium:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 20px 40px oklch(0 0 0 / 10%),
+      0 0 0 1px oklch(0 0 0 / 5%);
+  }
+
+  /* Glow Effects */
+  .glow-gold {
+    box-shadow:
+      0 0 20px oklch(0.85 0.19 95 / 30%),
+      0 0 40px oklch(0.85 0.19 95 / 18%);
+  }
+
+  .glow-gold-intense {
+    box-shadow:
+      0 0 30px oklch(0.85 0.19 95 / 45%),
+      0 0 60px oklch(0.85 0.19 95 / 28%),
+      0 0 100px oklch(0.85 0.19 95 / 15%);
+  }
+
+  /* Animated Border */
+  .border-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .border-shine::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(0.85 0.19 95 / 50%),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shine 3s infinite;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    50%, 100% { transform: translateX(100%); }
+  }
+
+  /* Metal Texture Overlay */
+  .metal-texture {
+    position: relative;
+  }
+
+  .metal-texture::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  /* Section Divider */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(0 0 0 / 8%) 20%,
+      oklch(0.85 0.19 95 / 50%) 50%,
+      oklch(0 0 0 / 8%) 80%,
+      transparent
+    );
+  }
+}
+
+@layer utilities {
+  /* Custom Easing */
+  .ease-smooth {
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ease-bounce {
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Stagger Animation Delays */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
+
+  /* Text Balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide Scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ===== CUSTOM ANIMATIONS ===== */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px oklch(0.62 0.18 155 / 30%);
+  }
+  50% {
+    box-shadow: 0 0 40px oklch(0.62 0.18 155 / 50%);
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-reveal-up {
+  animation: reveal-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-reveal-scale {
+  animation: reveal-scale 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
