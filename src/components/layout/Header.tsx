@@ -160,13 +160,13 @@ export function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <Button
+                  <button
                     onClick={handleWhatsAppClick}
-                    className="w-full bg-whatsapp hover:bg-whatsapp-dark text-white font-semibold py-6 gap-2 text-lg"
+                    className="btn-apple btn-apple-whatsapp w-full !py-4 !text-lg"
                   >
                     <MessageCircle className="w-5 h-5" />
-                    Chat on WhatsApp
-                  </Button>
+                    <span>Chat on WhatsApp</span>
+                  </button>
                 </motion.div>
               </div>
             </motion.nav>
