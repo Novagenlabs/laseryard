@@ -26,7 +26,7 @@ const specs = [
 ];
 
 const finishes = [
-  { id: "brushed", label: "Brushed Metal", color: "#3a3a3a", colorEnd: "#1a1a1a" },
+  { id: "brushed", label: "Brushed Silver", color: "#C0C0C0", colorEnd: "#6B7280" },
   { id: "matte-black", label: "Matte Black", color: "#1a1a1a", colorEnd: "#0a0a0a" },
   { id: "gold", label: "Gold", color: "#D4AF37", colorEnd: "#8B7355" },
   { id: "red", label: "Red", color: "#DC2626", colorEnd: "#7F1D1D" },
