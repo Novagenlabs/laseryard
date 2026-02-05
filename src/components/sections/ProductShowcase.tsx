@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Ruler, Layers, Sparkles } from "lucide-react";
+import { ArrowRight, Ruler, Layers, Zap } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ const specs = [
     value: "0.2mm / 0.4mm",
   },
   {
-    icon: Sparkles,
+    icon: Zap,
     label: "Finish",
     value: "Laser Engraved",
   },

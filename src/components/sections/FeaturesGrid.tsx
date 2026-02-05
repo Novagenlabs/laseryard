@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import {
   Layers,
-  Sparkles,
+  PenTool,
   Shield,
   Crosshair,
   Clock,
@@ -18,7 +18,7 @@ import { FEATURES } from "@/lib/constants";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Layers,
-  Sparkles,
+  PenTool,
   Shield,
   Crosshair,
   Clock,

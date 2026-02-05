@@ -8,7 +8,7 @@ import {
   Check,
   Ruler,
   Layers,
-  Sparkles,
+  Crosshair,
   Shield,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
@@ -46,7 +46,7 @@ const features = [
     description: "Aircraft-grade aluminum for lasting durability",
   },
   {
-    icon: Sparkles,
+    icon: Crosshair,
     title: "Laser Precision",
     description: "Micron-level engraving accuracy",
   },

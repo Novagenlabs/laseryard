@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
-import { MessageCircle, Mail, Phone, MapPin } from "lucide-react";
+import { MessageCircle, Mail, MapPin } from "lucide-react";
 import { NAV_LINKS, WHATSAPP_NUMBER, COUNTRIES } from "@/lib/constants";
 
 const footerLinks = {
@@ -30,13 +29,10 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block">
-              <Image
-                src="/images/laseryard_logo_large.png"
+              <img
+                src="/images/lazer_logo.svg"
                 alt="Laser Yard"
-                width={2000}
-                height={2000}
-                className="h-56 w-auto"
-                loading="lazy"
+                className="h-24 w-auto"
               />
             </Link>
             <p className="mt-4 text-muted-foreground max-w-sm leading-relaxed">

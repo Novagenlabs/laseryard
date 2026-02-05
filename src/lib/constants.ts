@@ -36,13 +36,13 @@ export const FEATURES = [
   },
   {
     title: "Any Material",
-    description: "Metal, wood, acrylic, leather, glass — we engrave it all",
+    description: "Metal, wood, acrylic, leather, glass. We engrave it all.",
     icon: "Layers",
   },
   {
     title: "Custom Designs",
     description: "From your file or created by our design team",
-    icon: "Sparkles",
+    icon: "PenTool",
   },
   {
     title: "Fast Turnaround",
@@ -56,7 +56,7 @@ export const FEATURES = [
   },
   {
     title: "West Africa Wide",
-    description: "Serving Nigeria, Ghana, Togo, Benin & beyond",
+    description: "Serving Nigeria, Ghana, Togo, Benin and beyond",
     icon: "Truck",
   },
 ];
@@ -101,7 +101,7 @@ export const TESTIMONIALS = [
   },
   {
     quote:
-      "Worth every kobo. These aren't just business cards — they're conversation starters.",
+      "Worth every kobo. These aren't just business cards, they're conversation starters.",
     author: "Emeka Nwosu",
     title: "Founder, NexGen Consulting",
     location: "Abuja, Nigeria",

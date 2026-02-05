@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, MessageCircle } from "lucide-react";
@@ -46,13 +45,10 @@ export function Header() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <Image
-                  src="/images/laseryard_logo_large.png"
+                <img
+                  src="/images/lazer_logo.svg"
                   alt="Laser Yard"
-                  width={2000}
-                  height={2000}
-                  className="h-28 w-auto"
-                  priority
+                  className="h-16 w-auto"
                 />
               </motion.div>
             </Link>

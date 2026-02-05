@@ -99,7 +99,7 @@ export default function ProcessPage() {
               <span className="text-gradient-gold">Delivery</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              From metal business cards to custom signage — our streamlined process
+              From metal business cards to custom signage, our streamlined process
               ensures you receive exactly what you envision.
             </p>
           </ScrollReveal>

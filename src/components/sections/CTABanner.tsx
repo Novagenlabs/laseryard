@@ -60,7 +60,7 @@ export function CTABanner() {
                 transition={{ delay: 0.1 }}
                 className="text-muted-foreground text-lg max-w-2xl mx-auto mb-10"
               >
-                From metal business cards to custom signage — bring your vision
+                From metal business cards to custom signage, we bring your vision
                 to life with precision laser engraving. Get your quote in minutes.
               </motion.p>
 

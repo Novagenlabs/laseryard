@@ -60,7 +60,7 @@ export default function AboutPage() {
                 Laser Yard was born from a passion for precision and a vision to
                 bring world-class laser engraving to West Africa. From metal
                 business cards to custom signage, architectural elements to
-                promotional products — we turn your ideas into tangible reality.
+                promotional products. We turn your ideas into tangible reality.
               </p>
             </ScrollReveal>
           </div>
@@ -80,7 +80,7 @@ export default function AboutPage() {
                 <p className="text-muted-foreground leading-relaxed">
                   To be West Africa's go-to destination for precision laser
                   engraving. Whether you're creating premium business cards,
-                  custom signage, or unique promotional items — we combine
+                  custom signage, or unique promotional items. We combine
                   cutting-edge technology with meticulous craftsmanship to bring
                   your vision to life.
                 </p>
@@ -97,7 +97,7 @@ export default function AboutPage() {
                   To become the region's most trusted name in laser engraving.
                   We envision a future where every business, from startups to
                   multinationals, knows that when it comes to precision
-                  engraving — you come to Laser Yard.
+                  engraving, you come to Laser Yard.
                 </p>
               </div>
             </ScrollReveal>
