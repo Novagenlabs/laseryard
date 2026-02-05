@@ -398,6 +398,34 @@
   animation: reveal-scale 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Marquee animation - runs on compositor thread (GPU), doesn't block main thread */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  /* GPU acceleration */
+  will-change: transform;
+}
+
+/* Pause marquee on hover for better UX */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
 /* ===== CSS SCROLL-DRIVEN ANIMATIONS ===== */
 /* These run off the main thread for better mobile performance */
 
