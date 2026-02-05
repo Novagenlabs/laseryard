@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, useInView } from "motion/react";
 import { useRef } from "react";
 import { Upload, FileCheck, Zap, Package } from "lucide-react";
 import {
@@ -9,16 +9,47 @@ import {
   StaggerItem,
 } from "@/components/animations/ScrollReveal";
 import { PROCESS_STEPS } from "@/lib/constants";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const icons = [Upload, FileCheck, Zap, Package];
 
+// Separate component for icon nodes - uses useInView for better scroll performance
+function IconNode({ Icon, index }: { Icon: typeof Upload; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px 0px" });
+
+  return (
+    <div
+      ref={ref}
+      className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={isInView ? { scale: 1 } : { scale: 0 }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 20,
+          delay: index * 0.1,
+        }}
+        className="w-16 h-16 rounded-2xl bg-card border border-gold/50 flex items-center justify-center shadow-lg shadow-gold/10"
+      >
+        <Icon className="w-7 h-7 text-gold" aria-hidden="true" />
+      </motion.div>
+    </div>
+  );
+}
+
 export function ProcessSteps() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
+  // Motion values don't cause re-renders - GPU accelerated
   const lineHeight = useTransform(scrollYProgress, [0.1, 0.7], ["0%", "100%"]);
 
   return (
@@ -102,23 +133,10 @@ export function ProcessSteps() {
                     </motion.div>
                   </div>
 
-                  {/* Icon Node - Desktop */}
-                  <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
-                        delay: index * 0.1,
-                      }}
-                      className="w-16 h-16 rounded-2xl bg-card border border-gold/50 flex items-center justify-center shadow-lg shadow-gold/10"
-                    >
-                      <Icon className="w-7 h-7 text-gold" />
-                    </motion.div>
-                  </div>
+                  {/* Icon Node - Desktop only */}
+                  {!isMobile && (
+                    <IconNode Icon={Icon} index={index} />
+                  )}
                 </StaggerItem>
               );
             })}

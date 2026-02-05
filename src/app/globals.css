@@ -397,3 +397,55 @@
 .animate-reveal-scale {
   animation: reveal-scale 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* ===== CSS SCROLL-DRIVEN ANIMATIONS ===== */
+/* These run off the main thread for better mobile performance */
+
+@keyframes css-scroll-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes css-scroll-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* CSS scroll reveal - runs off main thread, no JS re-renders */
+.css-scroll-reveal {
+  animation: css-scroll-reveal linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
+.css-scroll-fade {
+  animation: css-scroll-fade linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 25%;
+}
+
+/* Fallback for browsers without scroll-driven animation support */
+@supports not (animation-timeline: view()) {
+  .css-scroll-reveal,
+  .css-scroll-fade {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* Honor reduced motion - disable scroll animations */
+@media (prefers-reduced-motion: reduce) {
+  .css-scroll-reveal,
+  .css-scroll-fade {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { ReactNode } from "react";
+import { motion, useReducedMotion, useInView } from "motion/react";
+import { ReactNode, useRef } from "react";
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -12,6 +12,11 @@ interface ScrollRevealProps {
   once?: boolean;
 }
 
+/**
+ * Optimized scroll reveal using useInView instead of whileInView.
+ * useInView uses Intersection Observer which runs off the main thread,
+ * preventing scroll-triggered re-renders that cause jitter.
+ */
 export function ScrollReveal({
   children,
   delay = 0,
@@ -20,13 +25,13 @@ export function ScrollReveal({
   className,
   once = true,
 }: ScrollRevealProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const isInView = useInView(ref, { once, margin: "-50px 0px" });
 
-  // Simplified: only use vertical movement on mobile-friendly animations
-  // Horizontal transforms can cause layout issues on mobile
+  // Only use vertical movement - horizontal transforms cause layout issues
   const getOffset = () => {
     if (direction === "none") return {};
-    // Use smaller offset for better mobile performance
     return { y: direction === "down" ? -20 : 20 };
   };
 
@@ -36,19 +41,20 @@ export function ScrollReveal({
 
   return (
     <motion.div
+      ref={ref}
       initial={{
         opacity: 0,
         ...getOffset(),
       }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-      }}
-      viewport={{ once, margin: "-50px" }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, ...getOffset() }}
       transition={{
         duration,
         delay,
         ease: "easeOut",
+      }}
+      style={{
+        // GPU acceleration hint - only when animating
+        willChange: isInView ? "auto" : "transform, opacity",
       }}
       className={className}
     >
@@ -64,13 +70,18 @@ interface StaggerContainerProps {
   once?: boolean;
 }
 
+/**
+ * Optimized stagger container using useInView for better scroll performance.
+ */
 export function StaggerContainer({
   children,
   className,
   staggerDelay = 0.08,
   once = true,
 }: StaggerContainerProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const isInView = useInView(ref, { once, margin: "-30px 0px" });
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
@@ -78,9 +89,9 @@ export function StaggerContainer({
 
   return (
     <motion.div
+      ref={ref}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once, margin: "-30px" }}
+      animate={isInView ? "visible" : "hidden"}
       variants={{
         hidden: {},
         visible: {
