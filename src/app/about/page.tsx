@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
-import { CTABanner } from "@/components/sections/CTABanner";
 import { Target, Eye, Gem, Users, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -231,8 +230,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      <CTABanner />
     </>
   );
 }
