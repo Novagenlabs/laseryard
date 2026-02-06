@@ -1,5 +1,4 @@
 import { HeroSection } from "@/components/sections/HeroSection";
-import { TrustSignals } from "@/components/sections/TrustSignals";
 import { ProductShowcase } from "@/components/sections/ProductShowcase";
 import { FeaturesGrid } from "@/components/sections/FeaturesGrid";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
@@ -11,7 +10,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <TrustSignals />
+      {/* TrustSignals removed for mobile testing */}
       <ProductShowcase />
       <FeaturesGrid />
       <ProcessSteps />
