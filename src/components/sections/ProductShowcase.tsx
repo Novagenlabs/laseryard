@@ -43,8 +43,9 @@ export function ProductShowcase() {
               <div className="relative flex items-center justify-center min-h-[250px] sm:min-h-[300px]">
                 {isMobile ? (
                   // Mobile: Completely static - no motion at all
+                  // safari-fix-overflow fixes WebKit bug with overflow:hidden + border-radius
                   <div
-                    className="w-full aspect-[1.6/1] relative rounded-2xl overflow-hidden"
+                    className="w-full aspect-[1.6/1] relative rounded-2xl safari-fix-overflow"
                     style={{
                       background: `linear-gradient(145deg, ${activeFinish.color} 0%, ${activeFinish.colorEnd} 100%)`,
                       boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.4)`,
@@ -64,7 +65,7 @@ export function ProductShowcase() {
                       className="w-full max-w-[400px] aspect-[1.6/1] relative"
                     >
                       <div
-                        className="absolute inset-0 rounded-2xl metal-texture overflow-hidden"
+                        className="absolute inset-0 rounded-2xl metal-texture safari-fix-overflow"
                         style={{
                           background: `linear-gradient(145deg, ${activeFinish.color} 0%, ${activeFinish.colorEnd} 100%)`,
                           boxShadow: `

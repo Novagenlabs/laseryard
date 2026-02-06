@@ -133,12 +133,49 @@
 }
 
 @layer components {
+  /* ===== SAFARI MOBILE FIXES ===== */
+  /* Fix WebKit bug: overflow:hidden + border-radius + transform = blank content */
+  /* Source: https://bugs.webkit.org/show_bug.cgi?id=98538 */
+
+  .safari-fix-overflow {
+    isolation: isolate;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+  }
+
+  /* Apply to all rounded containers with overflow hidden */
+  .rounded-2xl.overflow-hidden,
+  .rounded-xl.overflow-hidden,
+  .rounded-3xl.overflow-hidden,
+  .rounded-lg.overflow-hidden {
+    isolation: isolate;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+  }
+
+  /* Force GPU acceleration on animated/transformed elements */
+  .gpu-accelerate {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+  }
+
+  /* Fix for blur effects on Safari - use will-change sparingly */
+  .blur-safe {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
   /* Premium Glass Effect */
   .glass {
     background: oklch(1 0 0 / 70%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid oklch(0 0 0 / 8%);
+    /* Safari fix */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 
   /* Gradient Text */

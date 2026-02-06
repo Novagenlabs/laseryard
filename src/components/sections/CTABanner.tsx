@@ -9,7 +9,7 @@ export function CTABanner() {
     <section className="py-16 sm:py-24 relative overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden safari-fix-overflow">
             {/* Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-gold/20 via-gold/10 to-transparent" />
             <div className="absolute inset-0 bg-card" />

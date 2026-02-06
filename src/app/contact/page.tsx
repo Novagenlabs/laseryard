@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
+import { DesktopBlur } from "@/components/ui/DesktopBlur";
 import { MessageCircle, Mail, Phone, Clock, MapPin } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
@@ -54,7 +55,7 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-gold/5 rounded-full blur-[120px]" />
+          <DesktopBlur className="absolute top-1/3 left-1/4 w-96 h-96 bg-gold/5 rounded-full blur-[120px]" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">

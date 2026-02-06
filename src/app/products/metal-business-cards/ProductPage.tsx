@@ -16,6 +16,7 @@ import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { cn } from "@/lib/utils";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type Thickness = "0.2mm" | "0.4mm";
 
@@ -66,6 +67,7 @@ export function ProductPage() {
   const [selectedThickness, setSelectedThickness] =
     useState<Thickness>("0.4mm");
   const [activeImage, setActiveImage] = useState(0);
+  const isMobile = useIsMobile();
 
   const option = thicknessOptions[selectedThickness];
 
@@ -87,66 +89,107 @@ export function ProductPage() {
             <ScrollReveal direction="left">
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-card border border-border">
+                <div className="relative aspect-square rounded-2xl bg-card border border-border safari-fix-overflow">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    {/* Product Visual */}
-                    <motion.div
-                      key={activeImage}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="w-[80%] aspect-[1.6/1] relative"
-                    >
-                      <div
-                        className="absolute inset-0 rounded-xl metal-texture overflow-hidden"
-                        style={{
-                          background:
-                            "linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%)",
-                          boxShadow: `
-                            0 30px 60px -15px rgba(0, 0, 0, 0.5),
-                            0 0 0 1px rgba(255, 255, 255, 0.08),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                          `,
-                        }}
-                      >
-                        {/* Shine Effect */}
-                        <motion.div
-                          animate={{ x: [-200, 400] }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            repeatDelay: 3,
+                    {/* Product Visual - static on mobile, animated on desktop */}
+                    {isMobile ? (
+                      <div className="w-[80%] aspect-[1.6/1] relative">
+                        <div
+                          className="absolute inset-0 rounded-xl metal-texture safari-fix-overflow"
+                          style={{
+                            background:
+                              "linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%)",
+                            boxShadow: `
+                              0 30px 60px -15px rgba(0, 0, 0, 0.5),
+                              0 0 0 1px rgba(255, 255, 255, 0.08),
+                              inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                            `,
                           }}
-                          className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
-                        />
-
-                        {/* Card Content */}
-                        <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                          <div className="flex justify-between items-start">
+                        >
+                          {/* Card Content - Mobile */}
+                          <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <div className="text-gold/80 text-sm font-semibold tracking-wide">
+                                  YOUR NAME
+                                </div>
+                                <div className="text-white/50 text-xs mt-1 tracking-wider">
+                                  YOUR TITLE
+                                </div>
+                              </div>
+                              <div className="w-8 h-8 rounded bg-gold/20 flex items-center justify-center">
+                                <span className="text-gold font-bold text-xs">
+                                  LOGO
+                                </span>
+                              </div>
+                            </div>
                             <div>
-                              <div className="text-gold/80 text-sm font-semibold tracking-wide">
-                                YOUR NAME
-                              </div>
-                              <div className="text-white/50 text-xs mt-1 tracking-wider">
-                                YOUR TITLE
+                              <div className="text-white/40 text-xs tracking-wider">
+                                YOUR COMPANY
                               </div>
                             </div>
-                            <div className="w-8 h-8 rounded bg-gold/20 flex items-center justify-center">
-                              <span className="text-gold font-bold text-xs">
-                                LOGO
-                              </span>
-                            </div>
                           </div>
-                          <div>
-                            <div className="text-white/40 text-xs tracking-wider">
-                              YOUR COMPANY
-                            </div>
-                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
                         </div>
-
-                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
                       </div>
-                    </motion.div>
+                    ) : (
+                      <motion.div
+                        key={activeImage}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-[80%] aspect-[1.6/1] relative"
+                      >
+                        <div
+                          className="absolute inset-0 rounded-xl metal-texture safari-fix-overflow"
+                          style={{
+                            background:
+                              "linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%)",
+                            boxShadow: `
+                              0 30px 60px -15px rgba(0, 0, 0, 0.5),
+                              0 0 0 1px rgba(255, 255, 255, 0.08),
+                              inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                            `,
+                          }}
+                        >
+                          {/* Shine Effect - Desktop only */}
+                          <motion.div
+                            animate={{ x: [-200, 400] }}
+                            transition={{
+                              duration: 3,
+                              repeat: Infinity,
+                              repeatDelay: 3,
+                            }}
+                            className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
+                          />
+
+                          {/* Card Content - Desktop */}
+                          <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <div className="text-gold/80 text-sm font-semibold tracking-wide">
+                                  YOUR NAME
+                                </div>
+                                <div className="text-white/50 text-xs mt-1 tracking-wider">
+                                  YOUR TITLE
+                                </div>
+                              </div>
+                              <div className="w-8 h-8 rounded bg-gold/20 flex items-center justify-center">
+                                <span className="text-gold font-bold text-xs">
+                                  LOGO
+                                </span>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-white/40 text-xs tracking-wider">
+                                YOUR COMPANY
+                              </div>
+                            </div>
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Zoom hint */}
