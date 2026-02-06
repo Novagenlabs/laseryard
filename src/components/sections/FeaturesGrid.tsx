@@ -15,6 +15,7 @@ import {
   StaggerItem,
 } from "@/components/animations/ScrollReveal";
 import { FEATURES } from "@/lib/constants";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Layers,
@@ -26,6 +27,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function FeaturesGrid() {
+  const isMobile = useIsMobile();
+
   return (
     <section className="py-24 relative overflow-hidden">
       {/* Background */}
@@ -49,26 +52,30 @@ export function FeaturesGrid() {
             const Icon = iconMap[feature.icon];
             return (
               <StaggerItem key={index}>
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  className="group relative p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-500"
-                >
-                  {/* Icon */}
-                  <div className="w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6 group-hover:bg-gold/20 transition-colors">
-                    <Icon className="w-7 h-7 text-gold" />
+                {isMobile ? (
+                  <div className="group relative p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-500">
+                    {/* Icon */}
+                    <div className="w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6 group-hover:bg-gold/20 transition-colors">
+                      <Icon className="w-7 h-7 text-gold" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-3 text-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   </div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-semibold mb-3 text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </p>
-
-                  {/* Hover Gradient */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </motion.div>
+                ) : (
+                  <motion.div
+                    whileHover={{ y: -4 }}
+                    className="group relative p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-500"
+                  >
+                    {/* Icon */}
+                    <div className="w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6 group-hover:bg-gold/20 transition-colors">
+                      <Icon className="w-7 h-7 text-gold" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-3 text-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </motion.div>
+                )}
               </StaggerItem>
             );
           })}

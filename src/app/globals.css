@@ -167,6 +167,21 @@
     transform: translateZ(0);
   }
 
+  /* ===== iOS SAFARI SAFETY NET ===== */
+  /* Ensure content is always visible on mobile, even if JS animation state is stale */
+  /* The is-mobile class is set by an inline script before React hydrates */
+  .is-mobile [style*="opacity: 0"],
+  .is-mobile [style*="opacity:0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Force repaint on key containers in iOS Safari after hydration */
+  .is-ios section,
+  .is-ios .safari-fix-overflow {
+    -webkit-backface-visibility: hidden;
+  }
+
   /* Premium Glass Effect */
   .glass {
     background: oklch(1 0 0 / 70%);

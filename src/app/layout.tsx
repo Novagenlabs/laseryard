@@ -83,12 +83,17 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#FAFAFA" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var d=document.documentElement,w=window.innerWidth;if(w<768){d.classList.add('is-mobile')}if(/iPhone|iPad|iPod/.test(navigator.userAgent)){d.classList.add('is-ios')}})()`,
+          }}
+        />
       </head>
       <body
         className={`${dmSans.variable} ${playfair.variable} font-sans antialiased`}
       >
         <Header />
-        <main className="min-h-screen">{children}</main>
+        <main className="min-h-[100dvh]">{children}</main>
         <Footer />
         <WhatsAppFloating />
       </body>

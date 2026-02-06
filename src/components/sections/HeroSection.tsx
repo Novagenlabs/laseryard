@@ -32,7 +32,7 @@ export function HeroSection() {
  */
 function HeroMobile() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[90dvh] flex items-center overflow-hidden">
       {/* Background - simplified, no blur effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-gold/3" />
@@ -155,7 +155,7 @@ function HeroMobile() {
  */
 function HeroDesktop() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-gold/3" />

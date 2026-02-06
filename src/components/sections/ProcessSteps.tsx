@@ -104,33 +104,60 @@ export function ProcessSteps() {
                       isEven ? "lg:text-right lg:pr-16" : "lg:col-start-2 lg:pl-16"
                     }`}
                   >
-                    <motion.div
-                      whileHover={{ x: isEven ? -4 : 4 }}
-                      className="p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-300"
-                    >
-                      {/* Step Number */}
-                      <div
-                        className={`flex items-center gap-4 mb-4 ${
-                          isEven ? "lg:justify-end" : ""
-                        }`}
+                    {isMobile ? (
+                      <div className="p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-300">
+                        {/* Step Number */}
+                        <div
+                          className={`flex items-center gap-4 mb-4 ${
+                            isEven ? "lg:justify-end" : ""
+                          }`}
+                        >
+                          <span className="text-5xl font-bold text-gold/20">
+                            0{step.step}
+                          </span>
+                        </div>
+
+                        {/* Icon - Mobile */}
+                        <div className="lg:hidden w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
+                          <Icon className="w-7 h-7 text-gold" />
+                        </div>
+
+                        <h3 className="text-2xl font-semibold mb-3">
+                          {step.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {step.description}
+                        </p>
+                      </div>
+                    ) : (
+                      <motion.div
+                        whileHover={{ x: isEven ? -4 : 4 }}
+                        className="p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-300"
                       >
-                        <span className="text-5xl font-bold text-gold/20">
-                          0{step.step}
-                        </span>
-                      </div>
+                        {/* Step Number */}
+                        <div
+                          className={`flex items-center gap-4 mb-4 ${
+                            isEven ? "lg:justify-end" : ""
+                          }`}
+                        >
+                          <span className="text-5xl font-bold text-gold/20">
+                            0{step.step}
+                          </span>
+                        </div>
 
-                      {/* Icon - Mobile */}
-                      <div className="lg:hidden w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
-                        <Icon className="w-7 h-7 text-gold" />
-                      </div>
+                        {/* Icon - Mobile */}
+                        <div className="lg:hidden w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
+                          <Icon className="w-7 h-7 text-gold" />
+                        </div>
 
-                      <h3 className="text-2xl font-semibold mb-3">
-                        {step.title}
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {step.description}
-                      </p>
-                    </motion.div>
+                        <h3 className="text-2xl font-semibold mb-3">
+                          {step.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {step.description}
+                        </p>
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Icon Node - Desktop only */}
