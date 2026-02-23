@@ -43,56 +43,88 @@
 
 :root {
   --radius: 0.75rem;
+  --announcement-height: 36px;
 
   /* Core Palette - Light Theme */
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.13 0.02 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.13 0.02 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.13 0.02 260);
+  --background: oklch(0.97 0.005 80);
+  --foreground: oklch(0.13 0.01 260);
+  --card: oklch(0.99 0.002 80);
+  --card-foreground: oklch(0.13 0.01 260);
+  --popover: oklch(0.99 0.002 80);
+  --popover-foreground: oklch(0.13 0.01 260);
 
-  /* Primary - Laser Yard Signature Yellow */
-  --gold: oklch(0.85 0.19 95);
-  --gold-dark: oklch(0.75 0.18 90);
-  --gold-light: oklch(0.92 0.14 98);
+  /* Primary - Laser Yard Signature Gold */
+  --gold: oklch(0.75 0.17 85);
+  --gold-dark: oklch(0.65 0.16 80);
+  --gold-light: oklch(0.82 0.14 90);
   --primary: var(--gold);
-  --primary-foreground: oklch(0.15 0.02 260);
+  --primary-foreground: oklch(0.99 0 0);
 
   /* Secondary */
-  --secondary: oklch(0.97 0.005 260);
-  --secondary-foreground: oklch(0.13 0.02 260);
+  --secondary: oklch(0.93 0.005 80);
+  --secondary-foreground: oklch(0.13 0.01 260);
 
   /* Muted */
-  --muted: oklch(0.96 0.003 260);
-  --muted-foreground: oklch(0.50 0.01 260);
+  --muted: oklch(0.93 0.005 80);
+  --muted-foreground: oklch(0.45 0.01 260);
 
   /* Accent */
-  --accent: oklch(0.97 0.005 260);
-  --accent-foreground: oklch(0.13 0.02 260);
+  --accent: oklch(0.93 0.005 80);
+  --accent-foreground: oklch(0.13 0.01 260);
 
   /* WhatsApp */
   --whatsapp: oklch(0.62 0.17 155);
   --whatsapp-dark: oklch(0.55 0.15 155);
 
   /* Borders & Inputs */
-  --border: oklch(0.13 0.02 260 / 8%);
-  --input: oklch(0.13 0.02 260 / 5%);
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0 0 0 / 5%);
   --ring: var(--gold);
 
   /* Destructive */
   --destructive: oklch(0.55 0.22 25);
+
+  /* Theme-aware shadow color */
+  --shadow-color: oklch(0 0 0 / 8%);
 }
 
-/* Dark section variant */
-.dark-section {
-  --background: oklch(0.12 0.01 240);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.16 0.01 240);
-  --card-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.20 0.01 240);
-  --muted-foreground: oklch(0.65 0 0);
+.dark {
+  /* Core Palette - Dark Theme */
+  --background: oklch(0.11 0.01 240);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.15 0.01 240);
+  --card-foreground: oklch(0.96 0 0);
+  --popover: oklch(0.15 0.01 240);
+  --popover-foreground: oklch(0.96 0 0);
+
+  /* Primary - Brighter gold for dark backgrounds */
+  --gold: oklch(0.87 0.19 95);
+  --gold-dark: oklch(0.77 0.18 90);
+  --gold-light: oklch(0.92 0.14 98);
+  --primary: var(--gold);
+  --primary-foreground: oklch(0.12 0.02 260);
+
+  /* Secondary */
+  --secondary: oklch(0.18 0.005 240);
+  --secondary-foreground: oklch(0.96 0 0);
+
+  /* Muted */
+  --muted: oklch(0.19 0.005 240);
+  --muted-foreground: oklch(0.60 0.01 260);
+
+  /* Accent */
+  --accent: oklch(0.18 0.005 240);
+  --accent-foreground: oklch(0.96 0 0);
+
+  /* Borders & Inputs */
   --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 7%);
+
+  /* Destructive */
+  --destructive: oklch(0.55 0.22 25);
+
+  /* Theme-aware shadow color */
+  --shadow-color: oklch(0 0 0 / 25%);
 }
 
 @layer base {
@@ -128,7 +160,8 @@
   }
 
   ::selection {
-    background: oklch(0.85 0.19 95 / 35%);
+    background: oklch(from var(--gold) l c h / 35%);
+    color: var(--background);
   }
 }
 
@@ -168,14 +201,6 @@
   }
 
   /* ===== iOS SAFARI SAFETY NET ===== */
-  /* Ensure content is always visible on mobile, even if JS animation state is stale */
-  /* The is-mobile class is set by an inline script before React hydrates */
-  .is-mobile [style*="opacity: 0"],
-  .is-mobile [style*="opacity:0"] {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
   /* Force repaint on key containers in iOS Safari after hydration */
   .is-ios section,
   .is-ios .safari-fix-overflow {
@@ -184,10 +209,10 @@
 
   /* Premium Glass Effect */
   .glass {
-    background: oklch(1 0 0 / 70%);
+    background: oklch(from var(--card) l c h / 70%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid oklch(0 0 0 / 8%);
+    border: 1px solid var(--border);
     /* Safari fix */
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
@@ -234,7 +259,7 @@
 
   .btn-apple-primary {
     background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
-    color: var(--foreground);
+    color: oklch(0.12 0.02 260);
     box-shadow:
       0 1px 3px oklch(0 0 0 / 12%),
       0 4px 12px oklch(0.75 0.18 90 / 25%),
@@ -250,18 +275,18 @@
   }
 
   .btn-apple-secondary {
-    background: oklch(1 0 0);
+    background: var(--secondary);
     color: var(--foreground);
     box-shadow:
-      0 0 0 1px oklch(0 0 0 / 8%),
-      0 2px 8px oklch(0 0 0 / 6%);
+      0 0 0 1px var(--border),
+      0 2px 8px var(--shadow-color);
   }
 
   .btn-apple-secondary:hover {
-    background: oklch(0.98 0 0);
+    background: var(--accent);
     box-shadow:
-      0 0 0 1px oklch(0 0 0 / 12%),
-      0 4px 16px oklch(0 0 0 / 10%);
+      0 0 0 1px var(--border),
+      0 4px 16px var(--shadow-color);
     transform: translateY(-1px);
   }
 
@@ -290,22 +315,22 @@
   .card-premium:hover {
     transform: translateY(-4px);
     box-shadow:
-      0 20px 40px oklch(0 0 0 / 10%),
-      0 0 0 1px oklch(0 0 0 / 5%);
+      0 20px 40px oklch(0 0 0 / 30%),
+      0 0 0 1px oklch(1 0 0 / 5%);
   }
 
   /* Glow Effects */
   .glow-gold {
     box-shadow:
-      0 0 20px oklch(0.85 0.19 95 / 30%),
-      0 0 40px oklch(0.85 0.19 95 / 18%);
+      0 0 20px oklch(from var(--gold) l c h / 30%),
+      0 0 40px oklch(from var(--gold) l c h / 18%);
   }
 
   .glow-gold-intense {
     box-shadow:
-      0 0 30px oklch(0.85 0.19 95 / 45%),
-      0 0 60px oklch(0.85 0.19 95 / 28%),
-      0 0 100px oklch(0.85 0.19 95 / 15%);
+      0 0 30px oklch(from var(--gold) l c h / 45%),
+      0 0 60px oklch(from var(--gold) l c h / 28%),
+      0 0 100px oklch(from var(--gold) l c h / 15%);
   }
 
   /* Animated Border */
@@ -321,7 +346,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      oklch(0.85 0.19 95 / 50%),
+      oklch(from var(--gold) l c h / 50%),
       transparent
     );
     transform: translateX(-100%);
@@ -354,9 +379,9 @@
     background: linear-gradient(
       90deg,
       transparent,
-      oklch(0 0 0 / 8%) 20%,
-      oklch(0.85 0.19 95 / 50%) 50%,
-      oklch(0 0 0 / 8%) 80%,
+      var(--border) 20%,
+      oklch(from var(--gold) l c h / 50%) 50%,
+      var(--border) 80%,
       transparent
     );
   }

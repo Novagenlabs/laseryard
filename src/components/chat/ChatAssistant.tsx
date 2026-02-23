@@ -1,0 +1,349 @@
+"use client";
+
+import { useState, useEffect, useRef, type FormEvent } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { MessageCircle, X, Send, Loader2, ExternalLink } from "lucide-react";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { useChat, type ChatMessage } from "@/hooks/useChat";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
+
+function TypingIndicator() {
+  return (
+    <div className="flex items-center gap-1 px-4 py-3">
+      <span
+        className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
+        style={{ animationDelay: "0ms", animationDuration: "0.6s" }}
+      />
+      <span
+        className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
+        style={{ animationDelay: "150ms", animationDuration: "0.6s" }}
+      />
+      <span
+        className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
+        style={{ animationDelay: "300ms", animationDuration: "0.6s" }}
+      />
+    </div>
+  );
+}
+
+function MessageBubble({ message, isStreaming }: { message: ChatMessage; isStreaming: boolean }) {
+  const isUser = message.role === "user";
+
+  return (
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
+      <div
+        className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed ${
+          isUser
+            ? "bg-gray-800 text-white rounded-br-md"
+            : "bg-muted text-foreground rounded-bl-md"
+        }`}
+      >
+        {message.content || (isStreaming && (
+          <span className="inline-block w-2 h-4 bg-muted-foreground animate-pulse rounded-sm" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function ChatAssistant() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const { messages, isLoading, error, sendMessage, clearMessages } = useChat();
+  const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 2-second appearance delay
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Focus input when panel opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage(input);
+    setInput("");
+  };
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}`;
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)]">
+      {/* Chat Panel */}
+      <AnimatePresence>
+        {isOpen && (
+          isMobile ? (
+            <div
+              className="absolute bottom-16 right-0 w-[calc(100vw-1.5rem)] max-w-[400px] flex flex-col bg-card rounded-2xl overflow-hidden transition-all duration-200 ease-out"
+              style={{
+                height: "min(70dvh, 500px)",
+                isolation: "isolate",
+                boxShadow:
+                  "0 0 0 1px var(--border), 0 4px 16px var(--shadow-color), 0 12px 40px var(--shadow-color)",
+              }}
+            >
+              <ChatPanelContent
+                messages={messages}
+                isLoading={isLoading}
+                error={error}
+                input={input}
+                setInput={setInput}
+                handleSubmit={handleSubmit}
+                whatsappUrl={whatsappUrl}
+                onClose={() => setIsOpen(false)}
+                onClear={clearMessages}
+                messagesEndRef={messagesEndRef}
+                inputRef={inputRef}
+              />
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute bottom-16 right-0 w-96 h-[500px] flex flex-col bg-card rounded-2xl overflow-hidden"
+              style={{
+                isolation: "isolate",
+                boxShadow:
+                  "0 0 0 1px var(--border), 0 4px 16px var(--shadow-color), 0 12px 40px var(--shadow-color)",
+              }}
+            >
+              <ChatPanelContent
+                messages={messages}
+                isLoading={isLoading}
+                error={error}
+                input={input}
+                setInput={setInput}
+                handleSubmit={handleSubmit}
+                whatsappUrl={whatsappUrl}
+                onClose={() => setIsOpen(false)}
+                onClear={clearMessages}
+                messagesEndRef={messagesEndRef}
+                inputRef={inputRef}
+              />
+            </motion.div>
+          )
+        )}
+      </AnimatePresence>
+
+      {/* Floating Button */}
+      {isMobile ? (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+          style={{
+            background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%)",
+            boxShadow:
+              "0 2px 8px oklch(from var(--gold) l c h / 30%), 0 8px 24px oklch(from var(--gold) l c h / 25%), inset 0 1px 0 oklch(1 0 0 / 20%)",
+            transform: isOpen ? "scale(0.95)" : "scale(1)",
+          }}
+          aria-label={isOpen ? "Close chat" : "Open chat assistant"}
+          aria-expanded={isOpen}
+        >
+          <div
+            className="transition-transform duration-200"
+            style={{ transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+          >
+            {isOpen ? (
+              <X className="w-6 h-6 text-white" aria-hidden="true" />
+            ) : (
+              <MessageCircle className="w-6 h-6 text-white" aria-hidden="true" />
+            )}
+          </div>
+        </button>
+      ) : (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-14 h-14 rounded-full flex items-center justify-center transition-shadow duration-300 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+          style={{
+            background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%)",
+            boxShadow:
+              "0 2px 8px oklch(from var(--gold) l c h / 30%), 0 8px 24px oklch(from var(--gold) l c h / 25%), inset 0 1px 0 oklch(1 0 0 / 20%)",
+          }}
+          aria-label={isOpen ? "Close chat" : "Open chat assistant"}
+          aria-expanded={isOpen}
+        >
+          <motion.div
+            animate={{ rotate: isOpen ? 90 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {isOpen ? (
+              <X className="w-6 h-6 text-white" aria-hidden="true" />
+            ) : (
+              <MessageCircle className="w-6 h-6 text-white" aria-hidden="true" />
+            )}
+          </motion.div>
+        </motion.button>
+      )}
+    </div>
+  );
+}
+
+function ChatPanelContent({
+  messages,
+  isLoading,
+  error,
+  input,
+  setInput,
+  handleSubmit,
+  whatsappUrl,
+  onClose,
+  onClear,
+  messagesEndRef,
+  inputRef,
+}: {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  error: string | null;
+  input: string;
+  setInput: (v: string) => void;
+  handleSubmit: (e: FormEvent) => void;
+  whatsappUrl: string;
+  onClose: () => void;
+  onClear: () => void;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+}) {
+  return (
+    <>
+      {/* Header */}
+      <div
+        className="px-4 py-3 flex items-center justify-between shrink-0"
+        style={{
+          background: "linear-gradient(135deg, #D4A853 0%, #B8922E 100%)",
+        }}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+            <MessageCircle className="w-4 h-4 text-white" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-white text-[14px] leading-tight">
+              Laser Yard
+            </p>
+            <p className="text-[12px] text-white/80 leading-tight">
+              AI Assistant
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 transition-colors text-white text-[11px] font-medium"
+            title="Talk to a human on WhatsApp"
+          >
+            <ExternalLink className="w-3 h-3" aria-hidden="true" />
+            <span>Human</span>
+          </a>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-white"
+            aria-label="Close chat"
+          >
+            <X className="w-4 h-4 text-white" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain p-4 scrollbar-hide"
+      >
+        {messages.map((message, i) => (
+          <MessageBubble
+            key={message.id}
+            message={message}
+            isStreaming={
+              isLoading &&
+              message.role === "assistant" &&
+              i === messages.length - 1
+            }
+          />
+        ))}
+
+        {isLoading &&
+          messages[messages.length - 1]?.content === "" &&
+          messages[messages.length - 1]?.role === "assistant" && (
+            <TypingIndicator />
+          )}
+
+        {error && (
+          <div className="mb-3 px-4 py-3 bg-red-500/10 rounded-xl text-[13px] text-red-400">
+            <p>{error}</p>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 mt-1.5 text-red-700 font-medium hover:underline"
+            >
+              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+              Chat on WhatsApp instead
+            </a>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <form
+        onSubmit={handleSubmit}
+        className="shrink-0 p-3 border-t border-border flex items-center gap-2"
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask about our services..."
+          disabled={isLoading}
+          className="flex-1 min-w-0 px-4 py-2.5 bg-muted rounded-full text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-amber-500/30 disabled:opacity-50 transition-all"
+        />
+        <button
+          type="submit"
+          disabled={isLoading || !input.trim()}
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30 shrink-0"
+          style={{
+            background:
+              !isLoading && input.trim()
+                ? "linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%)"
+                : undefined,
+          }}
+          aria-label="Send message"
+        >
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" aria-hidden="true" />
+          ) : (
+            <Send className="w-5 h-5 text-white" aria-hidden="true" />
+          )}
+        </button>
+      </form>
+    </>
+  );
+}

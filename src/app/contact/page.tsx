@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { DesktopBlur } from "@/components/ui/DesktopBlur";
-import { MessageCircle, Mail, Phone, Clock, MapPin } from "lucide-react";
+import { MessageCircle, Mail, Clock, MapPin } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ const contactMethods = [
     icon: MessageCircle,
     title: "WhatsApp",
     subtitle: "Fastest response",
-    value: "+234 801 234 5678",
+    value: "Talk to us on WhatsApp",
     href: `https://wa.me/${WHATSAPP_NUMBER}`,
     primary: true,
   },
@@ -26,13 +26,6 @@ const contactMethods = [
     subtitle: "For detailed inquiries",
     value: "hello@laseryard.com",
     href: "mailto:hello@laseryard.com",
-  },
-  {
-    icon: Phone,
-    title: "Phone",
-    subtitle: "Business hours",
-    value: "+234 801 234 5678",
-    href: "tel:+2348012345678",
   },
 ];
 
@@ -64,13 +57,11 @@ export default function ContactPage() {
               Get In Touch
             </p>
             <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              Let's Start a{" "}
-              <span className="text-gradient-gold">Conversation</span>
+              <span className="text-gradient-gold">Talk</span> to Us
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Have questions about our laser engraving services? Ready to start
-              a project? We're here to help and typically respond within an hour
-              during business hours.
+              Questions about a project? Send us a message.
+              We reply within an hour during business hours.
             </p>
           </ScrollReveal>
         </div>
@@ -79,7 +70,7 @@ export default function ContactPage() {
       {/* Contact Methods */}
       <section className="pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {contactMethods.map((method, index) => (
               <ScrollReveal key={method.title} delay={index * 0.1}>
                 <a

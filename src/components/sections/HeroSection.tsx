@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Zap, Award, Clock } from "lucide-react";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
@@ -8,364 +9,299 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import Link from "next/link";
 
 const trustPoints = [
-  { icon: Zap, text: "Precision Equipment" },
-  { icon: Award, text: "Premium Quality" },
-  { icon: Clock, text: "Fast Turnaround" },
+  { icon: Zap, text: "Industrial-Grade Lasers" },
+  { icon: Award, text: "500+ Clients" },
+  { icon: Clock, text: "5-7 Day Turnaround" },
 ];
+
+/** Noise texture SVG for cinematic film grain effect */
+const noiseOverlay = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 export function HeroSection() {
   const isMobile = useIsMobile();
 
-  // Mobile: Completely static HTML - NO motion components at all
-  // This fixes Safari WebKit bugs with overflow + border-radius + transform
   if (isMobile) {
     return <HeroMobile />;
   }
 
-  // Desktop: Full animations with motion components
   return <HeroDesktop />;
 }
 
 /**
- * Mobile Hero - Pure HTML/CSS, zero motion components
- * Fixes Safari blank screen issues caused by transform + overflow + border-radius bug
+ * Mobile Hero - Centered layout with background image.
+ * Lightweight entrance animations only. No infinite animations.
  */
 function HeroMobile() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => { requestAnimationFrame(() => setReady(true)); }, []);
+
+  const fadeSlide = (delay: number) => ({
+    animate: ready ? { opacity: 1, y: 0 } as const : { opacity: 0, y: 15 } as const,
+    transition: { duration: 0.4, delay, ease: "easeOut" as const },
+  });
+
   return (
     <section className="relative min-h-[90dvh] flex items-center overflow-hidden">
-      {/* Background - simplified, no blur effects */}
+      {/* Background Image */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-gold/3" />
+        <img
+          src="/images/hero-bg.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40" />
+        {/* Gold radial glow */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 50%, oklch(from var(--gold) l c h / 8%) 0%, transparent 70%)",
+          }}
+        />
+        {/* Film grain */}
+        <div
+          className="absolute inset-0 opacity-[0.035] pointer-events-none mix-blend-overlay"
+          style={{ backgroundImage: noiseOverlay }}
+        />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 pt-24 pb-16">
-        <div className="grid lg:grid-cols-2 gap-10 items-center">
-          {/* Content */}
-          <div className="order-2 lg:order-1">
-            {/* Pre-headline */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/30 mb-6">
-              <span className="w-2 h-2 rounded-full bg-gold" />
-              <span className="text-sm font-medium text-gold uppercase tracking-wider">
-                Precision Laser Engraving
-              </span>
+      {/* Gradient fallback */}
+      <div
+        className="absolute inset-0 -z-10 bg-background"
+      />
+
+      <div className="relative mx-auto max-w-3xl px-4 sm:px-6 pt-28 pb-16 text-center">
+        {/* Pre-headline badge */}
+        <motion.div
+          {...fadeSlide(0)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/30 mb-6"
+        >
+          <span className="w-2 h-2 rounded-full bg-gold" />
+          <span className="text-sm font-medium text-gold uppercase tracking-wider">
+            Laser Engraving Studio
+          </span>
+        </motion.div>
+
+        {/* Headline */}
+        <motion.h1
+          {...fadeSlide(0.1)}
+          className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-balance"
+        >
+          Your Vision,{" "}
+          <span className="text-gradient-gold">Laser Engraved</span>
+        </motion.h1>
+
+        {/* Decorative gold line */}
+        <motion.div
+          {...fadeSlide(0.12)}
+          className="mx-auto mt-5 mb-5 h-px w-16"
+          style={{
+            background: "linear-gradient(90deg, transparent, var(--gold), transparent)",
+          }}
+        />
+
+        {/* Subtitle */}
+        <motion.p
+          {...fadeSlide(0.15)}
+          className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+        >
+          Based in Lagos. Serving all of West Africa. We sell ready-made
+          engraved products and custom-engrave items you bring us.
+        </motion.p>
+
+        {/* Trust Points */}
+        <motion.div
+          {...fadeSlide(0.2)}
+          className="mt-6 flex flex-wrap justify-center gap-4"
+        >
+          {trustPoints.map((point, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 text-sm text-muted-foreground"
+            >
+              <point.icon className="w-4 h-4 text-gold" aria-hidden="true" />
+              <span>{point.text}</span>
             </div>
+          ))}
+        </motion.div>
 
-            {/* Main Headline */}
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-balance">
-              Where Ideas Get{" "}
-              <span className="text-gradient-gold">Etched in Metal</span>
-            </h1>
-
-            {/* Subheadline */}
-            <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed">
-              West Africa&apos;s premier laser engraving studio. From business cards
-              to custom signage, we bring your vision to life with micron-level
-              precision.
-            </p>
-
-            {/* Trust Points */}
-            <div className="mt-6 flex flex-wrap gap-4">
-              {trustPoints.map((point, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                  <point.icon className="w-4 h-4 text-gold" aria-hidden="true" />
-                  <span>{point.text}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* CTAs */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <WhatsAppCTA
-                buttonText="Start Your Project"
-                size="lg"
-                message="Hi! I'm interested in laser engraving services. Can we discuss my project?"
-                trackingLabel="hero"
-              />
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="group border-border hover:border-gold hover:bg-gold/5 px-8"
-              >
-                <Link href="/products/metal-business-cards">
-                  View Our Work
-                  <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Hero Visual - Static, no animations or transforms */}
-          <div className="order-1 lg:order-2 relative">
-            <div className="relative w-full max-w-sm mx-auto">
-              {/* Laser Machine - using isolation to fix Safari bug */}
-              <div className="relative w-full aspect-square">
-                <div className="absolute inset-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 shadow-xl safari-fix-overflow">
-                  <div className="absolute inset-3 rounded-lg bg-slate-800">
-                    {/* Grid Lines */}
-                    <div
-                      className="absolute inset-0 opacity-20"
-                      style={{
-                        backgroundImage: `linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
-                                        linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-                        backgroundSize: "20px 20px",
-                      }}
-                    />
-
-                    {/* Static Metal Card */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-14 rounded-lg bg-gradient-to-br from-slate-300 to-slate-400 shadow-lg">
-                      <div className="absolute inset-2 flex flex-col justify-between">
-                        <div className="w-10 h-1 bg-slate-500/50 rounded" />
-                        <div className="w-6 h-0.5 bg-slate-500/30 rounded" />
-                      </div>
-                    </div>
-
-                    {/* Static Laser Beam */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                      <div className="relative">
-                        <div className="w-2 h-2 bg-red-500 rounded-full opacity-80" />
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0.5 h-12 bg-gradient-to-t from-red-500 to-transparent" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Machine Header */}
-                  <div className="absolute top-0 left-0 right-0 h-6 bg-slate-300 border-b border-slate-400 flex items-center px-2 gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                    <div className="text-[6px] font-mono text-slate-600 ml-1">
-                      LASER YARD PRO
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* CTAs */}
+        <motion.div
+          {...fadeSlide(0.25)}
+          className="mt-8 flex flex-col sm:flex-row justify-center gap-4"
+        >
+          <WhatsAppCTA
+            buttonText="Get a Quote"
+            size="lg"
+            message="Hi! I'm interested in laser engraving services. Can we discuss my project?"
+            trackingLabel="hero"
+          />
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="group border-border hover:border-gold hover:bg-gold/5 px-8"
+          >
+            <Link href="/shop">
+              Browse Products
+              <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+            </Link>
+          </Button>
+        </motion.div>
       </div>
     </section>
   );
 }
 
 /**
- * Desktop Hero - Full animations with Framer Motion
+ * Desktop Hero - Full-bleed background image with centered text overlay.
+ * Cinematic slow zoom on background, film grain texture.
  */
 function HeroDesktop() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => { requestAnimationFrame(() => setReady(true)); }, []);
+
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-gold/3" />
-        <div
-          className="absolute inset-0 opacity-[0.03]"
+      {/* Background Image with slow zoom */}
+      <motion.div
+        initial={{ scale: 1 }}
+        animate={{ scale: 1.05 }}
+        transition={{ duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+        className="absolute inset-0"
+      >
+        <img
+          src="/images/hero-bg.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </motion.div>
+
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
+
+      {/* Gold radial glow */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 40%, oklch(from var(--gold) l c h / 10%) 0%, transparent 60%)",
+        }}
+      />
+
+      {/* Film grain texture */}
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
+        style={{ backgroundImage: noiseOverlay }}
+      />
+
+      {/* Gradient fallback */}
+      <div
+        className="absolute inset-0 -z-10 bg-background"
+      />
+
+      <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-40 pb-20 text-center">
+        {/* Pre-headline badge */}
+        <motion.div
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/30 backdrop-blur-sm mb-8"
+        >
+          <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+          <span className="text-sm font-medium text-gold uppercase tracking-wider">
+            Laser Engraving Studio
+          </span>
+        </motion.div>
+
+        {/* Headline */}
+        <motion.h1
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="font-[family-name:var(--font-playfair)] text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.08] text-balance"
+        >
+          Your Vision,{" "}
+          <span className="text-gradient-gold">Laser Engraved</span>
+        </motion.h1>
+
+        {/* Decorative gold line */}
+        <motion.div
+          animate={ready ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
+          className="mx-auto mt-6 mb-6 h-px w-24"
           style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
+            background: "linear-gradient(90deg, transparent, var(--gold), transparent)",
           }}
         />
-      </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-32 pb-20">
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
-          {/* Content */}
-          <div className="order-2 lg:order-1">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/30 mb-6"
+        {/* Subtitle */}
+        <motion.p
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+        >
+          Based in Lagos. Serving all of West Africa. We sell ready-made
+          engraved products and custom-engrave items you bring us.
+        </motion.p>
+
+        {/* Trust Points */}
+        <motion.div
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-8 flex flex-wrap justify-center gap-6"
+        >
+          {trustPoints.map((point, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 text-sm text-muted-foreground"
             >
-              <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-              <span className="text-sm font-medium text-gold uppercase tracking-wider">
-                Precision Laser Engraving
-              </span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-[family-name:var(--font-playfair)] text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] text-balance"
-            >
-              Where Ideas Get{" "}
-              <span className="text-gradient-gold">Etched in Metal</span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-6 text-lg lg:text-xl text-muted-foreground max-w-xl leading-relaxed"
-            >
-              West Africa&apos;s premier laser engraving studio. From business cards
-              to custom signage, we bring your vision to life with micron-level
-              precision.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-8 flex flex-wrap gap-6"
-            >
-              {trustPoints.map((point, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                  <point.icon className="w-4 h-4 text-gold" aria-hidden="true" />
-                  <span>{point.text}</span>
-                </div>
-              ))}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-10 flex flex-col sm:flex-row gap-4"
-            >
-              <WhatsAppCTA
-                buttonText="Start Your Project"
-                size="lg"
-                message="Hi! I'm interested in laser engraving services. Can we discuss my project?"
-                trackingLabel="hero"
-              />
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="group border-border hover:border-gold hover:bg-gold/5 px-8"
-              >
-                <Link href="/products/metal-business-cards">
-                  View Our Work
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-                </Link>
-              </Button>
-            </motion.div>
-          </div>
-
-          {/* Hero Visual - Animated */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="order-1 lg:order-2 relative"
-          >
-            <div className="relative w-full max-w-md mx-auto">
-              <div className="absolute inset-0 bg-gold/10 rounded-3xl blur-[80px]" />
-
-              <div className="relative w-full aspect-square">
-                <div className="absolute inset-8 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 shadow-xl safari-fix-overflow">
-                  <div className="absolute inset-4 rounded-lg bg-slate-800">
-                    <div
-                      className="absolute inset-0 opacity-20"
-                      style={{
-                        backgroundImage: `linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
-                                        linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-                        backgroundSize: "20px 20px",
-                      }}
-                    />
-
-                    {/* Animated Metal Card */}
-                    <motion.div
-                      animate={{ scale: [1, 1.02, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-20 rounded-lg bg-gradient-to-br from-slate-300 to-slate-400 shadow-lg"
-                      style={{
-                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.3)",
-                      }}
-                    >
-                      <div className="absolute inset-2 flex flex-col justify-between">
-                        <div className="w-12 h-1.5 bg-slate-500/50 rounded" />
-                        <div className="w-8 h-1 bg-slate-500/30 rounded" />
-                      </div>
-                    </motion.div>
-
-                    {/* Animated Laser Beam */}
-                    <motion.div
-                      animate={{ x: [-30, 30, -30], opacity: [0.8, 1, 0.8] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <div className="relative">
-                        <div className="w-3 h-3 bg-red-500 rounded-full blur-sm" />
-                        <div className="absolute inset-0 w-3 h-3 bg-red-400 rounded-full animate-ping" />
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0.5 h-16 bg-gradient-to-t from-red-500 to-transparent" />
-                      </div>
-                    </motion.div>
-                  </div>
-
-                  <div className="absolute top-0 left-0 right-0 h-8 bg-slate-300 border-b border-slate-400 flex items-center px-3 gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                    <div className="text-[8px] font-mono text-slate-600 ml-2">
-                      LASER YARD PRO
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sparks */}
-                <motion.div
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                >
-                  {[...Array(6)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{
-                        x: [0, (i % 2 === 0 ? 1 : -1) * 20],
-                        y: [0, (i % 3 === 0 ? 1 : -1) * 20],
-                        opacity: [1, 0],
-                      }}
-                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.1 }}
-                      className="absolute w-1 h-1 bg-gold rounded-full"
-                    />
-                  ))}
-                </motion.div>
-              </div>
-
-              {/* Floating Labels */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 }}
-                className="absolute -left-4 top-1/4 bg-white rounded-lg shadow-lg px-4 py-2 border border-slate-200"
-              >
-                <p className="text-xs font-semibold text-slate-800">0.01mm Precision</p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1 }}
-                className="absolute -right-4 bottom-1/3 bg-white rounded-lg shadow-lg px-4 py-2 border border-slate-200"
-              >
-                <p className="text-xs font-semibold text-slate-800">Industrial Grade</p>
-              </motion.div>
+              <point.icon className="w-4 h-4 text-gold" aria-hidden="true" />
+              <span>{point.text}</span>
             </div>
-          </motion.div>
-        </div>
+          ))}
+        </motion.div>
+
+        {/* CTAs */}
+        <motion.div
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-10 flex flex-col sm:flex-row justify-center gap-4"
+        >
+          <WhatsAppCTA
+            buttonText="Get a Quote"
+            size="lg"
+            message="Hi! I'm interested in laser engraving services. Can we discuss my project?"
+            trackingLabel="hero"
+          />
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="group border-border hover:border-gold hover:bg-gold/5 px-8"
+          >
+            <Link href="/shop">
+              Browse Products
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+            </Link>
+          </Button>
+        </motion.div>
       </div>
 
       {/* Scroll Indicator */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        animate={ready ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ delay: 1.2 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
+        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50">
+          Scroll
+        </span>
         <motion.div
-          animate={{ y: [0, 8, 0] }}
+          animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-2"
+          className="w-5 h-8 rounded-full border border-muted-foreground/20 flex items-start justify-center pt-1.5"
         >
-          <div className="w-1 h-2 rounded-full bg-gold" />
+          <div className="w-0.5 h-1.5 rounded-full bg-gold" />
         </motion.div>
       </motion.div>
     </section>

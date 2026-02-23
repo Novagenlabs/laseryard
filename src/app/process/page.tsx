@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = {
   title: "Our Process",
   description:
-    "Learn how Laser Yard brings your vision to life - from design submission to delivery. Simple 4-step process for all laser engraving projects.",
+    "How Laser Yard works - from design submission to delivery. Four steps for all laser engraving projects.",
 };
 
 const steps = [

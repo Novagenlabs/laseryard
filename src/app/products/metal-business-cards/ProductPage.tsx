@@ -73,7 +73,7 @@ export function ProductPage() {
 
   return (
     <>
-      <section className="pt-32 pb-16">
+      <section className="pt-40 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
@@ -226,8 +226,8 @@ export function ProductPage() {
                     Premium Metal Business Cards
                   </h1>
                   <p className="text-muted-foreground text-lg">
-                    Laser-engraved aluminum cards that command attention and make
-                    lasting impressions.
+                    Laser-engraved aluminum cards. Heavy, cold to the touch,
+                    and impossible to throw away.
                   </p>
                 </div>
 
@@ -289,7 +289,7 @@ export function ProductPage() {
                   </div>
                   <div className="pt-4 border-t border-border">
                     <p className="text-sm text-muted-foreground">
-                      Pricing depends on design complexity, quantity, and customization options. Get in touch for a personalized quote.
+                      Pricing depends on design complexity, quantity, and finish. Message us for a quote.
                     </p>
                   </div>
                 </div>

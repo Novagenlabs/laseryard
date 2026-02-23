@@ -14,8 +14,9 @@ interface ScrollRevealProps {
 }
 
 /**
- * Scroll reveal animation - DISABLED on mobile for performance.
- * Mobile gets instant static content, desktop gets smooth animations.
+ * Scroll reveal animation.
+ * Mobile: lightweight opacity + gentle slide (respects iOS Safari GPU limits).
+ * Desktop: full directional animations.
  */
 export function ScrollReveal({
   children,
@@ -28,14 +29,31 @@ export function ScrollReveal({
   const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
-  const isInView = useInView(ref, { once, margin: "-50px 0px" });
+  const isInView = useInView(ref, {
+    once,
+    margin: isMobile ? "-20% 0px" : "-50px 0px",
+  });
 
-  // Mobile: No animations at all - just render children
-  if (isMobile || shouldReduceMotion) {
+  if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
   }
 
-  // Desktop: Full animations
+  // Mobile: lightweight fade + gentle slide-up
+  if (isMobile) {
+    return (
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 15 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+        transition={{ duration: 0.4, delay, ease: "easeOut" }}
+        className={className}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
+  // Desktop: full animations
   const getOffset = () => {
     if (direction === "none") return {};
     return { y: direction === "down" ? -20 : 20 };
@@ -62,7 +80,8 @@ interface StaggerContainerProps {
 }
 
 /**
- * Stagger container - DISABLED on mobile for performance.
+ * Stagger container.
+ * Mobile: enabled with safe IntersectionObserver margin.
  */
 export function StaggerContainer({
   children,
@@ -73,10 +92,12 @@ export function StaggerContainer({
   const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
-  const isInView = useInView(ref, { once, margin: "-30px 0px" });
+  const isInView = useInView(ref, {
+    once,
+    margin: isMobile ? "-20% 0px" : "-30px 0px",
+  });
 
-  // Mobile: No animations
-  if (isMobile || shouldReduceMotion) {
+  if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
   }
 
@@ -101,7 +122,8 @@ export function StaggerContainer({
 }
 
 /**
- * Stagger item - DISABLED on mobile for performance.
+ * Stagger item.
+ * Mobile: lighter fade + slide (y:10, 0.3s). Desktop: full (y:15, 0.4s).
  */
 export function StaggerItem({
   children,
@@ -113,20 +135,19 @@ export function StaggerItem({
   const shouldReduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
 
-  // Mobile: No animations
-  if (isMobile || shouldReduceMotion) {
+  if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
   }
 
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 15 },
+        hidden: { opacity: 0, y: isMobile ? 10 : 15 },
         visible: {
           opacity: 1,
           y: 0,
           transition: {
-            duration: 0.4,
+            duration: isMobile ? 0.3 : 0.4,
             ease: "easeOut",
           },
         },

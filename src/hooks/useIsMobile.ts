@@ -3,42 +3,34 @@
 import { useState, useEffect } from "react";
 
 export function useIsMobile(breakpoint: number = 768) {
-  const [isMobile, setIsMobile] = useState(() => {
-    // Read from early detection script (runs before React hydrates)
-    if (typeof document !== "undefined") {
-      return document.documentElement.classList.contains("is-mobile");
-    }
-    return false;
-  });
+  // Always start false to match SSR — avoids hydration mismatch.
+  // The inline script in layout.tsx sets the `is-mobile` CSS class for
+  // immediate styling, but React state must match server on first render.
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Verify/correct after mount (handles edge cases like resize before load)
-    const checkMobile = window.innerWidth < breakpoint;
-    if (checkMobile !== isMobile) {
-      setIsMobile(checkMobile);
-    }
-  }, [breakpoint]);
-
-  return isMobile;
-}
-
-export function useIsMobileWithResize(breakpoint: number = 768) {
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof document !== "undefined") {
-      return document.documentElement.classList.contains("is-mobile");
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < breakpoint);
+    const check = () => {
+      const mobile = window.innerWidth < breakpoint;
+      setIsMobile(mobile);
+      document.documentElement.classList.toggle("is-mobile", mobile);
     };
 
-    checkMobile();
+    check();
 
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    let timer: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(check, 150);
+    };
+
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
   }, [breakpoint]);
 
   return isMobile;

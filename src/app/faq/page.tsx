@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Frequently asked questions about Laser Yard's laser engraving services - ordering, customization, delivery, payment, and more.",
+    "Frequently asked questions about Laser Yard's laser engraving services - ordering, customization, delivery, and payment.",
 };
 
 const faqCategories = [
@@ -138,8 +138,7 @@ export default function FAQPage() {
               <span className="text-gradient-gold">Questions</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Everything you need to know about working with Laser Yard on your
-              laser engraving projects.
+              Common questions about ordering, materials, pricing, and delivery.
             </p>
           </ScrollReveal>
         </div>

@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { TESTIMONIALS } from "@/lib/constants";
+import { TESTIMONIALS, TESTIMONIAL_STATS } from "@/lib/constants";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { StarRating } from "@/components/ui/StarRating";
 
 export function TestimonialsSlider() {
   const [current, setCurrent] = useState(0);
@@ -63,6 +64,12 @@ export function TestimonialsSlider() {
           <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
             What Our <span className="text-gradient-gold">Clients</span> Say
           </h2>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <StarRating rating={TESTIMONIAL_STATS.averageRating} size="md" />
+            <span className="text-muted-foreground text-sm">
+              {TESTIMONIAL_STATS.averageRating}/5 from {TESTIMONIAL_STATS.totalClients}+ clients
+            </span>
+          </div>
         </ScrollReveal>
 
         {/* Slider */}
@@ -90,8 +97,12 @@ export function TestimonialsSlider() {
             <div className="relative min-h-[350px] flex items-center justify-center px-8 sm:px-12">
               <div className="w-full p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-card border border-border text-center safari-fix-overflow">
                 {/* Quote Icon */}
-                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-6 sm:mb-8 rounded-xl sm:rounded-2xl bg-gold/10 flex items-center justify-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-xl sm:rounded-2xl bg-gold/10 flex items-center justify-center">
                   <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-gold" aria-hidden="true" />
+                </div>
+
+                <div className="mb-4 sm:mb-6 flex justify-center">
+                  <StarRating rating={TESTIMONIALS[current].rating} size="sm" />
                 </div>
 
                 {/* Quote */}
@@ -132,8 +143,12 @@ export function TestimonialsSlider() {
                 >
                   <div className="p-8 lg:p-12 rounded-3xl bg-card border border-border text-center">
                     {/* Quote Icon */}
-                    <div className="w-16 h-16 mx-auto mb-8 rounded-2xl bg-gold/10 flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gold/10 flex items-center justify-center">
                       <Quote className="w-8 h-8 text-gold" aria-hidden="true" />
+                    </div>
+
+                    <div className="mb-6 flex justify-center">
+                      <StarRating rating={TESTIMONIALS[current].rating} size="md" />
                     </div>
 
                     {/* Quote */}

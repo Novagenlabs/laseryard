@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/sections/HeroSection";
+import { TwoPathSection } from "@/components/sections/TwoPathSection";
 import { ProductShowcase } from "@/components/sections/ProductShowcase";
-import { FeaturesGrid } from "@/components/sections/FeaturesGrid";
+import { CustomEngravingSection } from "@/components/sections/CustomEngravingSection";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { TestimonialsSlider } from "@/components/sections/TestimonialsSlider";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
@@ -10,9 +11,9 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      {/* TrustSignals removed for mobile testing */}
+      <TwoPathSection />
       <ProductShowcase />
-      <FeaturesGrid />
+      <CustomEngravingSection />
       <ProcessSteps />
       <TestimonialsSlider />
       <FAQAccordion />

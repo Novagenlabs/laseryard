@@ -29,13 +29,13 @@ export function FAQAccordion() {
               <span className="text-gradient-gold">We've Got Answers</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8">
-              Everything you need to know about our metal business cards. Can't
-              find what you're looking for? Chat with us.
+              Common questions about pricing, materials, and turnaround.
+              Can&apos;t find yours? Chat with us.
             </p>
 
             <WhatsAppCTA
               buttonText="Ask a Question"
-              message="Hi! I have a question about your metal business cards..."
+              message="Hi! I have a question about your laser engraving services..."
               trackingLabel="faq"
             />
           </ScrollReveal>

@@ -6,10 +6,14 @@ import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, MessageCircle } from "lucide-react";
 import { NAV_LINKS, WHATSAPP_NUMBER, WHATSAPP_MESSAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => { requestAnimationFrame(() => setReady(true)); }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,33 +34,38 @@ export function Header() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-colors transition-shadow duration-500 ease-smooth",
+          "fixed left-0 right-0 z-50 transition-colors transition-shadow duration-500 ease-smooth",
           isScrolled
             ? "bg-background/80 backdrop-blur-xl border-b border-border"
             : "bg-transparent"
         )}
+        style={{ top: 'var(--announcement-height, 0px)' }}
       >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="relative z-10 flex items-center">
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                animate={ready ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
                 transition={{ duration: 0.5 }}
               >
                 <img
-                  src="/images/lazer_logo.svg"
+                  src="/images/laseryard_logos/logo_light.png"
                   alt="Laser Yard"
-                  className="h-16 w-auto"
+                  className="h-16 w-auto dark:hidden"
+                />
+                <img
+                  src="/images/laseryard_logos/logo_dark.png"
+                  alt=""
+                  aria-hidden="true"
+                  className="h-16 w-auto hidden dark:block"
                 />
               </motion.div>
             </Link>
 
             {/* Desktop Navigation */}
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               className="hidden lg:flex items-center gap-1"
             >
@@ -74,11 +83,11 @@ export function Header() {
 
             {/* CTA Button */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              animate={ready ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="hidden lg:flex items-center gap-4"
+              className="hidden lg:flex items-center gap-3"
             >
+              <ThemeToggle />
               <button
                 onClick={handleWhatsAppClick}
                 className="btn-apple btn-apple-whatsapp !py-2.5 !px-5"
@@ -157,7 +166,12 @@ export function Header() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
+                  className="space-y-4"
                 >
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm text-muted-foreground">Theme</span>
+                    <ThemeToggle />
+                  </div>
                   <button
                     onClick={handleWhatsAppClick}
                     className="btn-apple btn-apple-whatsapp w-full !py-4 !text-lg"

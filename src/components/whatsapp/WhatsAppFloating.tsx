@@ -32,7 +32,7 @@ export function WhatsAppFloating() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute bottom-20 right-0 w-80 max-w-[calc(100vw-3rem)] bg-white rounded-2xl overflow-hidden overscroll-contain"
+            className="absolute bottom-20 right-0 w-80 max-w-[calc(100vw-3rem)] bg-card rounded-2xl overflow-hidden overscroll-contain"
             style={{
               boxShadow: `
                 0 0 0 1px rgba(0, 0, 0, 0.04),
@@ -72,11 +72,11 @@ export function WhatsAppFloating() {
 
             {/* Content */}
             <div className="p-5">
-              <div className="bg-gray-50 rounded-xl p-4 mb-5">
-                <p className="text-[15px] text-gray-800 leading-relaxed">
+              <div className="bg-muted rounded-xl p-4 mb-5">
+                <p className="text-[15px] text-foreground leading-relaxed">
                   Hi there! Interested in laser engraving services?
                 </p>
-                <p className="text-[15px] text-gray-800 leading-relaxed mt-2">
+                <p className="text-[15px] text-foreground leading-relaxed mt-2">
                   Click below to chat with us on WhatsApp.
                 </p>
               </div>

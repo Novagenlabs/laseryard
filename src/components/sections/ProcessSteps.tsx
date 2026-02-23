@@ -9,11 +9,9 @@ import {
   StaggerItem,
 } from "@/components/animations/ScrollReveal";
 import { PROCESS_STEPS } from "@/lib/constants";
-import { useIsMobile } from "@/hooks/useIsMobile";
 
 const icons = [Upload, FileCheck, Zap, Package];
 
-// Separate component for icon nodes - uses useInView for better scroll performance
 function IconNode({ Icon, index }: { Icon: typeof Upload; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px 0px" });
@@ -42,18 +40,16 @@ function IconNode({ Icon, index }: { Icon: typeof Upload; index: number }) {
 
 export function ProcessSteps() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // Motion values don't cause re-renders - GPU accelerated
   const lineHeight = useTransform(scrollYProgress, [0.1, 0.7], ["0%", "100%"]);
 
   return (
-    <section ref={containerRef} className="py-24 relative overflow-hidden">
+    <section ref={containerRef} className="relative py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-card/30 via-background to-card/30" />
 
@@ -67,8 +63,7 @@ export function ProcessSteps() {
             From Design to <span className="text-gradient-gold">Delivery</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Getting your premium metal business cards is straightforward. Here's
-            how it works.
+            Four steps. No runaround.
           </p>
         </ScrollReveal>
 
@@ -104,66 +99,34 @@ export function ProcessSteps() {
                       isEven ? "lg:text-right lg:pr-16" : "lg:col-start-2 lg:pl-16"
                     }`}
                   >
-                    {isMobile ? (
-                      <div className="p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-300">
-                        {/* Step Number */}
-                        <div
-                          className={`flex items-center gap-4 mb-4 ${
-                            isEven ? "lg:justify-end" : ""
-                          }`}
-                        >
-                          <span className="text-5xl font-bold text-gold/20">
-                            0{step.step}
-                          </span>
-                        </div>
-
-                        {/* Icon - Mobile */}
-                        <div className="lg:hidden w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
-                          <Icon className="w-7 h-7 text-gold" />
-                        </div>
-
-                        <h3 className="text-2xl font-semibold mb-3">
-                          {step.title}
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {step.description}
-                        </p>
-                      </div>
-                    ) : (
-                      <motion.div
-                        whileHover={{ x: isEven ? -4 : 4 }}
-                        className="p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-300"
+                    <div className="p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-[border-color] duration-300">
+                      {/* Step Number */}
+                      <div
+                        className={`flex items-center gap-4 mb-4 ${
+                          isEven ? "lg:justify-end" : ""
+                        }`}
                       >
-                        {/* Step Number */}
-                        <div
-                          className={`flex items-center gap-4 mb-4 ${
-                            isEven ? "lg:justify-end" : ""
-                          }`}
-                        >
-                          <span className="text-5xl font-bold text-gold/20">
-                            0{step.step}
-                          </span>
-                        </div>
+                        <span className="text-5xl font-bold text-gold/20">
+                          0{step.step}
+                        </span>
+                      </div>
 
-                        {/* Icon - Mobile */}
-                        <div className="lg:hidden w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
-                          <Icon className="w-7 h-7 text-gold" />
-                        </div>
+                      {/* Icon - Mobile */}
+                      <div className="lg:hidden w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
+                        <Icon className="w-7 h-7 text-gold" />
+                      </div>
 
-                        <h3 className="text-2xl font-semibold mb-3">
-                          {step.title}
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {step.description}
-                        </p>
-                      </motion.div>
-                    )}
+                      <h3 className="text-2xl font-semibold mb-3">
+                        {step.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Icon Node - Desktop only */}
-                  {!isMobile && (
-                    <IconNode Icon={Icon} index={index} />
-                  )}
+                  {/* Icon Node - Desktop only (hidden via CSS) */}
+                  <IconNode Icon={Icon} index={index} />
                 </StaggerItem>
               );
             })}

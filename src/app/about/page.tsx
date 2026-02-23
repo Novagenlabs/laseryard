@@ -7,7 +7,7 @@ import { Target, Eye, Gem, Users, MapPin } from "lucide-react";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Learn about Laser Yard - West Africa's premier laser engraving studio. Our story, mission, and commitment to precision craftsmanship.",
+    "Laser Yard is a laser engraving studio based in Lagos, serving West Africa. Our story, how we work, and what we stand for.",
 };
 
 const values = [
@@ -21,7 +21,7 @@ const values = [
     icon: Users,
     title: "Customer Focus",
     description:
-      "Your success is our success. We work closely with each client to ensure their vision becomes reality.",
+      "We work directly with each client. You tell us what you need, we figure out how to make it happen.",
   },
   {
     icon: Target,
@@ -58,10 +58,11 @@ export default function AboutPage() {
                 <span className="text-gradient-gold">Craftsmanship</span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed">
-                Laser Yard was born from a passion for precision and a vision to
-                bring world-class laser engraving to West Africa. From metal
-                business cards to custom signage, architectural elements to
-                promotional products. We turn your ideas into tangible reality.
+                Laser Yard started because there was nowhere in West Africa
+                to get high-quality laser engraving done right. So we built
+                the studio ourselves. Metal business cards, crystal awards,
+                custom signage, promotional products. If a laser can mark it,
+                we do it.
               </p>
             </ScrollReveal>
           </div>
@@ -79,11 +80,10 @@ export default function AboutPage() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  To be West Africa's go-to destination for precision laser
-                  engraving. Whether you're creating premium business cards,
-                  custom signage, or unique promotional items. We combine
-                  cutting-edge technology with meticulous craftsmanship to bring
-                  your vision to life.
+                  To be the studio people in West Africa think of first when
+                  they need something engraved. Business cards, signage,
+                  awards, promotional items. We use industrial-grade
+                  equipment and we sweat the small stuff.
                 </p>
               </div>
             </ScrollReveal>
@@ -95,10 +95,10 @@ export default function AboutPage() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Our Vision</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  To become the region's most trusted name in laser engraving.
-                  We envision a future where every business, from startups to
-                  multinationals, knows that when it comes to precision
-                  engraving, you come to Laser Yard.
+                  To make laser engraving accessible to every business in the
+                  region. Whether you run a startup in Lagos or a corporation
+                  in Accra, you should be able to get your stuff engraved
+                  properly, fast, and at a fair price.
                 </p>
               </div>
             </ScrollReveal>
@@ -216,10 +216,10 @@ export default function AboutPage() {
                 Our Quality Promise
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                Every Laser Yard project is executed using industrial-grade laser
-                equipment calibrated for micron-level precision. From metal business
-                cards to custom signage, we inspect each piece individually before
-                delivery, ensuring you receive nothing but the best.
+                We use industrial-grade lasers calibrated for micron-level
+                accuracy. Every piece is inspected individually before it
+                ships. If it doesn&apos;t meet our standard, it doesn&apos;t
+                leave the studio.
               </p>
               <WhatsAppCTA
                 buttonText="Start Your Project"

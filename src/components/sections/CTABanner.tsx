@@ -1,6 +1,5 @@
 "use client";
 
-import { Phone } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 
@@ -17,35 +16,30 @@ export function CTABanner() {
             {/* Content */}
             <div className="relative px-6 py-12 sm:px-16 sm:py-20 text-center">
               <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight mb-4">
-                Ready to Elevate Your{" "}
-                <span className="text-gradient-gold">Networking?</span>
+                Ready to{" "}
+                <span className="text-gradient-gold">Get Started?</span>
               </h2>
 
               <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10">
-                From metal business cards to custom signage, we bring your vision
-                to life with precision laser engraving. Get your quote in minutes.
+                Tell us what you need. We&apos;ll send you a quote within the hour.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <WhatsAppCTA
-                  buttonText="Start Your Order"
+                  buttonText="Start Your Project"
                   size="lg"
                   variant="gold"
-                  message="Hi! I'm ready to order premium metal business cards. Can we get started?"
+                  message="Hi! I'm interested in your laser engraving services. Can we get started?"
                   trackingLabel="cta-banner"
                 />
 
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="w-4 h-4" aria-hidden="true" />
-                  <span>+234 801 234 5678</span>
-                </div>
               </div>
 
               {/* Trust Badge */}
               <div className="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-border/50">
                 <p className="text-sm text-muted-foreground">
                   <span className="text-gold font-semibold">500+</span>{" "}
-                  executives trust Laser Yard for premium business cards
+                  clients trust Laser Yard for precision laser engraving
                 </p>
               </div>
             </div>

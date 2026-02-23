@@ -10,9 +10,11 @@ const footerLinks = {
     { label: "Contact", href: "/contact" },
   ],
   products: [
+    { label: "Shop All Products", href: "/shop" },
     { label: "Metal Business Cards", href: "/products/metal-business-cards" },
-    { label: "Custom Designs", href: "/products/metal-business-cards#custom" },
-    { label: "Get a Quote", href: "/contact" },
+    { label: "Crystal Awards", href: "/products/crystal-awards" },
+    { label: "Wood Engraving", href: "/products/wood-engraving" },
+    { label: "Custom Engraving", href: "/custom-engraving" },
   ],
   regions: COUNTRIES.map((c) => ({
     label: c.name,
@@ -30,14 +32,20 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block">
               <img
-                src="/images/lazer_logo.svg"
+                src="/images/laseryard_logos/logo_light.png"
                 alt="Laser Yard"
-                className="h-24 w-auto"
+                className="h-24 w-auto dark:hidden"
+              />
+              <img
+                src="/images/laseryard_logos/logo_dark.png"
+                alt=""
+                aria-hidden="true"
+                className="h-24 w-auto hidden dark:block"
               />
             </Link>
             <p className="mt-4 text-muted-foreground max-w-sm leading-relaxed">
-              West Africa's premier laser engraving studio. From business cards
-              to custom signage, we bring your vision to life with precision.
+              Laser engraving studio based in Lagos, serving all of West Africa.
+              We sell ready-made products and engrave items you bring us.
             </p>
 
             {/* Contact Info */}
@@ -49,7 +57,7 @@ export function Footer() {
                 className="flex items-center gap-3 text-muted-foreground hover:text-whatsapp transition-colors focus-visible:text-whatsapp focus-visible:outline-none"
               >
                 <MessageCircle className="w-5 h-5" aria-hidden="true" />
-                <span>+234 801 234 5678</span>
+                <span>Talk to us on WhatsApp</span>
               </a>
               <a
                 href="mailto:hello@laseryard.com"
@@ -83,7 +91,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Products</h4>
+            <h4 className="font-semibold text-foreground mb-4">Products & Services</h4>
             <ul className="space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.href}>
