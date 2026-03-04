@@ -1,10 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
+import Image from "next/image";
 import { Check, Star } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { TESTIMONIALS } from "@/lib/constants";
 
 const sellingPoints = [
@@ -18,74 +17,7 @@ const sellingPoints = [
 const WHATSAPP_MESSAGE =
   "Hi! I saw your metal business card ad and I'm interested in ordering. Can you help me get started?";
 
-function MetalCardVisual({ isMobile }: { isMobile: boolean }) {
-  const card = (
-    <div
-      className="absolute inset-0 rounded-xl metal-texture safari-fix-overflow"
-      style={{
-        background:
-          "linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%)",
-        boxShadow: `
-          0 30px 60px -15px rgba(0, 0, 0, 0.5),
-          0 0 0 1px rgba(255, 255, 255, 0.08),
-          inset 0 1px 0 rgba(255, 255, 255, 0.1)
-        `,
-      }}
-    >
-      <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-between">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="text-gold/80 text-sm sm:text-base font-semibold tracking-wide">
-              YOUR NAME
-            </div>
-            <div className="text-white/50 text-xs sm:text-sm mt-1 tracking-wider">
-              YOUR TITLE
-            </div>
-          </div>
-          <div className="size-8 sm:size-10 rounded bg-gold/20 flex items-center justify-center">
-            <span className="text-gold font-bold text-xs">LOGO</span>
-          </div>
-        </div>
-        <div className="flex justify-between items-end">
-          <div className="text-white/40 text-xs sm:text-sm tracking-wider">
-            YOUR COMPANY
-          </div>
-          <div className="text-white/30 text-[10px] tracking-wider">
-            laseryard.com
-          </div>
-        </div>
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
-    </div>
-  );
-
-  if (isMobile) {
-    return (
-      <div className="w-full max-w-[340px] mx-auto aspect-[1.6/1] relative">
-        {card}
-      </div>
-    );
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
-      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-      transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-      className="w-full max-w-[480px] mx-auto aspect-[1.6/1] relative"
-    >
-      {card}
-      <motion.div
-        animate={{ x: [-200, 500] }}
-        transition={{ duration: 3, repeat: Infinity, repeatDelay: 4 }}
-        className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 pointer-events-none"
-      />
-    </motion.div>
-  );
-}
-
 export function UnforgettableLanding() {
-  const isMobile = useIsMobile();
 
   return (
     <>
@@ -152,9 +84,14 @@ export function UnforgettableLanding() {
             <div className="order-1 lg:order-2">
               <ScrollReveal direction="none">
                 <div className="relative">
-                  <MetalCardVisual isMobile={isMobile} />
-                  {/* Glow behind card */}
-                  <div className="absolute inset-0 -z-10 scale-110 blur-3xl bg-gold/8 rounded-full" />
+                  <Image
+                    src="/images/products/metal_card_2.png"
+                    alt="Two Laser Yard metal business cards on a dark surface, showing front and back"
+                    width={960}
+                    height={640}
+                    className="w-full rounded-2xl"
+                    priority
+                  />
                 </div>
               </ScrollReveal>
             </div>
@@ -185,6 +122,53 @@ export function UnforgettableLanding() {
               <span className="text-2xl font-bold text-gold tabular-nums">25</span>
               <p className="text-xs text-muted-foreground mt-0.5">Card minimum</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Product Close-up */}
+      <section className="py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <ScrollReveal direction="left">
+              <Image
+                src="/images/products/johndoe-card.jpg"
+                alt="Close-up of a Laser Yard matte-black metal business card with laser-engraved details"
+                width={1024}
+                height={683}
+                className="w-full rounded-2xl"
+              />
+            </ScrollReveal>
+            <ScrollReveal direction="right">
+              <div>
+                <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance mb-6">
+                  Every detail,{" "}
+                  <span className="text-gradient-gold">laser sharp</span>
+                </h2>
+                <p className="text-muted-foreground text-base sm:text-lg text-pretty mb-6">
+                  Your logo, name, QR code, contact info. All engraved into
+                  brushed matte-black aluminum with a laser that operates at
+                  micron-level accuracy. The result is a card that looks and
+                  feels nothing like paper.
+                </p>
+                <ul className="space-y-3">
+                  {[
+                    "Custom QR codes that link anywhere",
+                    "Full design flexibility, front and back",
+                    "Two thickness options: 0.2mm or 0.4mm",
+                  ].map((point) => (
+                    <li key={point} className="flex items-start gap-3">
+                      <span className="mt-0.5 flex-shrink-0 size-5 rounded-full bg-gold/15 flex items-center justify-center">
+                        <Check className="size-3 text-gold" />
+                      </span>
+                      <span className="text-foreground/90 text-sm sm:text-base">
+                        {point}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
