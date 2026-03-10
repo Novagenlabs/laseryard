@@ -33,7 +33,7 @@ export function FeaturesGrid() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal className="text-center mb-16">
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
             Why <span className="text-gradient-gold">Laser Yard</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

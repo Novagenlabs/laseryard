@@ -7,7 +7,7 @@ import { Target, Eye, Gem, Users, MapPin } from "lucide-react";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Laser Yard is a laser engraving studio based in Lagos, serving West Africa. Our story, how we work, and what we stand for.",
+    "Laser Yard is a precision laser engraving studio headquartered in Lagos, serving clients worldwide. Our story, how we work, and what we stand for.",
 };
 
 const values = [
@@ -34,8 +34,10 @@ const values = [
 const locations = [
   "Lagos, Nigeria",
   "Accra, Ghana",
-  "Lome, Togo",
-  "Cotonou, Benin",
+  "London, UK",
+  "New York, US",
+  "Dubai, UAE",
+  "Johannesburg, SA",
 ];
 
 export default function AboutPage() {
@@ -53,16 +55,16 @@ export default function AboutPage() {
               <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
                 Our Story
               </p>
-              <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Where Precision Meets{" "}
                 <span className="text-gradient-gold">Craftsmanship</span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed">
-                Laser Yard started because there was nowhere in West Africa
-                to get high-quality laser engraving done right. So we built
+                Laser Yard started because we saw a gap in the market for
+                truly high-quality laser engraving. So we built
                 the studio ourselves. Metal business cards, crystal awards,
                 custom signage, promotional products. If a laser can mark it,
-                we do it.
+                we do it, for clients around the world.
               </p>
             </ScrollReveal>
           </div>
@@ -80,7 +82,7 @@ export default function AboutPage() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  To be the studio people in West Africa think of first when
+                  To be the studio people think of first when
                   they need something engraved. Business cards, signage,
                   awards, promotional items. We use industrial-grade
                   equipment and we sweat the small stuff.
@@ -95,9 +97,9 @@ export default function AboutPage() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Our Vision</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  To make laser engraving accessible to every business in the
-                  region. Whether you run a startup in Lagos or a corporation
-                  in Accra, you should be able to get your stuff engraved
+                  To make laser engraving accessible to every business,
+                  anywhere. Whether you're a startup in Lagos or a corporation
+                  in London, you should be able to get your stuff engraved
                   properly, fast, and at a fair price.
                 </p>
               </div>
@@ -110,11 +112,11 @@ export default function AboutPage() {
       <section className="py-16 bg-card/50 border-y border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               Why Laser Yard?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              When precision matters, businesses across West Africa trust us to
+              When precision matters, businesses worldwide trust us to
               deliver.
             </p>
           </ScrollReveal>
@@ -132,9 +134,9 @@ export default function AboutPage() {
                 description: "Metal, wood, acrylic, leather, glass",
               },
               {
-                stat: "4",
+                stat: "20+",
                 label: "Countries Served",
-                description: "Nigeria, Ghana, Togo, Benin & beyond",
+                description: "Clients across Africa, Europe, the Americas & beyond",
               },
             ].map((item, index) => (
               <ScrollReveal key={item.label} delay={index * 0.1}>
@@ -157,7 +159,7 @@ export default function AboutPage() {
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               Our Values
             </h2>
           </ScrollReveal>
@@ -186,12 +188,12 @@ export default function AboutPage() {
               <MapPin className="w-4 h-4 text-gold" />
               <span className="text-sm font-medium text-gold">We Serve</span>
             </div>
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Serving West Africa
+            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+              Serving Clients Worldwide
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Based in Lagos, Nigeria, we deliver precision laser engraving
-              services across the region.
+              Headquartered in Lagos, Nigeria, we deliver precision laser engraving
+              services to clients around the globe.
             </p>
           </ScrollReveal>
 
@@ -212,7 +214,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <ScrollReveal>
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-6">
+              <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-6">
                 Our Quality Promise
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">

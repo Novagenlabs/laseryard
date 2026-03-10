@@ -21,7 +21,7 @@ export function TrustSignals() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <p className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-wider">
-            Trusted by leading West African companies
+            Trusted by leading companies worldwide
           </p>
         </ScrollReveal>
 

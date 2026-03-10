@@ -36,7 +36,7 @@ export function UnforgettableLanding() {
                 <p className="text-gold font-semibold text-sm tracking-widest uppercase mb-4">
                   Metal Business Cards
                 </p>
-                <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] text-balance mb-6">
+                <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] text-balance mb-6">
                   BE{" "}
                   <span className="text-gradient-gold">UNFORGETTABLE</span>
                 </h1>
@@ -141,7 +141,7 @@ export function UnforgettableLanding() {
             </ScrollReveal>
             <ScrollReveal direction="right">
               <div>
-                <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance mb-6">
+                <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance mb-6">
                   Every detail,{" "}
                   <span className="text-gradient-gold">laser sharp</span>
                 </h2>
@@ -155,7 +155,7 @@ export function UnforgettableLanding() {
                   {[
                     "Custom QR codes that link anywhere",
                     "Full design flexibility, front and back",
-                    "Two thickness options: 0.2mm or 0.4mm",
+                    "Two thickness options: 0.4mm or 0.8mm",
                   ].map((point) => (
                     <li key={point} className="flex items-start gap-3">
                       <span className="mt-0.5 flex-shrink-0 size-5 rounded-full bg-gold/15 flex items-center justify-center">
@@ -177,7 +177,7 @@ export function UnforgettableLanding() {
       <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-center text-balance mb-12">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-center text-balance mb-12">
               Three steps to{" "}
               <span className="text-gradient-gold">your cards</span>
             </h2>
@@ -223,7 +223,7 @@ export function UnforgettableLanding() {
       <section className="py-16 sm:py-24 bg-card/50 border-y border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-center text-balance mb-12">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-center text-balance mb-12">
               What our clients say
             </h2>
           </ScrollReveal>
@@ -265,7 +265,7 @@ export function UnforgettableLanding() {
               <div className="absolute inset-0 bg-card" />
 
               <div className="relative px-6 py-12 sm:px-16 sm:py-20 text-center">
-                <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-balance mb-4">
+                <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-balance mb-4">
                   Your next meeting starts{" "}
                   <span className="text-gradient-gold">differently</span>
                 </h2>

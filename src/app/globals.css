@@ -9,8 +9,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-dm-sans);
-  --font-display: var(--font-playfair);
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-montserrat);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);

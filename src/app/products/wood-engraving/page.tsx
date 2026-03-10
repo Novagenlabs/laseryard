@@ -25,7 +25,7 @@ export default function WoodEngravingPage() {
               <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
                 Our Products
               </p>
-              <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Wood Boards &{" "}
                 <span className="text-gradient-gold">Coasters</span>
               </h1>

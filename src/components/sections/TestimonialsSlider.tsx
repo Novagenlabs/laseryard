@@ -61,7 +61,7 @@ export function TestimonialsSlider() {
           <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
             Client Stories
           </p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
+          <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
             What Our <span className="text-gradient-gold">Clients</span> Say
           </h2>
           <div className="mt-4 flex items-center justify-center gap-2">

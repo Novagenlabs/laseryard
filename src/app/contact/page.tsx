@@ -38,7 +38,7 @@ const businessInfo = [
   {
     icon: MapPin,
     title: "Location",
-    lines: ["Lagos, Nigeria", "Serving all of West Africa"],
+    lines: ["Lagos, Nigeria", "Serving clients worldwide"],
   },
 ];
 
@@ -56,7 +56,7 @@ export default function ContactPage() {
             <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
               Get In Touch
             </p>
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+            <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               <span className="text-gradient-gold">Talk</span> to Us
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -121,7 +121,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="max-w-2xl mx-auto text-center">
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+              <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
                 Prefer WhatsApp?
               </h2>
               <p className="text-muted-foreground mb-8">
@@ -172,7 +172,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="max-w-2xl mx-auto text-center">
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold tracking-tight mb-4">
+              <h2 className="font-[family-name:var(--font-montserrat)] text-2xl font-bold tracking-tight mb-4">
                 What to Expect
               </h2>
               <div className="grid sm:grid-cols-3 gap-6 mt-8">

@@ -23,10 +23,9 @@ export function FAQAccordion() {
             <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
               FAQ
             </p>
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-              Questions?
-              <br />
-              <span className="text-gradient-gold">We've Got Answers</span>
+            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+              Common{" "}
+              <span className="text-gradient-gold">Questions</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8">
               Common questions about pricing, materials, and turnaround.

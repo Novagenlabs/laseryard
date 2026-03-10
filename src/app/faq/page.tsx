@@ -53,8 +53,8 @@ const faqCategories = [
         a: "Yes! QR codes work very well on metal cards. We recommend keeping them at least 15mm x 15mm for reliable scanning.",
       },
       {
-        q: "What's the difference between 0.2mm and 0.4mm thickness?",
-        a: "0.2mm cards are lightweight and flexible, similar to a thick credit card. 0.4mm cards are more rigid and have a substantial, premium weight feel. Most clients prefer 0.4mm for the executive impression it makes.",
+        q: "What's the difference between 0.4mm and 0.8mm thickness?",
+        a: "0.4mm cards are solid and durable, similar to a premium credit card. 0.8mm cards are heavy, rigid, and have a substantial executive feel. Most clients prefer 0.8mm for the impression it makes.",
       },
     ],
   },
@@ -84,15 +84,15 @@ const faqCategories = [
     questions: [
       {
         q: "Where do you ship to?",
-        a: "We ship across West Africa including Nigeria, Ghana, Togo, Benin, and Cameroon. We can also arrange international shipping on request.",
+        a: "We ship worldwide! Local delivery in Lagos is 24-48 hours, rest of Nigeria in 3-5 days, and international orders typically arrive within 7-14 business days.",
       },
       {
         q: "How long does delivery take?",
-        a: "Lagos: 24-48 hours. Other Nigerian cities: 3-5 days. Ghana (Accra): 5-7 days. Other West African countries: 7-10 days.",
+        a: "Lagos: 24-48 hours. Other Nigerian cities: 3-5 days. International: 7-14 business days depending on destination. Contact us for specific delivery estimates to your location.",
       },
       {
         q: "How much does shipping cost?",
-        a: "Shipping costs vary by location: Lagos ($5), Other Nigerian cities ($10), Ghana ($15), Other West Africa ($20). These are estimates - exact costs confirmed at checkout.",
+        a: "Shipping costs vary by destination. Local Lagos delivery starts at $5, other Nigerian cities from $10. International shipping is quoted per order. Contact us on WhatsApp for exact costs to your location.",
       },
       {
         q: "Can I track my order?",
@@ -105,7 +105,7 @@ const faqCategories = [
     questions: [
       {
         q: "What payment methods do you accept?",
-        a: "We accept bank transfers (Nigerian and Ghanaian banks), mobile money (MTN MoMo, Airtel Money), and can discuss international wire transfers for overseas clients.",
+        a: "We accept bank transfers, mobile money (MTN MoMo, Airtel Money), and international wire transfers. Contact us to discuss the best payment method for your location.",
       },
       {
         q: "When is payment due?",
@@ -133,7 +133,7 @@ export default function FAQPage() {
             <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
               FAQ
             </p>
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+            <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               Frequently Asked{" "}
               <span className="text-gradient-gold">Questions</span>
             </h1>
@@ -184,7 +184,7 @@ export default function FAQPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="p-12 rounded-3xl bg-gradient-to-br from-gold/10 via-card to-card border border-gold/20 text-center">
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+              <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
                 Still Have Questions?
               </h2>
               <p className="text-muted-foreground mb-8 max-w-xl mx-auto">

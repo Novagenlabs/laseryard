@@ -39,7 +39,7 @@ export function CustomEngravingSection() {
           <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
             Custom Engraving
           </p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
             Bring Your Own{" "}
             <span className="text-gradient-gold">Items</span>
           </h2>
@@ -71,7 +71,7 @@ export function CustomEngravingSection() {
 
         {/* How It Works Mini Steps */}
         <ScrollReveal className="mb-12">
-          <h3 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl font-bold tracking-tight text-center mb-10">
+          <h3 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl font-bold tracking-tight text-center mb-10">
             How Custom Engraving Works
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

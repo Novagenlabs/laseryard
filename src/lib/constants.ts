@@ -4,7 +4,7 @@ export const SITE_CONFIG = {
   name: "Laser Yard",
   tagline: "Precision Laser Engraving",
   description:
-    "Laser engraving studio based in Lagos, serving all of West Africa. We sell ready-made engraved products and custom-engrave items you bring us — metal, wood, crystal, acrylic, and leather.",
+    "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Ready-made engraved products and custom engraving:metal, wood, crystal, acrylic, and leather.",
   url: "https://laseryard.com",
 };
 
@@ -37,7 +37,7 @@ export const PRODUCT_CATEGORIES = [
     name: "Metal Business Cards",
     description:
       "Laser-engraved aluminum cards. Heavy, cold to the touch, and impossible to throw away. The kind of card people ask about.",
-    features: ["Premium Aluminum", "0.2mm / 0.4mm Thickness", "Multiple Finishes"],
+    features: ["Premium Aluminum", "0.4mm / 0.8mm Thickness", "Multiple Finishes"],
     href: "/products/metal-business-cards",
   },
   {
@@ -141,8 +141,8 @@ export const FEATURES = [
     icon: "Shield",
   },
   {
-    title: "West Africa Wide",
-    description: "Serving Nigeria, Ghana, Togo, Benin and beyond",
+    title: "Worldwide Delivery",
+    description: "Serving clients across Africa, Europe, the Americas, and beyond",
     icon: "Truck",
   },
 ];
@@ -182,17 +182,33 @@ export const TESTIMONIALS = [
   {
     quote:
       "The quality is exceptional. I've had clients keep my card for months just because of how it feels.",
-    author: "Kwame Asante",
-    title: "Managing Director, Asante Holdings",
-    location: "Accra, Ghana",
+    author: "James Hartley",
+    title: "Director, Hartley & Co",
+    location: "London, UK",
     rating: 5,
   },
   {
     quote:
-      "Worth every kobo. These aren't just business cards, they're conversation starters.",
-    author: "Emeka Nwosu",
-    title: "Founder, NexGen Consulting",
-    location: "Abuja, Nigeria",
+      "Worth every penny. These aren't just business cards, they're conversation starters.",
+    author: "Sarah Chen",
+    title: "Founder, Apex Ventures",
+    location: "New York, US",
+    rating: 5,
+  },
+  {
+    quote:
+      "Ordered crystal awards for our annual gala. The engraving detail was flawless. Will be back next year.",
+    author: "Fatima Al-Rashid",
+    title: "Events Manager, Gulf Properties",
+    location: "Dubai, UAE",
+    rating: 5,
+  },
+  {
+    quote:
+      "We use Laser Yard for all our corporate gifting. Fast turnaround, consistent quality every time.",
+    author: "Kwame Asante",
+    title: "Managing Director, Asante Holdings",
+    location: "Accra, Ghana",
     rating: 5,
   },
 ];
@@ -214,12 +230,12 @@ export const FAQ_ITEMS = [
   {
     question: "What products do you offer?",
     answer:
-      "We offer laser-engraved metal business cards, 3D crystal awards and trophies, and custom wood boards and coasters. We also provide custom engraving on your own items — metal, wood, acrylic, leather, glass, and fabric.",
+      "We offer laser-engraved metal business cards, 3D crystal awards and trophies, and custom wood boards and coasters. We also provide custom engraving on your own items:metal, wood, acrylic, leather, glass, and fabric.",
   },
   {
     question: "What is the minimum order quantity?",
     answer:
-      "For metal business cards, our minimum order is 25 cards. For crystal awards and wood products, we can handle single-piece orders. Custom engraving on your own items has no minimum — bring us one item or a hundred.",
+      "For metal business cards, our minimum order is 25 cards. For crystal awards and wood products, we can handle single-piece orders. Custom engraving on your own items has no minimum:bring us one item or a hundred.",
   },
   {
     question: "How long does production take?",
@@ -234,12 +250,12 @@ export const FAQ_ITEMS = [
   {
     question: "Can you engrave my own items?",
     answer:
-      "Yes! Bring us your own items — laptops, phones, water bottles, leather goods, wooden gifts, and more. We'll assess the material and provide a quote for custom engraving.",
+      "Yes! Bring us your own items:laptops, phones, water bottles, leather goods, wooden gifts, and more. We'll assess the material and provide a quote for custom engraving.",
   },
   {
-    question: "Do you ship outside Nigeria?",
+    question: "Do you ship internationally?",
     answer:
-      "Yes! We ship across West Africa including Ghana, Togo, Benin, and Cameroon. Delivery times vary by location.",
+      "Yes! We ship worldwide. Delivery times vary by location:contact us on WhatsApp for shipping details to your country.",
   },
 ];
 
@@ -259,17 +275,24 @@ export const COUNTRIES = [
     phone: "+233",
   },
   {
-    slug: "togo",
-    name: "Togo",
-    cities: ["Lome"],
-    currency: "XOF",
-    phone: "+228",
+    slug: "united-kingdom",
+    name: "United Kingdom",
+    cities: ["London", "Manchester", "Birmingham"],
+    currency: "GBP",
+    phone: "+44",
   },
   {
-    slug: "benin",
-    name: "Benin",
-    cities: ["Cotonou", "Porto-Novo"],
-    currency: "XOF",
-    phone: "+229",
+    slug: "united-states",
+    name: "United States",
+    cities: ["New York", "Los Angeles", "Houston"],
+    currency: "USD",
+    phone: "+1",
+  },
+  {
+    slug: "uae",
+    name: "UAE",
+    cities: ["Dubai", "Abu Dhabi"],
+    currency: "AED",
+    phone: "+971",
   },
 ];

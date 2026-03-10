@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { Poppins, Montserrat } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { ChatAssistant } from "@/components/chat/ChatAssistant";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
   weight: ["600", "700", "800"],
 });
@@ -25,30 +24,29 @@ export const metadata: Metadata = {
     template: "%s | Laser Yard",
   },
   description:
-    "Laser engraving studio based in Lagos, serving West Africa. Ready-made engraved products and custom engraving on your own items — metal, wood, crystal, acrylic, and leather.",
+    "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Ready-made engraved products and custom engraving on your own items:metal, wood, crystal, acrylic, and leather.",
   keywords: [
     "laser engraving",
     "metal business cards",
     "crystal awards",
     "wood engraving",
     "custom engraving",
-    "Nigeria",
-    "Ghana",
-    "West Africa",
     "precision engraving",
     "coasters",
     "trophies",
+    "custom laser engraving",
+    "engraved gifts",
   ],
   authors: [{ name: "Laser Yard" }],
   creator: "Laser Yard",
   openGraph: {
     type: "website",
-    locale: "en_NG",
+    locale: "en_US",
     url: "https://laseryard.com",
     siteName: "Laser Yard",
     title: "Precision Laser Engraving",
     description:
-      "Laser engraving studio based in Lagos, serving West Africa. Shop products or bring your own items for custom engraving.",
+      "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Shop products or bring your own items for custom engraving.",
     images: [
       {
         url: "/og-image.jpg",
@@ -62,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Laser Yard | Precision Laser Engraving",
     description:
-      "Laser engraving studio based in Lagos, serving West Africa. Shop products or bring your own items for custom engraving.",
+      "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Shop products or bring your own items for custom engraving.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -97,10 +95,9 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${dmSans.variable} ${playfair.variable} font-sans antialiased`}
+        className={`${poppins.variable} ${montserrat.variable} font-sans antialiased`}
       >
         <ThemeProvider>
-          <AnnouncementBar />
           <Header />
           <main className="min-h-[100dvh]">{children}</main>
           <Footer />

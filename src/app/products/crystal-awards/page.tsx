@@ -25,7 +25,7 @@ export default function CrystalAwardsPage() {
               <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
                 Our Products
               </p>
-              <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Crystal <span className="text-gradient-gold">Awards</span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">

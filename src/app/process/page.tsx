@@ -59,8 +59,8 @@ const steps = [
       "Your finished products are carefully packaged and shipped to your location. Track your order and receive updates via WhatsApp.",
     details: [
       "Lagos: 24-48 hours",
-      "Other Nigeria: 3-5 days",
-      "West Africa: 5-10 days",
+      "Rest of Nigeria: 3-5 days",
+      "International: 7-14 days",
     ],
   },
 ];
@@ -95,7 +95,7 @@ export default function ProcessPage() {
             <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
               How It Works
             </p>
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+            <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               From Design to{" "}
               <span className="text-gradient-gold">Delivery</span>
             </h1>
@@ -211,7 +211,7 @@ export default function ProcessPage() {
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               Expected Timeline
             </h2>
             <p className="text-muted-foreground">
@@ -244,7 +244,7 @@ export default function ProcessPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="p-12 rounded-3xl bg-gradient-to-br from-gold/10 via-card to-card border border-gold/20 text-center">
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+              <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
                 Ready to Get Started?
               </h2>
               <p className="text-muted-foreground mb-8 max-w-xl mx-auto">

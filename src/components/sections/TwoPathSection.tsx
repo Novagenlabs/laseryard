@@ -20,7 +20,7 @@ const paths = [
   {
     title: "Custom Engraving",
     description:
-      "Bring your own items and we'll engrave them. Laptops, phones, leather goods, gifts — if we can laser it, we will.",
+      "Bring your own items and we'll engrave them. Laptops, phones, leather goods, gifts. If we can laser it, we will.",
     href: "/custom-engraving",
     icon: Paintbrush,
     cta: "Learn More",
@@ -35,7 +35,7 @@ export function TwoPathSection() {
           <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
             Two Ways to Work With Us
           </p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
+          <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
             How Can We <span className="text-gradient-gold">Help You?</span>
           </h2>
         </ScrollReveal>

@@ -18,16 +18,16 @@ import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
-type Thickness = "0.2mm" | "0.4mm";
+type Thickness = "0.4mm" | "0.8mm";
 
 const thicknessOptions = {
-  "0.2mm": {
-    label: "Standard",
-    description: "Lightweight & flexible, similar to a credit card",
-  },
   "0.4mm": {
+    label: "Standard",
+    description: "Solid & durable, similar to a premium credit card",
+  },
+  "0.8mm": {
     label: "Premium",
-    description: "Substantial & rigid with a premium weight feel",
+    description: "Heavy & rigid with a substantial executive feel",
   },
 };
 
@@ -222,7 +222,7 @@ export function ProductPage() {
             <ScrollReveal direction="right">
               <div className="lg:sticky lg:top-32 space-y-8">
                 <div>
-                  <h1 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl font-bold tracking-tight mb-3">
+                  <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-3">
                     Premium Metal Business Cards
                   </h1>
                   <p className="text-muted-foreground text-lg">
@@ -333,7 +333,7 @@ export function ProductPage() {
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl font-bold tracking-tight mb-8">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl font-bold tracking-tight mb-8">
               Specifications
             </h2>
           </ScrollReveal>

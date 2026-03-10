@@ -44,7 +44,7 @@ export function Footer() {
               />
             </Link>
             <p className="mt-4 text-muted-foreground max-w-sm leading-relaxed">
-              Laser engraving studio based in Lagos, serving all of West Africa.
+              Precision laser engraving studio headquartered in Lagos, serving clients worldwide.
               We sell ready-made products and engrave items you bring us.
             </p>
 

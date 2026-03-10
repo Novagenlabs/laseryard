@@ -19,7 +19,7 @@ export function ProductShowcase() {
           <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
             Our Products
           </p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
             Ready-Made <span className="text-gradient-gold">Products</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
