@@ -53,9 +53,9 @@
   --popover-foreground: oklch(0.13 0.01 260);
 
   /* Primary - Laser Yard Signature Gold */
-  --gold: oklch(0.75 0.17 85);
-  --gold-dark: oklch(0.65 0.16 80);
-  --gold-light: oklch(0.82 0.14 90);
+  --gold: oklch(0.82 0.19 88);
+  --gold-dark: oklch(0.72 0.18 83);
+  --gold-light: oklch(0.88 0.15 93);
   --primary: var(--gold);
   --primary-foreground: oklch(0.99 0 0);
 
@@ -97,9 +97,9 @@
   --popover-foreground: oklch(0.96 0 0);
 
   /* Primary - Brighter gold for dark backgrounds */
-  --gold: oklch(0.87 0.19 95);
-  --gold-dark: oklch(0.77 0.18 90);
-  --gold-light: oklch(0.92 0.14 98);
+  --gold: oklch(0.90 0.20 93);
+  --gold-dark: oklch(0.80 0.19 88);
+  --gold-light: oklch(0.94 0.15 96);
   --primary: var(--gold);
   --primary-foreground: oklch(0.12 0.02 260);
 
