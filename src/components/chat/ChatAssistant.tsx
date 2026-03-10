@@ -47,23 +47,38 @@ function WhatsAppButton({ url }: { url: string }) {
 }
 
 function renderMessageContent(content: string) {
-  // Match WhatsApp URLs like https://wa.me/22899883594
+  // Strip markdown link syntax around wa.me URLs: [text](https://wa.me/123) → https://wa.me/123
+  let cleaned = content.replace(
+    /\[([^\]]*)\]\((https?:\/\/wa\.me\/\d+)\)/g,
+    "$2"
+  );
+  // Also strip duplicate wa.me URLs (keep only the first)
+  const waUrls: string[] = [];
+  cleaned = cleaned.replace(/https?:\/\/wa\.me\/\d+/g, (url) => {
+    if (waUrls.includes(url)) return "";
+    waUrls.push(url);
+    return url;
+  });
+  // Clean up leftover whitespace from removals
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
+
+  // Now render wa.me URLs as buttons
   const waRegex = /https?:\/\/wa\.me\/\d+/g;
   const result: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = waRegex.exec(content)) !== null) {
+  while ((match = waRegex.exec(cleaned)) !== null) {
     if (match.index > lastIndex) {
-      result.push(content.slice(lastIndex, match.index));
+      result.push(cleaned.slice(lastIndex, match.index));
     }
     result.push(<WhatsAppButton key={match.index} url={match[0]} />);
     lastIndex = match.index + match[0].length;
   }
 
-  if (lastIndex === 0) return content;
-  if (lastIndex < content.length) {
-    result.push(content.slice(lastIndex));
+  if (lastIndex === 0) return cleaned;
+  if (lastIndex < cleaned.length) {
+    result.push(cleaned.slice(lastIndex));
   }
 
   return <>{result}</>;
