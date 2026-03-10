@@ -240,7 +240,7 @@ export function ProductPage() {
                     {(
                       Object.entries(thicknessOptions) as [
                         Thickness,
-                        (typeof thicknessOptions)["0.2mm"]
+                        (typeof thicknessOptions)["0.4mm"]
                       ][]
                     ).map(([key, opt]) => (
                       <button
