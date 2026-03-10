@@ -43,7 +43,6 @@
 
 :root {
   --radius: 0.75rem;
-  --announcement-height: 36px;
 
   /* Core Palette - Light Theme */
   --background: oklch(0.97 0.005 80);
