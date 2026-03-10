@@ -358,17 +358,6 @@ export function ProductPage() {
 
       <FAQAccordion />
       <CTABanner />
-
-      {/* Sticky Mobile CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-lg border-t border-border lg:hidden z-40">
-        <WhatsAppCTA
-          buttonText="Get a Quote"
-          size="lg"
-          className="w-full"
-          message={`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing?`}
-          trackingLabel="product-page-sticky"
-        />
-      </div>
     </>
   );
 }
