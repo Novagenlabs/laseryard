@@ -286,17 +286,6 @@ export function UnforgettableLanding() {
         </div>
       </section>
 
-      {/* Sticky Mobile CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background/95 backdrop-blur-lg border-t border-border lg:hidden z-40">
-        <WhatsAppCTA
-          buttonText="Order Your Cards"
-          variant="gold"
-          size="lg"
-          className="w-full"
-          message={WHATSAPP_MESSAGE}
-          trackingLabel="unforgettable-sticky"
-        />
-      </div>
     </>
   );
 }
