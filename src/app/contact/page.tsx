@@ -38,7 +38,7 @@ const businessInfo = [
   {
     icon: MapPin,
     title: "Location",
-    lines: ["Lagos, Nigeria", "Serving clients worldwide"],
+    lines: ["Serving clients worldwide"],
   },
 ];
 

@@ -44,7 +44,7 @@ export function Footer() {
               />
             </Link>
             <p className="mt-4 text-muted-foreground max-w-sm leading-relaxed">
-              Precision laser engraving studio headquartered in Lagos, serving clients worldwide.
+              Precision laser engraving studio serving clients worldwide.
               We sell ready-made products and engrave items you bring us.
             </p>
 
@@ -68,7 +68,7 @@ export function Footer() {
               </a>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <MapPin className="w-5 h-5" aria-hidden="true" />
-                <span>Lagos, Nigeria</span>
+                <span>Serving clients worldwide</span>
               </div>
             </div>
           </div>
