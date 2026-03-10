@@ -87,8 +87,8 @@ export function UnforgettableLanding() {
                   <Image
                     src="/images/products/metal_card_2.png"
                     alt="Two Laser Yard metal business cards on a dark surface, showing front and back"
-                    width={960}
-                    height={640}
+                    width={2720}
+                    height={1388}
                     className="w-full rounded-2xl"
                     priority
                   />
