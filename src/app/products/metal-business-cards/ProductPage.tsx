@@ -10,6 +10,7 @@ import {
   Layers,
   Crosshair,
   Shield,
+  ArrowRight,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
@@ -192,10 +193,14 @@ export function ProductPage() {
                     )}
                   </div>
 
-                  {/* Zoom hint */}
-                  <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/50 text-xs text-white/70">
-                    360° view coming soon
-                  </div>
+                  {/* Design Studio hint */}
+                  <Link
+                    href="/unforgettable/design-studio"
+                    className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-gold/90 text-xs text-primary-foreground font-medium hover:bg-gold transition-colors flex items-center gap-1.5 group"
+                  >
+                    Preview your design in 3D
+                    <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
                 </div>
 
                 {/* Thumbnails */}
@@ -295,13 +300,22 @@ export function ProductPage() {
                 </div>
 
                 {/* CTA */}
-                <WhatsAppCTA
-                  buttonText="Get a Quote"
-                  size="lg"
-                  className="w-full"
-                  message={`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing and the design process?`}
-                  trackingLabel="product-page"
-                />
+                <div className="space-y-3">
+                  <WhatsAppCTA
+                    buttonText="Get a Quote"
+                    size="lg"
+                    className="w-full"
+                    message={`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing and the design process?`}
+                    trackingLabel="product-page"
+                  />
+                  <Link
+                    href="/unforgettable/design-studio"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-gold hover:border-gold/30 transition-all group"
+                  >
+                    Try the Design Studio
+                    <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
               </div>
             </ScrollReveal>
           </div>
@@ -326,6 +340,32 @@ export function ProductPage() {
               </ScrollReveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Design Studio CTA */}
+      <section className="py-16 border-b border-border">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 py-8 border-t border-border/50">
+              <div>
+                <h2 className="font-[family-name:var(--font-montserrat)] text-xl sm:text-2xl font-bold tracking-tight mb-2">
+                  See your card before you order
+                </h2>
+                <p className="text-muted-foreground text-sm max-w-lg">
+                  Upload your logo and preview it laser-engraved on metal in 3D.
+                  No account needed.
+                </p>
+              </div>
+              <Link
+                href="/unforgettable/design-studio"
+                className="inline-flex items-center gap-2.5 text-gold hover:text-gold/80 font-medium text-sm transition-colors group flex-shrink-0"
+              >
+                Open the Design Studio
+                <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

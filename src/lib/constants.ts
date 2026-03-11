@@ -8,7 +8,7 @@ export const SITE_CONFIG = {
   url: "https://laseryard.com",
 };
 
-export const WHATSAPP_NUMBER = "22899883594";
+export const WHATSAPP_NUMBER = "22893184418";
 
 export const WHATSAPP_MESSAGES = {
   hero: "Hi! I'm interested in your laser engraving services. Can we discuss my project?",
