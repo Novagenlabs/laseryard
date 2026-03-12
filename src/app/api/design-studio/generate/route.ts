@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { prompt, engraveImage, originalImage } = body;
+    const { prompt, engraveImage } = body;
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -95,21 +95,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build message content — images + text prompt
+    // Build message content — engrave mask image + text prompt
     const content: Array<
       | { type: "text"; text: string }
       | { type: "image_url"; image_url: { url: string } }
     > = [];
 
-    // Include the original design image for context (full-color reference)
-    if (originalImage && typeof originalImage === "string") {
-      content.push({
-        type: "image_url",
-        image_url: { url: originalImage },
-      });
-    }
-
-    // Include the engrave mask (white-on-transparent threshold result)
+    // Include the engrave mask (single image — avoids confusing the model)
     if (engraveImage && typeof engraveImage === "string") {
       content.push({
         type: "image_url",
