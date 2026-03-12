@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatAssistant } from "@/components/chat/ChatAssistant";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { Agentation } from "agentation";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -102,6 +103,7 @@ export default function RootLayout({
           <main className="min-h-[100dvh]">{children}</main>
           <Footer />
           <ChatAssistant />
+          {process.env.NODE_ENV === "development" && <Agentation />}
         </ThemeProvider>
       </body>
     </html>

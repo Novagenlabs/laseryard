@@ -4,11 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { TESTIMONIALS } from "@/lib/constants";
-
-const WHATSAPP_MESSAGE =
-  "Hi! I saw your metal business card ad and I'm interested in ordering. Can you help me get started?";
 
 export function UnforgettableLanding() {
   return (
@@ -20,7 +16,7 @@ export function UnforgettableLanding() {
             {/* Copy */}
             <div className="text-center lg:text-left order-2 lg:order-1">
               <ScrollReveal>
-                <p className="text-gold/70 text-[11px] tracking-[0.35em] uppercase font-medium mb-6">
+                <p className="text-muted-foreground text-[11px] tracking-[0.35em] uppercase font-medium mb-6">
                   Metal Business Cards
                 </p>
                 <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
@@ -36,23 +32,23 @@ export function UnforgettableLanding() {
 
               <ScrollReveal delay={0.15}>
                 <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                  <WhatsAppCTA
-                    buttonText="Order Your Cards"
-                    variant="gold"
-                    size="lg"
-                    message={WHATSAPP_MESSAGE}
-                    trackingLabel="unforgettable-hero"
-                  />
+                  <Link
+                    href="/products/metal-business-cards"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
+                  >
+                    Order Your Cards
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                   <Link
                     href="/unforgettable/design-studio"
-                    className="btn-apple btn-apple-secondary !py-4 !px-8 !text-base group"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-border text-foreground font-medium text-base hover:bg-foreground/5 transition-colors group"
                   >
-                    <span>Try the Design Studio</span>
+                    Try the Design Studio
                     <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 </div>
                 <p className="text-[11px] text-muted-foreground/50 mt-4 text-center lg:text-left tracking-wide">
-                  Free design consultation · 5–7 day delivery · Min. 25 cards
+                  Free design consultation · 10-14 day production · Min. 30 cards
                 </p>
               </ScrollReveal>
             </div>
@@ -61,8 +57,8 @@ export function UnforgettableLanding() {
             <div className="order-1 lg:order-2">
               <ScrollReveal direction="none">
                 <Image
-                  src="/images/products/metal_card_2.png"
-                  alt="Two Laser Yard metal business cards on a dark surface, showing front and back"
+                  src="/images/products/front_and back_blac_card_product_photo_whitebackground.png"
+                  alt="Front and back of matte black laser-engraved metal business card"
                   width={2720}
                   height={1388}
                   className="w-full rounded-2xl"
@@ -81,7 +77,7 @@ export function UnforgettableLanding() {
             {[
               { value: "500+", label: "clients" },
               { value: "4.9", label: "rating" },
-              { value: "5–7 days", label: "delivery" },
+              { value: "10-14 days", label: "production" },
               { value: "25", label: "card min." },
             ].map((s) => (
               <div key={s.label} className="flex items-baseline gap-2">
@@ -103,8 +99,8 @@ export function UnforgettableLanding() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <ScrollReveal direction="left">
               <Image
-                src="/images/products/johndoe-card.jpg"
-                alt="Close-up of a matte-black metal business card with laser-engraved details"
+                src="/images/products/blac_card_product_photo_whitebackground.png"
+                alt="Angled view of matte black laser-engraved metal business card"
                 width={1024}
                 height={683}
                 className="w-full rounded-2xl"
@@ -117,14 +113,14 @@ export function UnforgettableLanding() {
                   Every detail, laser sharp
                 </h2>
                 <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-8">
-                  Your logo, name, QR code, contact info — all engraved into
+                  Your logo, name, QR code, contact info. All engraved into
                   brushed matte-black aluminum at micron-level accuracy. The
                   result is a card that looks and feels nothing like paper.
                 </p>
                 <div className="space-y-3.5 text-sm">
                   {[
                     "Laser-cut engraving, micron-level precision",
-                    "Matte-black metal, heavy in the hand",
+                    "Matte black, glossy, or brushed stainless steel",
                     "Credit-card sized, fits any wallet",
                     "Won't fade, bend, or tear",
                     "Custom QR codes that link anywhere",
@@ -132,7 +128,7 @@ export function UnforgettableLanding() {
                     "Two thickness options: 0.4mm or 0.8mm",
                   ].map((point) => (
                     <div key={point} className="flex items-center gap-3">
-                      <span className="size-1 rounded-full bg-gold flex-shrink-0" />
+                      <span className="size-1 rounded-full bg-foreground/30 flex-shrink-0" />
                       <span className="text-foreground/80">{point}</span>
                     </div>
                   ))}
@@ -156,7 +152,7 @@ export function UnforgettableLanding() {
             {
               num: "01",
               title: "Share your design",
-              desc: "Send us your logo and details via WhatsApp, or let our design team create something for you. We accept AI, EPS, PDF, and high-res PNG.",
+              desc: "Send us your logo and details, or let our design team create something for you. We accept AI, EPS, PDF, and high-res PNG.",
             },
             {
               num: "02",
@@ -166,12 +162,12 @@ export function UnforgettableLanding() {
             {
               num: "03",
               title: "Receive and impress",
-              desc: "Cards delivered to your door within 5–7 business days. Start handing them out and watch how people react.",
+              desc: "Cards delivered to your door within 10-14 business days after approval, though they can be ready in as little as 5-7 days.",
             },
           ].map((step, i) => (
             <ScrollReveal key={step.num} delay={i * 0.08}>
               <div className="flex gap-6 sm:gap-10 py-8 border-t border-border/40">
-                <span className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold text-gold/20 tabular-nums flex-shrink-0 leading-none pt-0.5">
+                <span className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold text-foreground/10 tabular-nums flex-shrink-0 leading-none pt-0.5">
                   {step.num}
                 </span>
                 <div>
@@ -192,7 +188,7 @@ export function UnforgettableLanding() {
           <ScrollReveal>
             <div className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-center">
               <div className="lg:col-span-3">
-                <p className="text-gold/50 text-[11px] tracking-[0.35em] uppercase font-medium mb-4">
+                <p className="text-muted-foreground/50 text-[11px] tracking-[0.35em] uppercase font-medium mb-4">
                   Design Studio
                 </p>
                 <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
@@ -205,7 +201,7 @@ export function UnforgettableLanding() {
                 </p>
                 <Link
                   href="/unforgettable/design-studio"
-                  className="inline-flex items-center gap-2.5 text-gold hover:text-gold/80 font-medium text-sm transition-colors group"
+                  className="inline-flex items-center gap-2.5 text-foreground hover:text-foreground/70 font-medium text-sm transition-colors group"
                 >
                   Open the Design Studio
                   <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
@@ -213,20 +209,13 @@ export function UnforgettableLanding() {
               </div>
 
               <div className="lg:col-span-2">
-                <div className="aspect-[85/55] rounded-lg bg-zinc-900 relative overflow-hidden border border-white/[0.06] safari-fix-overflow">
-                  <div className="absolute inset-0 metal-texture opacity-30" />
-                  {/* Abstract lines suggesting an engraved card layout */}
-                  <div className="absolute top-5 left-6 right-6">
-                    <div className="h-px bg-white/[0.07] mb-2.5" />
-                    <div className="h-px bg-white/[0.04] w-2/3 mb-5" />
-                    <div className="h-px bg-white/[0.03] w-1/3" />
-                  </div>
-                  <div className="absolute bottom-5 left-6">
-                    <div className="h-px bg-white/[0.05] w-20 mb-2" />
-                    <div className="h-px bg-white/[0.03] w-14" />
-                  </div>
-                  <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
-                </div>
+                <Image
+                  src="/images/products/card_front_transparent_background.png"
+                  alt="Matte black laser-engraved metal business card"
+                  width={800}
+                  height={500}
+                  className="w-full"
+                />
               </div>
             </div>
           </ScrollReveal>
@@ -249,7 +238,7 @@ export function UnforgettableLanding() {
                 <div>
                   <div className="flex gap-0.5 mb-6">
                     {Array.from({ length: TESTIMONIALS[0].rating }).map((_, j) => (
-                      <Star key={j} className="size-4 fill-gold text-gold" />
+                      <Star key={j} className="size-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
                   <blockquote className="text-lg sm:text-xl text-foreground leading-relaxed mb-8">
@@ -280,7 +269,7 @@ export function UnforgettableLanding() {
                       </div>
                       <div className="flex gap-0.5">
                         {Array.from({ length: t.rating }).map((_, j) => (
-                          <Star key={j} className="size-3 fill-gold text-gold" />
+                          <Star key={j} className="size-3 fill-amber-400 text-amber-400" />
                         ))}
                       </div>
                     </div>
@@ -300,16 +289,16 @@ export function UnforgettableLanding() {
               Your next meeting starts differently
             </h2>
             <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-              Message us on WhatsApp. We&apos;ll send a free design
-              mockup and a quote within the hour.
+              Get in touch and we&apos;ll send a free design mockup and a
+              quote within the hour.
             </p>
-            <WhatsAppCTA
-              buttonText="Start Your Order"
-              variant="gold"
-              size="lg"
-              message={WHATSAPP_MESSAGE}
-              trackingLabel="unforgettable-bottom-cta"
-            />
+            <Link
+              href="/products/metal-business-cards"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
+            >
+              Start Your Order
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </ScrollReveal>
         </div>
       </section>

@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { FAQ_ITEMS } from "@/lib/constants";
 import {
@@ -8,35 +10,29 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 
 export function FAQAccordion() {
   return (
     <section className="py-24 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-card/30 via-background to-background" />
-
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Header */}
           <ScrollReveal className="lg:sticky lg:top-32 lg:self-start">
-            <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
-              FAQ
-            </p>
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-              Common{" "}
-              <span className="text-gradient-gold">Questions</span>
+              FAQs
             </h2>
             <p className="text-muted-foreground text-lg mb-8">
-              Common questions about pricing, materials, and turnaround.
-              Can&apos;t find yours? Chat with us.
+              Got questions? We&apos;ve got answers. Everything you need to know
+              about the cards themselves.
             </p>
 
-            <WhatsAppCTA
-              buttonText="Ask a Question"
-              message="Hi! I have a question about your laser engraving services..."
-              trackingLabel="faq"
-            />
+            <Link
+              href="/products/metal-business-cards"
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border text-foreground font-medium text-sm hover:border-gold transition-colors"
+            >
+              Design Your Card
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </ScrollReveal>
 
           {/* Accordion */}

@@ -21,7 +21,7 @@ const faqCategories = [
     questions: [
       {
         q: "What is the minimum order quantity?",
-        a: "Our minimum order is 25 cards. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
+        a: "Our minimum order is 30 cards. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
       },
       {
         q: "How do I place an order?",
@@ -63,7 +63,7 @@ const faqCategories = [
     questions: [
       {
         q: "How long does production take?",
-        a: "Standard production is 5-7 business days after design approval. Rush orders (2-3 days) are available for an additional fee.",
+        a: "Standard production is 10-14 business days after design approval, though cards can be ready in as little as 5-7 days.",
       },
       {
         q: "What material are the cards made from?",

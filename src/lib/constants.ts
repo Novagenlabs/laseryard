@@ -23,10 +23,9 @@ export const WHATSAPP_MESSAGES = {
 };
 
 export const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/shop", label: "Shop" },
-  { href: "/custom-engraving", label: "Custom Engraving" },
-  { href: "/process", label: "Process" },
+  { href: "/products/metal-business-cards", label: "Metal Cards" },
+  { href: "/shop", label: "More Products" },
+  { href: "/process", label: "How It Works" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -228,34 +227,34 @@ export const TRUST_LOGOS = [
 
 export const FAQ_ITEMS = [
   {
-    question: "What products do you offer?",
+    question: "Will I see a proof before my cards are made?",
     answer:
-      "We offer laser-engraved metal business cards, 3D crystal awards and trophies, and custom wood boards and coasters. We also provide custom engraving on your own items:metal, wood, acrylic, leather, glass, and fabric.",
+      "Absolutely. We send you a digital proof within 1-3 business days of your order. You can request unlimited revisions until you're completely happy. Nothing gets engraved until you approve.",
+  },
+  {
+    question: "How do I design my metal business cards?",
+    answer:
+      "You have two options: upload your own design (PDF or high-resolution PNG) in the Design Studio and preview it on a 3D metal card, or let our design team handle it for you. Just share your logo and details, and we'll create a production-ready layout.",
+  },
+  {
+    question: "How long does it take to get my cards?",
+    answer:
+      "Standard production is 10-14 business days after you approve your proof, though cards can be ready in as little as 5-7 days. We ship worldwide.",
+  },
+  {
+    question: "Are the cards really made of metal?",
+    answer:
+      "Yes. Our cards are made from premium aluminum, available in 0.4mm or 0.8mm thick. They're heavy, cold to the touch, and built to last. The kind of card people keep instead of throwing away.",
   },
   {
     question: "What is the minimum order quantity?",
     answer:
-      "For metal business cards, our minimum order is 25 cards. For crystal awards and wood products, we can handle single-piece orders. Custom engraving on your own items has no minimum:bring us one item or a hundred.",
+      "Our minimum order is 30 cards. We offer volume discounts starting at 50+ cards. Contact us for bulk pricing on orders of 200+.",
   },
   {
-    question: "How long does production take?",
+    question: "Can I add NFC to my cards?",
     answer:
-      "Standard production is 5-7 business days after design approval. Rush orders (2-3 days) are available for an additional fee. Custom engraving on personal items is typically completed within 1-3 business days.",
-  },
-  {
-    question: "What file formats do you accept for designs?",
-    answer:
-      "We accept AI, EPS, PDF (vector), and high-resolution PNG files (minimum 300 DPI). Our team can also help convert your existing designs or create new ones.",
-  },
-  {
-    question: "Can you engrave my own items?",
-    answer:
-      "Yes! Bring us your own items:laptops, phones, water bottles, leather goods, wooden gifts, and more. We'll assess the material and provide a quote for custom engraving.",
-  },
-  {
-    question: "Do you ship internationally?",
-    answer:
-      "Yes! We ship worldwide. Delivery times vary by location:contact us on WhatsApp for shipping details to your country.",
+      "Yes! We offer custom NFC-enabled metal cards. Tap your card against any smartphone to instantly share your contact info, website, or digital business card. No app required.",
   },
 ];
 
@@ -294,5 +293,12 @@ export const COUNTRIES = [
     cities: ["Dubai", "Abu Dhabi"],
     currency: "AED",
     phone: "+971",
+  },
+  {
+    slug: "eu",
+    name: "EU",
+    cities: ["Berlin", "Paris", "Amsterdam", "Milan"],
+    currency: "EUR",
+    phone: "+49",
   },
 ];

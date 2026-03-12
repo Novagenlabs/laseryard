@@ -21,7 +21,7 @@ CORE PRODUCT -METAL BUSINESS CARDS:
 - Finish options: Matte, glossy, brushed
 - Standard size: 85mm × 55mm (same as traditional cards)
 - Custom shapes and sizes available
-- Minimum order: 25 cards
+- Minimum order: 30 cards
 - Volume discounts: Orders of 500+ cards receive 10% discount
 
 PRICING GUIDANCE:
@@ -43,7 +43,7 @@ ORDERING PROCESS:
 2. Share design (AI, EPS, PDF vector, or high-res PNG 300+ DPI)
 3. Receive digital proof for approval
 4. Pay 50% deposit to start production
-5. Production: 5–7 business days (standard), 2–3 days (rush, extra fee)
+5. Production: 10–14 business days (standard), can be ready in as little as 5–7 days
 6. Pay remaining 50% before shipping
 7. Delivery
 

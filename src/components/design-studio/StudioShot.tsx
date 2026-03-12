@@ -10,32 +10,8 @@ interface StudioShotProps {
   disabled?: boolean;
 }
 
-const SCENE_OPTIONS = [
-  {
-    id: "desk",
-    label: "On Dark Surface",
-    promptSuffix:
-      "resting on a dark matte surface with soft gradient lighting",
-  },
-  {
-    id: "marble",
-    label: "Marble Desk",
-    promptSuffix:
-      "placed on a white marble desk surface with natural window light",
-  },
-  {
-    id: "hand",
-    label: "Held in Hand",
-    promptSuffix:
-      "held between two fingers of a professional hand, blurred office background",
-  },
-  {
-    id: "wallet",
-    label: "With Wallet",
-    promptSuffix:
-      "next to an open premium leather wallet on a wooden desk",
-  },
-] as const;
+const SCENE_PROMPT_SUFFIX =
+  "held between two fingers of a professional hand, blurred office background";
 
 const MAX_GENERATIONS = 5;
 const STORAGE_KEY = "design-studio-gen-count";
@@ -62,7 +38,6 @@ function incrementGenerationCount() {
 }
 
 export function StudioShot({ engraveDataUrl, originalImageDataUrl, disabled }: StudioShotProps) {
-  const [selectedScene, setSelectedScene] = useState<string>("desk");
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,15 +46,13 @@ export function StudioShot({ engraveDataUrl, originalImageDataUrl, disabled }: S
   const remainingGenerations = MAX_GENERATIONS - genCount;
   const canGenerate = remainingGenerations > 0 && !disabled && !isGenerating;
 
-  const scene = SCENE_OPTIONS.find((s) => s.id === selectedScene)!;
-
   async function handleGenerate() {
     if (!canGenerate) return;
 
     setIsGenerating(true);
     setError(null);
 
-    const prompt = `Generate a professional product photograph of a laser-engraved metal business card. The card has a matte black anodized finish on brushed stainless steel. The attached image shows the EXACT engrave pattern that must appear on the card — the white areas are where the laser has removed the black coating to reveal shiny brushed metal underneath. You MUST reproduce this exact design faithfully on the card face — same layout, same text, same logo, same positions. Do not alter, simplify, or replace any part of the design. CRITICAL: UV laser engraving on aluminum is physically single-color only. The engraved areas must appear as bare brushed silver/white metal — NEVER add any color (no gold, red, blue, green, etc.) to the engraved design. The only two tones on the card are the matte black coating and the exposed silver brushed metal. The card should be ${scene.promptSuffix}. Studio lighting with soft directional light from upper left creating subtle reflections on the metal surface. Shallow depth of field. Shot on Canon EOS R5 with 100mm macro lens at f/2.8. Hyperrealistic product photography.`;
+    const prompt = `Generate a professional product photograph of a laser-engraved metal business card. The card has a matte black anodized finish on brushed stainless steel. The attached image shows the EXACT engrave pattern that must appear on the card - the white areas are where the laser has removed the black coating to reveal shiny brushed metal underneath. You MUST reproduce this exact design faithfully on the card face - same layout, same text, same logo, same positions. Do not alter, simplify, or replace any part of the design. CRITICAL: UV laser engraving on aluminum is physically single-color only. The engraved areas must appear as bare brushed silver/white metal - NEVER add any color (no gold, red, blue, green, etc.) to the engraved design. The only two tones on the card are the matte black coating and the exposed silver brushed metal. The card should be ${SCENE_PROMPT_SUFFIX}. Studio lighting with soft directional light from upper left creating subtle reflections on the metal surface. Shallow depth of field. Shot on Canon EOS R5 with 100mm macro lens at f/2.8. Hyperrealistic product photography.`;
 
     try {
       const response = await fetch("/api/design-studio/generate", {
@@ -120,24 +93,6 @@ export function StudioShot({ engraveDataUrl, originalImageDataUrl, disabled }: S
           </span>{" "}
           generations remaining today.
         </p>
-      </div>
-
-      {/* Scene selector */}
-      <div className="grid grid-cols-2 gap-2">
-        {SCENE_OPTIONS.map((option) => (
-          <button
-            key={option.id}
-            onClick={() => setSelectedScene(option.id)}
-            className={cn(
-              "py-2 px-3 rounded-xl text-xs font-medium transition-all text-center",
-              selectedScene === option.id
-                ? "bg-gold/15 text-gold border border-gold/30"
-                : "bg-muted text-muted-foreground border border-border hover:border-gold/30"
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
       </div>
 
       {/* Generate button */}

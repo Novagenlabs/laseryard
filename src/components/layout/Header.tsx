@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, MessageCircle } from "lucide-react";
-import { NAV_LINKS, WHATSAPP_NUMBER, WHATSAPP_MESSAGES } from "@/lib/constants";
+import { Menu, X, ArrowRight } from "lucide-react";
+import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
@@ -22,13 +22,6 @@ export function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleWhatsAppClick = () => {
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      WHATSAPP_MESSAGES.general
-    )}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
 
   return (
     <>
@@ -69,7 +62,7 @@ export function Header() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="hidden lg:flex items-center gap-1"
             >
-              {NAV_LINKS.map((link, index) => (
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -88,14 +81,13 @@ export function Header() {
               className="hidden lg:flex items-center gap-3"
             >
               <ThemeToggle />
-              <button
-                onClick={handleWhatsAppClick}
-                className="btn-apple btn-apple-whatsapp !py-2.5 !px-5"
-                aria-label="Get quote via WhatsApp"
+              <Link
+                href="/products/metal-business-cards"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background font-medium text-sm hover:opacity-90 transition-opacity"
               >
-                <MessageCircle className="w-4 h-4" aria-hidden="true" />
-                <span>Get Quote</span>
-              </button>
+                Design Your Card
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
             </motion.div>
 
             {/* Mobile Menu Button */}
@@ -172,14 +164,14 @@ export function Header() {
                     <span className="text-sm text-muted-foreground">Theme</span>
                     <ThemeToggle />
                   </div>
-                  <button
-                    onClick={handleWhatsAppClick}
-                    className="btn-apple btn-apple-whatsapp w-full !py-4 !text-lg"
-                    aria-label="Chat with us on WhatsApp"
+                  <Link
+                    href="/products/metal-business-cards"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-foreground text-background font-medium text-lg hover:opacity-90 transition-opacity"
                   >
-                    <MessageCircle className="w-5 h-5" aria-hidden="true" />
-                    <span>Chat on WhatsApp</span>
-                  </button>
+                    <span>Design Your Card</span>
+                    <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                  </Link>
                 </motion.div>
               </div>
             </motion.nav>

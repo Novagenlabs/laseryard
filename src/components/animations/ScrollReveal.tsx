@@ -4,25 +4,61 @@ import { motion, useReducedMotion, useInView } from "motion/react";
 import { ReactNode, useRef } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
+type RevealVariant = "clip-up" | "clip-left" | "clip-right" | "scale" | "none";
+
 interface ScrollRevealProps {
   children: ReactNode;
   delay?: number;
   duration?: number;
+  /** New variant-based API */
+  variant?: RevealVariant;
+  /** Legacy direction prop, maps to variants */
   direction?: "up" | "down" | "left" | "right" | "none";
   className?: string;
   once?: boolean;
 }
 
+const variantConfig = {
+  "clip-up": {
+    hidden: { clipPath: "inset(8% 0% 0% 0%)", opacity: 0.3 },
+    visible: { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 },
+  },
+  "clip-left": {
+    hidden: { clipPath: "inset(0% 100% 0% 0%)", opacity: 0 },
+    visible: { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 },
+  },
+  "clip-right": {
+    hidden: { clipPath: "inset(0% 0% 0% 100%)", opacity: 0 },
+    visible: { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 },
+  },
+  scale: {
+    hidden: { scale: 0.96, opacity: 0.4 },
+    visible: { scale: 1, opacity: 1 },
+  },
+  none: {
+    hidden: {},
+    visible: {},
+  },
+};
+
+function resolveVariant(variant?: RevealVariant, direction?: string): RevealVariant {
+  if (variant) return variant;
+  if (direction === "left") return "clip-left";
+  if (direction === "right") return "clip-right";
+  if (direction === "none") return "none";
+  return "clip-up";
+}
+
 /**
- * Scroll reveal animation.
- * Mobile: lightweight opacity + gentle slide (respects iOS Safari GPU limits).
- * Desktop: full directional animations.
+ * Scroll reveal with clip-path and scale animations.
+ * Uses clip-path wipes instead of generic fade-up.
  */
 export function ScrollReveal({
   children,
   delay = 0,
-  duration = 0.5,
-  direction = "up",
+  duration = 0.6,
+  variant,
+  direction,
   className,
   once = true,
 }: ScrollRevealProps) {
@@ -31,40 +67,27 @@ export function ScrollReveal({
   const isMobile = useIsMobile();
   const isInView = useInView(ref, {
     once,
-    margin: isMobile ? "-20% 0px" : "-50px 0px",
+    margin: isMobile ? "-15% 0px" : "-50px 0px",
   });
 
-  if (shouldReduceMotion) {
+  const resolved = resolveVariant(variant, direction);
+
+  if (shouldReduceMotion || resolved === "none") {
     return <div className={className}>{children}</div>;
   }
 
-  // Mobile: lightweight fade + gentle slide-up
-  if (isMobile) {
-    return (
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 15 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-        transition={{ duration: 0.4, delay, ease: "easeOut" }}
-        className={className}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-
-  // Desktop: full animations
-  const getOffset = () => {
-    if (direction === "none") return {};
-    return { y: direction === "down" ? -20 : 20 };
-  };
+  const config = variantConfig[resolved];
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, ...getOffset() }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, ...getOffset() }}
-      transition={{ duration, delay, ease: "easeOut" }}
+      initial={config.hidden}
+      animate={isInView ? config.visible : config.hidden}
+      transition={{
+        duration: isMobile ? 0.4 : duration,
+        delay,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
       className={className}
     >
       {children}
@@ -80,13 +103,12 @@ interface StaggerContainerProps {
 }
 
 /**
- * Stagger container.
- * Mobile: enabled with safe IntersectionObserver margin.
+ * Stagger container for grouped items.
  */
 export function StaggerContainer({
   children,
   className,
-  staggerDelay = 0.08,
+  staggerDelay = 0.1,
   once = true,
 }: StaggerContainerProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -94,7 +116,7 @@ export function StaggerContainer({
   const isMobile = useIsMobile();
   const isInView = useInView(ref, {
     once,
-    margin: isMobile ? "-20% 0px" : "-30px 0px",
+    margin: isMobile ? "-15% 0px" : "-30px 0px",
   });
 
   if (shouldReduceMotion) {
@@ -122,8 +144,7 @@ export function StaggerContainer({
 }
 
 /**
- * Stagger item.
- * Mobile: lighter fade + slide (y:10, 0.3s). Desktop: full (y:15, 0.4s).
+ * Stagger item with scale-in instead of fade-up.
  */
 export function StaggerItem({
   children,
@@ -133,7 +154,6 @@ export function StaggerItem({
   className?: string;
 }) {
   const shouldReduceMotion = useReducedMotion();
-  const isMobile = useIsMobile();
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
@@ -142,13 +162,13 @@ export function StaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: isMobile ? 10 : 15 },
+        hidden: { scale: 0.94, opacity: 0.2 },
         visible: {
+          scale: 1,
           opacity: 1,
-          y: 0,
           transition: {
-            duration: isMobile ? 0.3 : 0.4,
-            ease: "easeOut",
+            duration: 0.5,
+            ease: [0.25, 0.1, 0.25, 1],
           },
         },
       }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ThresholdControlsProps {
@@ -16,6 +16,12 @@ export function ThresholdControls({
   invert,
   onInvertChange,
 }: ThresholdControlsProps) {
+  // When inverted, the threshold behaves in reverse (higher = more detail
+  // instead of less), so flip the slider value to keep the UX consistent.
+  const sliderMin = 30;
+  const sliderMax = 225;
+  const displayValue = invert ? sliderMin + sliderMax - threshold : threshold;
+
   return (
     <div className="space-y-4">
       {/* Threshold slider */}
@@ -34,10 +40,13 @@ export function ThresholdControls({
         <input
           id="threshold"
           type="range"
-          min={30}
-          max={225}
-          value={threshold}
-          onChange={(e) => onThresholdChange(Number(e.target.value))}
+          min={sliderMin}
+          max={sliderMax}
+          value={displayValue}
+          onChange={(e) => {
+            const raw = Number(e.target.value);
+            onThresholdChange(invert ? sliderMin + sliderMax - raw : raw);
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer bg-muted
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-5
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gold
@@ -54,18 +63,30 @@ export function ThresholdControls({
       </div>
 
       {/* Invert toggle */}
-      <button
-        onClick={() => onInvertChange(!invert)}
-        className={cn(
-          "w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition-all",
-          invert
-            ? "bg-gold/15 text-gold border border-gold/30"
-            : "bg-muted text-muted-foreground border border-border hover:border-gold/30 hover:text-foreground"
-        )}
-      >
-        <ArrowLeftRight className="size-4" />
-        <span>Invert Design</span>
-      </button>
+      <div className="space-y-2">
+        <button
+          onClick={() => onInvertChange(!invert)}
+          className={cn(
+            "w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition-all",
+            invert
+              ? "bg-gold/15 text-gold border border-gold/30"
+              : "bg-muted text-muted-foreground border border-border hover:border-gold/30 hover:text-foreground"
+          )}
+        >
+          <ArrowLeftRight className="size-4" />
+          <span>Invert Design</span>
+        </button>
+        <p className="flex items-start gap-1.5 text-[10px] text-muted-foreground leading-relaxed">
+          <Info className="size-3 flex-shrink-0 mt-0.5" />
+          Dark designs may not be visible on the card. Use Invert Design to flip light and dark areas.
+        </p>
+      </div>
+
+      {/* Detail level hint */}
+      <p className="flex items-start gap-1.5 text-[10px] text-muted-foreground leading-relaxed">
+        <Info className="size-3 flex-shrink-0 mt-0.5" />
+        Adjust the detail slider to control how much of your design is engraved. More detail keeps finer lines; less detail simplifies the output.
+      </p>
     </div>
   );
 }

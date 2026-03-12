@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -13,11 +12,9 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { cn } from "@/lib/utils";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { CTABanner } from "@/components/sections/CTABanner";
-import { useIsMobile } from "@/hooks/useIsMobile";
 
 type Thickness = "0.4mm" | "0.8mm";
 
@@ -33,19 +30,19 @@ const thicknessOptions = {
 };
 
 const specs = [
-  { label: "Material", value: "Premium Aluminum" },
+  { label: "Material", value: "Aluminum & Stainless Steel" },
   { label: "Standard Size", value: "85mm × 55mm" },
-  { label: "Finish", value: "Brushed metal with laser engraving" },
+  { label: "Finishes", value: "Matte black, glossy, brushed steel" },
   { label: "Customization", value: "Full custom design" },
-  { label: "Minimum Order", value: "25 cards" },
-  { label: "Production Time", value: "5-7 business days" },
+  { label: "Minimum Order", value: "30 cards" },
+  { label: "Production Time", value: "10-14 business days after approval" },
 ];
 
 const features = [
   {
     icon: Layers,
-    title: "Premium Aluminum",
-    description: "Aircraft-grade aluminum for lasting durability",
+    title: "Aluminum & Stainless Steel",
+    description: "Two material options for the look you want",
   },
   {
     icon: Crosshair,
@@ -64,11 +61,29 @@ const features = [
   },
 ];
 
+const galleryImages = [
+  {
+    src: "/images/products/blac_card_product_photo_whitebackground.png",
+    alt: "Matte black laser-engraved metal business card, angled view",
+  },
+  {
+    src: "/images/products/card_whitebackground_product_photo_1.png",
+    alt: "Brushed stainless steel metal business card",
+  },
+  {
+    src: "/images/products/card_whitebackground_product_photo_2.png",
+    alt: "Back of metal business card with contact details",
+  },
+  {
+    src: "/images/products/front_and back_blac_card_product_photo_whitebackground.png",
+    alt: "Front and back of matte black metal business card",
+  },
+];
+
 export function ProductPage() {
   const [selectedThickness, setSelectedThickness] =
     useState<Thickness>("0.4mm");
   const [activeImage, setActiveImage] = useState(0);
-  const isMobile = useIsMobile();
 
   const option = thicknessOptions[selectedThickness];
 
@@ -78,7 +93,7 @@ export function ProductPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-            <Link href="/" className="hover:text-gold transition-colors">
+            <Link href="/" className="hover:text-foreground transition-colors">
               Home
             </Link>
             <ChevronRight className="w-4 h-4" />
@@ -90,113 +105,17 @@ export function ProductPage() {
             <ScrollReveal direction="left">
               <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square rounded-2xl bg-card border border-border safari-fix-overflow">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {/* Product Visual - static on mobile, animated on desktop */}
-                    {isMobile ? (
-                      <div className="w-[80%] aspect-[1.6/1] relative">
-                        <div
-                          className="absolute inset-0 rounded-xl metal-texture safari-fix-overflow"
-                          style={{
-                            background:
-                              "linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%)",
-                            boxShadow: `
-                              0 30px 60px -15px rgba(0, 0, 0, 0.5),
-                              0 0 0 1px rgba(255, 255, 255, 0.08),
-                              inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                            `,
-                          }}
-                        >
-                          {/* Card Content - Mobile */}
-                          <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="text-gold/80 text-sm font-semibold tracking-wide">
-                                  YOUR NAME
-                                </div>
-                                <div className="text-white/50 text-xs mt-1 tracking-wider">
-                                  YOUR TITLE
-                                </div>
-                              </div>
-                              <div className="w-8 h-8 rounded bg-gold/20 flex items-center justify-center">
-                                <span className="text-gold font-bold text-xs">
-                                  LOGO
-                                </span>
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-white/40 text-xs tracking-wider">
-                                YOUR COMPANY
-                              </div>
-                            </div>
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
-                        </div>
-                      </div>
-                    ) : (
-                      <motion.div
-                        key={activeImage}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className="w-[80%] aspect-[1.6/1] relative"
-                      >
-                        <div
-                          className="absolute inset-0 rounded-xl metal-texture safari-fix-overflow"
-                          style={{
-                            background:
-                              "linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%)",
-                            boxShadow: `
-                              0 30px 60px -15px rgba(0, 0, 0, 0.5),
-                              0 0 0 1px rgba(255, 255, 255, 0.08),
-                              inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                            `,
-                          }}
-                        >
-                          {/* Shine Effect - Desktop only */}
-                          <motion.div
-                            animate={{ x: [-200, 400] }}
-                            transition={{
-                              duration: 3,
-                              repeat: Infinity,
-                              repeatDelay: 3,
-                            }}
-                            className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
-                          />
-
-                          {/* Card Content - Desktop */}
-                          <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="text-gold/80 text-sm font-semibold tracking-wide">
-                                  YOUR NAME
-                                </div>
-                                <div className="text-white/50 text-xs mt-1 tracking-wider">
-                                  YOUR TITLE
-                                </div>
-                              </div>
-                              <div className="w-8 h-8 rounded bg-gold/20 flex items-center justify-center">
-                                <span className="text-gold font-bold text-xs">
-                                  LOGO
-                                </span>
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-white/40 text-xs tracking-wider">
-                                YOUR COMPANY
-                              </div>
-                            </div>
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
+                <div className="relative rounded-2xl bg-card border border-border overflow-hidden safari-fix-overflow">
+                  <img
+                    src={galleryImages[activeImage].src}
+                    alt={galleryImages[activeImage].alt}
+                    className="w-full"
+                  />
 
                   {/* Design Studio hint */}
                   <Link
                     href="/unforgettable/design-studio"
-                    className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-gold/90 text-xs text-primary-foreground font-medium hover:bg-gold transition-colors flex items-center gap-1.5 group"
+                    className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-foreground/90 text-xs text-background font-medium hover:bg-foreground transition-colors flex items-center gap-1.5 group"
                   >
                     Preview your design in 3D
                     <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
@@ -205,18 +124,22 @@ export function ProductPage() {
 
                 {/* Thumbnails */}
                 <div className="grid grid-cols-4 gap-3">
-                  {[0, 1, 2, 3].map((index) => (
+                  {galleryImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setActiveImage(index)}
                       className={cn(
-                        "aspect-square rounded-lg border-2 transition-all bg-card flex items-center justify-center",
+                        "aspect-square rounded-lg border-2 transition-all bg-card overflow-hidden",
                         activeImage === index
-                          ? "border-gold"
-                          : "border-border hover:border-gold/50"
+                          ? "border-foreground"
+                          : "border-border hover:border-foreground/30"
                       )}
                     >
-                      <div className="w-[60%] aspect-[1.6/1] rounded bg-muted" />
+                      <img
+                        src={image.src}
+                        alt={image.alt}
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -231,8 +154,8 @@ export function ProductPage() {
                     Premium Metal Business Cards
                   </h1>
                   <p className="text-muted-foreground text-lg">
-                    Laser-engraved aluminum cards. Heavy, cold to the touch,
-                    and impossible to throw away.
+                    Laser-engraved aluminum and stainless steel cards. Heavy,
+                    cold to the touch, and impossible to throw away.
                   </p>
                 </div>
 
@@ -254,8 +177,8 @@ export function ProductPage() {
                         className={cn(
                           "relative p-4 rounded-xl border-2 text-left transition-all",
                           selectedThickness === key
-                            ? "border-gold bg-gold/5"
-                            : "border-border hover:border-gold/30"
+                            ? "border-foreground bg-foreground/5"
+                            : "border-border hover:border-foreground/30"
                         )}
                       >
                         <div>
@@ -269,8 +192,8 @@ export function ProductPage() {
                         </p>
 
                         {selectedThickness === key && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
-                            <Check className="w-3 h-3 text-primary-foreground" />
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
+                            <Check className="w-3 h-3 text-background" />
                           </div>
                         )}
                       </button>
@@ -282,11 +205,11 @@ export function ProductPage() {
                 <div className="p-6 rounded-xl bg-card border border-border space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Minimum Order</span>
-                    <span className="font-semibold">25 cards</span>
+                    <span className="font-semibold">30 cards</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Production Time</span>
-                    <span className="font-semibold">5-7 business days</span>
+                    <span className="font-semibold">10-14 business days</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Selected Thickness</span>
@@ -301,16 +224,18 @@ export function ProductPage() {
 
                 {/* CTA */}
                 <div className="space-y-3">
-                  <WhatsAppCTA
-                    buttonText="Get a Quote"
-                    size="lg"
-                    className="w-full"
-                    message={`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing and the design process?`}
-                    trackingLabel="product-page"
-                  />
+                  <a
+                    href={`https://wa.me/22893184418?text=${encodeURIComponent(`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing and the design process?`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
+                  >
+                    Get a Quote
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
                   <Link
                     href="/unforgettable/design-studio"
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-gold hover:border-gold/30 transition-all group"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
                   >
                     Try the Design Studio
                     <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -329,8 +254,8 @@ export function ProductPage() {
             {features.map((feature, index) => (
               <ScrollReveal key={index} delay={index * 0.1}>
                 <div className="text-center">
-                  <div className="w-14 h-14 mx-auto rounded-xl bg-gold/10 flex items-center justify-center mb-4">
-                    <feature.icon className="w-7 h-7 text-gold" />
+                  <div className="w-14 h-14 mx-auto rounded-xl bg-foreground/5 dark:bg-background/10 flex items-center justify-center mb-4">
+                    <feature.icon className="w-7 h-7 text-foreground/70" />
                   </div>
                   <h3 className="font-semibold mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -359,7 +284,7 @@ export function ProductPage() {
               </div>
               <Link
                 href="/unforgettable/design-studio"
-                className="inline-flex items-center gap-2.5 text-gold hover:text-gold/80 font-medium text-sm transition-colors group flex-shrink-0"
+                className="inline-flex items-center gap-2.5 text-foreground hover:text-foreground/70 font-medium text-sm transition-colors group flex-shrink-0"
               >
                 Open the Design Studio
                 <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />

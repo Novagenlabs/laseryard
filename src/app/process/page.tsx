@@ -47,8 +47,8 @@ const steps = [
     description:
       "Your project is laser-engraved using industrial-grade equipment. Every piece is individually inspected to ensure perfect quality.",
     details: [
-      "5-7 business days standard",
-      "Rush options available",
+      "10-14 business days standard",
+      "Can be ready in as little as 5-7 days",
       "Quality inspection on every piece",
     ],
   },
@@ -215,14 +215,14 @@ export default function ProcessPage() {
               Expected Timeline
             </h2>
             <p className="text-muted-foreground">
-              Standard orders typically complete within 7-10 business days
+              Standard orders typically complete within 12-18 business days
             </p>
           </ScrollReveal>
 
           <div className="grid sm:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
               { phase: "Design Review", time: "1-2 days" },
-              { phase: "Production", time: "5-7 days" },
+              { phase: "Production", time: "10-14 days" },
               { phase: "Quality Check", time: "1 day" },
               { phase: "Shipping", time: "1-5 days" },
             ].map((item, index) => (

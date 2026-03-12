@@ -2,11 +2,12 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { RotateCcw, Crosshair, Eye, QrCode, Upload } from "lucide-react";
+import { RotateCcw, Crosshair, Eye, QrCode, Upload, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { DesignUploader, PdfUploader } from "./DesignUploader";
 import type { CardSide } from "./DesignUploader";
 import { ThresholdControls } from "./ThresholdControls";
@@ -21,7 +22,7 @@ const CardPreview3D = dynamic(
     loading: () => (
       <div className="w-full aspect-[4/3] rounded-2xl bg-card border border-border flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <div className="size-8 rounded-full border-2 border-gold border-t-transparent animate-spin" />
+          <div className="size-8 rounded-full border-2 border-foreground border-t-transparent animate-spin" />
           <p className="text-xs text-muted-foreground">Loading 3D preview...</p>
         </div>
       </div>
@@ -29,7 +30,7 @@ const CardPreview3D = dynamic(
   }
 );
 
-type Step = "upload" | "adjust" | "preview";
+type Step = "choose" | "upload" | "adjust" | "preview" | "request";
 
 interface SideState {
   file: File | null;
@@ -53,7 +54,16 @@ const emptySide: SideState = {
 
 export function DesignStudio() {
   const isMobile = useIsMobile();
-  const [step, setStep] = useState<Step>("upload");
+  const [step, setStep] = useState<Step>("choose");
+  const [requestForm, setRequestForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    logo: null as File | null,
+  });
+  const [requestSubmitted, setRequestSubmitted] = useState(false);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
   const [activeSide, setActiveSide] = useState<CardSide>("front");
   const [front, setFront] = useState<SideState>(emptySide);
   const [back, setBack] = useState<SideState>(emptySide);
@@ -194,15 +204,13 @@ export function DesignStudio() {
   const hasAnyDesign = !!(front.file || back.file);
   const hasAnyEngrave = !!(front.engraveDataUrl || back.engraveDataUrl);
 
-  const whatsappMessage = `Hi! I just previewed my metal business card design in your Design Studio and I'd like to place an order. Can you help me?`;
-
   return (
     <div className="min-h-screen pt-24 sm:pt-32 pb-16 sm:pb-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal>
           <div className="text-center mb-10 sm:mb-16">
-            <p className="text-gold/70 text-[11px] tracking-[0.35em] uppercase font-medium mb-4">
+            <p className="text-muted-foreground text-[11px] tracking-[0.35em] uppercase font-medium mb-4">
               Design Studio
             </p>
             <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1] text-balance mb-4">
@@ -216,36 +224,211 @@ export function DesignStudio() {
         </ScrollReveal>
 
         {/* Steps indicator */}
-        <ScrollReveal delay={0.1}>
-          <div className="flex items-center justify-center gap-2 mb-10">
-            {(["upload", "adjust", "preview"] as const).map((s, i) => (
-              <div key={s} className="flex items-center gap-2">
-                <div
-                  className={`size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    step === s
-                      ? "bg-gold text-primary-foreground"
-                      : i < ["upload", "adjust", "preview"].indexOf(step)
-                      ? "bg-gold/20 text-gold"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {i + 1}
+        {step !== "choose" && step !== "request" && (
+          <ScrollReveal delay={0.1}>
+            <div className="flex items-center justify-center gap-2 mb-10">
+              {(["upload", "adjust", "preview"] as const).map((s, i) => {
+                const stepIndex = ["upload", "adjust", "preview"].indexOf(step);
+                const thisIndex = i;
+                return (
+                  <div key={s} className="flex items-center gap-2">
+                    <div
+                      className={`size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                        step === s
+                          ? "bg-foreground text-background"
+                          : thisIndex < stepIndex
+                          ? "bg-foreground/20 text-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {i + 1}
+                    </div>
+                    {i < 2 && (
+                      <div
+                        className={`w-8 sm:w-16 h-px ${
+                          thisIndex < stepIndex
+                            ? "bg-foreground/40"
+                            : "bg-border"
+                        }`}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollReveal>
+        )}
+
+        {/* Choose path */}
+        {step === "choose" && (
+          <ScrollReveal delay={0.1}>
+            <div className="max-w-2xl mx-auto grid sm:grid-cols-2 gap-4 mb-10">
+              <button
+                onClick={() => setStep("upload")}
+                className="group p-8 rounded-2xl border border-border bg-card text-left hover:border-foreground/20 transition-all"
+              >
+                <Upload className="size-8 text-foreground/60 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">I have a design</h3>
+                <p className="text-sm text-muted-foreground">
+                  Upload your artwork and preview it on a metal card in 3D.
+                </p>
+              </button>
+              <button
+                onClick={() => setStep("request")}
+                className="group p-8 rounded-2xl border border-border bg-card text-left hover:border-foreground/20 transition-all"
+              >
+                <Crosshair className="size-8 text-foreground/60 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">I need a design</h3>
+                <p className="text-sm text-muted-foreground">
+                  Share your logo and details. Our design team will create something for you.
+                </p>
+              </button>
+            </div>
+          </ScrollReveal>
+        )}
+
+        {/* Design request form */}
+        {step === "request" && (
+          <ScrollReveal delay={0.1}>
+            <div className="max-w-lg mx-auto mb-10">
+              {requestSubmitted ? (
+                <div className="rounded-2xl border border-border bg-card p-8 text-center">
+                  <div className="size-16 mx-auto rounded-full bg-foreground/5 flex items-center justify-center mb-4">
+                    <Check className="size-8 text-foreground/60" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Request received</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Our design team will reach out to you via email or WhatsApp within 24 hours to discuss your card.
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-6">
+                    Want a faster response? Message us directly:
+                  </p>
+                  <a
+                    href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I just submitted a design request on the website. My name is " + requestForm.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity mb-4"
+                  >
+                    Chat on WhatsApp
+                    <ArrowRight className="size-3.5" />
+                  </a>
+                  <br />
+                  <button
+                    onClick={() => { setStep("choose"); setRequestSubmitted(false); }}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Back to Design Studio
+                  </button>
                 </div>
-                {i < 2 && (
-                  <div
-                    className={`w-8 sm:w-16 h-px ${
-                      i < ["upload", "adjust", "preview"].indexOf(step)
-                        ? "bg-gold/40"
-                        : "bg-border"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
+              ) : (
+                <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-5">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Tell us about your card</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Share your details and our design team will reach out to get started.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Name</label>
+                      <input
+                        type="text"
+                        value={requestForm.name}
+                        onChange={(e) => setRequestForm(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Your full name"
+                        className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Email</label>
+                      <input
+                        type="email"
+                        value={requestForm.email}
+                        onChange={(e) => setRequestForm(prev => ({ ...prev, email: e.target.value }))}
+                        placeholder="you@company.com"
+                        className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Phone</label>
+                      <input
+                        type="tel"
+                        value={requestForm.phone}
+                        onChange={(e) => setRequestForm(prev => ({ ...prev, phone: e.target.value }))}
+                        placeholder="+1 (555) 000-0000"
+                        className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Logo (optional)</label>
+                      <label className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-all cursor-pointer">
+                        <Upload className="size-4" />
+                        {requestForm.logo ? requestForm.logo.name : "Upload your logo"}
+                        <input
+                          type="file"
+                          accept="image/*,.pdf,.ai,.eps"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setRequestForm(prev => ({ ...prev, logo: file }));
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {requestError && (
+                    <p className="text-sm text-red-500 text-center">{requestError}</p>
+                  )}
+
+                  <button
+                    onClick={async () => {
+                      setRequestLoading(true);
+                      setRequestError(null);
+                      try {
+                        const res = await fetch("/api/design-request", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            name: requestForm.name,
+                            email: requestForm.email,
+                            phone: requestForm.phone,
+                            hasLogo: !!requestForm.logo,
+                          }),
+                        });
+                        if (!res.ok) {
+                          const data = await res.json().catch(() => null);
+                          throw new Error(data?.error || "Something went wrong");
+                        }
+                        setRequestSubmitted(true);
+                      } catch (err) {
+                        setRequestError(err instanceof Error ? err.message : "Failed to send request");
+                      } finally {
+                        setRequestLoading(false);
+                      }
+                    }}
+                    disabled={!requestForm.name || !requestForm.email || !requestForm.phone || requestLoading}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {requestLoading ? "Sending..." : "Send to Design Team"}
+                    {!requestLoading && <ArrowRight className="size-4" />}
+                  </button>
+
+                  <button
+                    onClick={() => setStep("choose")}
+                    className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
+                  >
+                    Back
+                  </button>
+                </div>
+              )}
+            </div>
+          </ScrollReveal>
+        )}
 
         {/* Main content */}
+        {step !== "choose" && step !== "request" && (
         <div className="grid lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Left panel: Controls */}
           <div className="lg:col-span-2 space-y-6">
@@ -324,7 +507,7 @@ export function DesignStudio() {
                   {/* Side switcher for settings */}
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-                      <Crosshair className="size-4 text-gold" />
+                      <Crosshair className="size-4 text-foreground/60" />
                       Engrave Settings
                     </h3>
                     <button
@@ -390,8 +573,8 @@ export function DesignStudio() {
                         onClick={() => setShowQR(!showQR)}
                         className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition-all ${
                           showQR
-                            ? "bg-gold/15 text-gold border border-gold/30"
-                            : "bg-muted text-muted-foreground border border-border hover:border-gold/30 hover:text-foreground"
+                            ? "bg-foreground/10 text-foreground border border-foreground/20"
+                            : "bg-muted text-muted-foreground border border-border hover:border-foreground/20 hover:text-foreground"
                         }`}
                       >
                         <QrCode className="size-4" />
@@ -410,7 +593,7 @@ export function DesignStudio() {
                             </p>
                             <div className={cn(
                               "rounded-lg overflow-hidden bg-zinc-900 p-1.5 safari-fix-overflow border",
-                              activeSide === "front" ? "border-gold/40" : "border-transparent"
+                              activeSide === "front" ? "border-foreground/40" : "border-transparent"
                             )}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -428,7 +611,7 @@ export function DesignStudio() {
                             </p>
                             <div className={cn(
                               "rounded-lg overflow-hidden bg-zinc-900 p-1.5 safari-fix-overflow border",
-                              activeSide === "back" ? "border-gold/40" : "border-transparent"
+                              activeSide === "back" ? "border-foreground/40" : "border-transparent"
                             )}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -444,7 +627,7 @@ export function DesignStudio() {
                       {/* Preview button */}
                       <button
                         onClick={() => setStep("preview")}
-                        className="w-full btn-apple btn-apple-primary !py-3 !text-sm"
+                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
                       >
                         <Eye className="size-4" />
                         <span>View on Card</span>
@@ -475,21 +658,21 @@ export function DesignStudio() {
             {/* Order CTA */}
             {step === "preview" && (
               <ScrollReveal delay={0.2}>
-                <div className="rounded-2xl border border-gold/20 bg-gold/5 p-5 text-center">
+                <div className="rounded-2xl border border-border bg-card p-5 text-center">
                   <p className="text-sm font-medium text-foreground mb-1">
                     Love what you see?
                   </p>
                   <p className="text-xs text-muted-foreground mb-4">
-                    Message us to place your order. We&apos;ll confirm the
-                    design and get started.
+                    Get in touch and we&apos;ll confirm the design and get
+                    started.
                   </p>
-                  <WhatsAppCTA
-                    buttonText="Order These Cards"
-                    variant="gold"
-                    size="md"
-                    message={whatsappMessage}
-                    trackingLabel="design-studio-order"
-                  />
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
+                  >
+                    Order These Cards
+                    <ArrowRight className="size-4" />
+                  </Link>
                 </div>
               </ScrollReveal>
             )}
@@ -582,6 +765,7 @@ export function DesignStudio() {
             </ScrollReveal>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

@@ -1,13 +1,14 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 
 export function CTABanner() {
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
+        <ScrollReveal variant="scale">
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden safari-fix-overflow">
             {/* Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-gold/20 via-gold/10 to-transparent" />
@@ -25,14 +26,13 @@ export function CTABanner() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <WhatsAppCTA
-                  buttonText="Start Your Project"
-                  size="lg"
-                  variant="gold"
-                  message="Hi! I'm interested in your laser engraving services. Can we get started?"
-                  trackingLabel="cta-banner"
-                />
-
+                <Link
+                  href="/products/metal-business-cards"
+                  className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
+                >
+                  Design Your Card
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </div>
 
               {/* Trust Badge */}

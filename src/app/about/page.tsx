@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { DesktopBlur } from "@/components/ui/DesktopBlur";
-import { Target, Eye, Gem, Users, MapPin } from "lucide-react";
+import { Target, Eye, BadgeCheck, Users, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const values = [
   {
-    icon: Gem,
+    icon: BadgeCheck,
     title: "Quality First",
     description:
       "We never compromise on materials or craftsmanship. Every piece that leaves our studio meets exacting standards.",
