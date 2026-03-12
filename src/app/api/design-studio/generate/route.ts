@@ -95,6 +95,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("Design studio generate:", {
+      hasEngraveImage: !!engraveImage,
+      engraveImageLength: engraveImage?.length || 0,
+      promptLength: prompt.length,
+    });
+
     // Build message content — engrave mask image + text prompt
     const content: Array<
       | { type: "text"; text: string }

@@ -210,9 +210,14 @@ export function DesignStudio() {
         {/* Header */}
         <ScrollReveal>
           <div className="text-center mb-10 sm:mb-16">
-            <p className="text-muted-foreground text-[11px] tracking-[0.35em] uppercase font-medium mb-4">
-              Design Studio
-            </p>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <p className="text-muted-foreground text-[11px] tracking-[0.35em] uppercase font-medium">
+                Design Studio
+              </p>
+              <span className="px-2 py-0.5 rounded-full bg-foreground/10 text-[10px] font-semibold uppercase tracking-wider text-foreground/60">
+                Beta
+              </span>
+            </div>
             <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1] text-balance mb-4">
               See your card before you order
             </h1>
