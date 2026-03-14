@@ -8,11 +8,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { JsonLd } from "@/components/JsonLd";
+import { faqSchema, breadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Frequently asked questions about Laser Yard's laser engraving services - ordering, customization, delivery, and payment.",
+    "Answers to common questions about metal business cards, laser engraving, ordering, design, production, shipping, and payment at Laser Yard.",
+  alternates: { canonical: "/faq" },
 };
 
 const faqCategories = [
@@ -120,8 +123,18 @@ const faqCategories = [
 ];
 
 export default function FAQPage() {
+  const allQuestions = faqCategories.flatMap((cat) =>
+    cat.questions.map((q) => ({ question: q.q, answer: q.a }))
+  );
+
   return (
     <>
+      <JsonLd
+        data={[
+          faqSchema(allQuestions),
+          breadcrumbSchema([{ name: "FAQ", url: "/faq" }]),
+        ]}
+      />
       {/* Hero */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -163,12 +176,18 @@ export default function FAQPage() {
                       key={qIndex}
                       value={`${category.category}-${qIndex}`}
                       className="bg-card border border-border rounded-xl px-6 data-[state=open]:border-gold/30 transition-colors"
+                      itemScope
+                      itemType="https://schema.org/Question"
                     >
                       <AccordionTrigger className="text-left text-base hover:no-underline hover:text-gold transition-colors py-5">
-                        {item.q}
+                        <span itemProp="name">{item.q}</span>
                       </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
-                        {item.a}
+                      <AccordionContent
+                        className="text-muted-foreground pb-5 leading-relaxed"
+                        itemScope
+                        itemType="https://schema.org/Answer"
+                      >
+                        <span itemProp="text">{item.a}</span>
                       </AccordionContent>
                     </AccordionItem>
                   ))}

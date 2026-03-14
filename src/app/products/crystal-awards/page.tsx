@@ -2,16 +2,34 @@ import { Metadata } from "next";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { ProductIllustration } from "@/components/product-illustrations/ProductIllustration";
+import { JsonLd } from "@/components/JsonLd";
+import { productSchema, breadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Crystal Awards",
   description:
     "3D laser-engraved crystal trophies and awards. Used for corporate recognition, team events, and milestones.",
+  alternates: { canonical: "/products/crystal-awards" },
 };
 
 export default function CrystalAwardsPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          productSchema({
+            name: "Crystal Awards",
+            description:
+              "3D laser-engraved crystal trophies and awards for corporate recognition, team events, and milestones.",
+            image: "/og-image.jpg",
+            material: "Crystal",
+            url: "/products/crystal-awards",
+          }),
+          breadcrumbSchema([
+            { name: "Crystal Awards", url: "/products/crystal-awards" },
+          ]),
+        ]}
+      />
       {/* Spacer for fixed header */}
       <div className="pt-32" />
 

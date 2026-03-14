@@ -1,13 +1,19 @@
 import { Metadata } from "next";
-import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import {
+  ScrollReveal,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
-import { DesktopBlur } from "@/components/ui/DesktopBlur";
 import { Target, Eye, BadgeCheck, Users, MapPin } from "lucide-react";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "About Us",
   description:
     "Laser Yard is a precision laser engraving studio headquartered in Lagos, serving clients worldwide. Our story, how we work, and what we stand for.",
+  alternates: { canonical: "/about" },
 };
 
 const values = [
@@ -43,22 +49,18 @@ const locations = [
 export default function AboutPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="pt-32 pb-16 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <DesktopBlur className="absolute top-1/3 right-1/4 w-96 h-96 bg-gold/5 rounded-full blur-[120px]" />
-        </div>
+      <JsonLd data={breadcrumbSchema([{ name: "About", url: "/about" }])} />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Hero */}
+      <section className="pt-32 pb-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <ScrollReveal>
-              <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
-                Our Story
-              </p>
               <h1 className="font-[family-name:var(--font-montserrat)] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 Where Precision Meets{" "}
-                <span className="text-gradient-gold">Craftsmanship</span>
+                <span className="font-extrabold">Craftsmanship</span>
               </h1>
+              <div className="w-16 h-px bg-border mb-6" />
               <p className="text-muted-foreground text-lg leading-relaxed">
                 Laser Yard started because we saw a gap in the market for
                 truly high-quality laser engraving. So we built
@@ -77,10 +79,11 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             <ScrollReveal>
               <div className="p-8 rounded-2xl bg-card border border-border h-full">
-                <div className="w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6">
-                  <Target className="w-7 h-7 text-gold" />
+                <div className="w-14 h-14 rounded-xl bg-foreground/5 dark:bg-background/10 flex items-center justify-center mb-6">
+                  <Target className="w-7 h-7 text-foreground/70" />
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
+                <div className="w-12 h-px bg-border mb-4" />
                 <p className="text-muted-foreground leading-relaxed">
                   To be the studio people think of first when
                   they need something engraved. Business cards, signage,
@@ -92,13 +95,14 @@ export default function AboutPage() {
 
             <ScrollReveal delay={0.1}>
               <div className="p-8 rounded-2xl bg-card border border-border h-full">
-                <div className="w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6">
-                  <Eye className="w-7 h-7 text-gold" />
+                <div className="w-14 h-14 rounded-xl bg-foreground/5 dark:bg-background/10 flex items-center justify-center mb-6">
+                  <Eye className="w-7 h-7 text-foreground/70" />
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Our Vision</h2>
+                <div className="w-12 h-px bg-border mb-4" />
                 <p className="text-muted-foreground leading-relaxed">
                   To make laser engraving accessible to every business,
-                  anywhere. Whether you're a startup in Lagos or a corporation
+                  anywhere. Whether you&apos;re a startup in Lagos or a corporation
                   in London, you should be able to get your stuff engraved
                   properly, fast, and at a fair price.
                 </p>
@@ -109,11 +113,11 @@ export default function AboutPage() {
       </section>
 
       {/* Why Laser Yard */}
-      <section className="py-16 bg-card/50 border-y border-border">
+      <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Why Laser Yard?
+              Why <span className="font-extrabold">Laser Yard?</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               When precision matters, businesses worldwide trust us to
@@ -121,37 +125,39 @@ export default function AboutPage() {
             </p>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              {
-                stat: "500+",
-                label: "Projects Completed",
-                description: "Business cards, signage, and custom work",
-              },
-              {
-                stat: "5+",
-                label: "Materials",
-                description: "Metal, wood, acrylic, leather, glass",
-              },
-              {
-                stat: "20+",
-                label: "Countries Served",
-                description: "Clients across Africa, Europe, the Americas & beyond",
-              },
-            ].map((item, index) => (
-              <ScrollReveal key={item.label} delay={index * 0.1}>
-                <div className="text-center">
-                  <p className="text-5xl font-bold text-gradient-gold mb-2">
-                    {item.stat}
-                  </p>
-                  <p className="font-semibold mb-1">{item.label}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
+          <ScrollReveal variant="scale">
+            <div className="rounded-2xl sm:rounded-3xl bg-zinc-950 text-white p-8 sm:p-12 lg:p-16 overflow-hidden safari-fix-overflow">
+              <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                {[
+                  {
+                    stat: "500+",
+                    label: "Projects Completed",
+                    description: "Business cards, signage, and custom work",
+                  },
+                  {
+                    stat: "5+",
+                    label: "Materials",
+                    description: "Metal, wood, acrylic, leather, glass",
+                  },
+                  {
+                    stat: "20+",
+                    label: "Countries Served",
+                    description: "Clients across Africa, Europe, the Americas & beyond",
+                  },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <p className="text-5xl font-extrabold mb-2">
+                      {item.stat}
+                    </p>
+                    <p className="font-semibold mb-1">{item.label}</p>
+                    <p className="text-sm text-white/60">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -160,36 +166,36 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Our Values
+              Our <span className="font-extrabold">Values</span>
             </h2>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {values.map((value, index) => (
-              <ScrollReveal key={value.title} delay={index * 0.1}>
-                <div className="p-8 rounded-2xl bg-card border border-border h-full hover:border-gold/30 transition-colors">
-                  <div className="w-14 h-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6">
-                    <value.icon className="w-7 h-7 text-gold" />
+          <StaggerContainer className="grid md:grid-cols-3 gap-8">
+            {values.map((value) => (
+              <StaggerItem key={value.title}>
+                <div className="group">
+                  <div className="w-12 h-12 rounded-xl bg-foreground/5 dark:bg-background/10 flex items-center justify-center mb-5">
+                    <value.icon className="w-6 h-6 text-foreground/70" aria-hidden="true" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{value.title}</h3>
-                  <p className="text-muted-foreground">{value.description}</p>
+                  <h3 className="text-xl font-bold mb-2">{value.title}</h3>
+                  <div className="w-12 h-px bg-border mb-4" />
+                  <p className="text-muted-foreground leading-relaxed">{value.description}</p>
                 </div>
-              </ScrollReveal>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Locations */}
-      <section className="py-16 bg-card/50 border-y border-border">
+      <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 mb-4">
-              <MapPin className="w-4 h-4 text-gold" />
-              <span className="text-sm font-medium text-gold">We Serve</span>
+            <div className="w-12 h-12 rounded-xl bg-foreground/5 dark:bg-background/10 flex items-center justify-center mb-4 mx-auto">
+              <MapPin className="w-6 h-6 text-foreground/70" />
             </div>
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Serving Clients Worldwide
+              Serving Clients <span className="font-extrabold">Worldwide</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Headquartered in Lagos, Nigeria, we deliver precision laser engraving
@@ -209,15 +215,15 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Quality Promise */}
-      <section className="py-16">
+      {/* Quality Promise CTA */}
+      <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <ScrollReveal>
+          <ScrollReveal variant="scale">
+            <div className="rounded-2xl sm:rounded-3xl bg-secondary dark:bg-card overflow-hidden safari-fix-overflow px-6 py-12 sm:px-16 sm:py-20 text-center">
               <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-6">
-                Our Quality Promise
+                Our Quality <span className="font-extrabold">Promise</span>
               </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-8 max-w-2xl mx-auto">
                 We use industrial-grade lasers calibrated for micron-level
                 accuracy. Every piece is inspected individually before it
                 ships. If it doesn&apos;t meet our standard, it doesn&apos;t
@@ -229,8 +235,8 @@ export default function AboutPage() {
                 message="Hi! I'd like to learn more about Laser Yard's laser engraving services."
                 trackingLabel="about-page"
               />
-            </ScrollReveal>
-          </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     </>

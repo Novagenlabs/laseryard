@@ -4,6 +4,12 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatAssistant } from "@/components/chat/ChatAssistant";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  organizationSchema,
+  localBusinessSchema,
+  websiteSchema,
+} from "@/lib/schema";
 import { Agentation } from "agentation";
 import "./globals.css";
 
@@ -20,12 +26,13 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://laseryard.com"),
   title: {
     default: "Laser Yard | Precision Laser Engraving",
     template: "%s | Laser Yard",
   },
   description:
-    "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Ready-made engraved products and custom engraving on your own items:metal, wood, crystal, acrylic, and leather.",
+    "Precision laser engraving studio headquartered in Lagos, serving clients in Nigeria, Ghana, UK, US, UAE, and the EU. Metal business cards, crystal awards, wood engraving, and custom laser engraving services.",
   keywords: [
     "laser engraving",
     "metal business cards",
@@ -88,6 +95,13 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7F5F0" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1A1A24" />
+        <JsonLd
+          data={[
+            organizationSchema(),
+            localBusinessSchema(),
+            websiteSchema(),
+          ]}
+        />
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{

@@ -43,12 +43,18 @@ export function FAQAccordion() {
                   key={index}
                   value={`item-${index}`}
                   className="bg-card border border-border rounded-xl px-6 data-[state=open]:border-gold/30 transition-colors"
+                  itemScope
+                  itemType="https://schema.org/Question"
                 >
                   <AccordionTrigger className="text-left text-base hover:no-underline hover:text-gold transition-colors py-6">
-                    {item.question}
+                    <span itemProp="name">{item.question}</span>
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-6 leading-relaxed">
-                    {item.answer}
+                  <AccordionContent
+                    className="text-muted-foreground pb-6 leading-relaxed"
+                    itemScope
+                    itemType="https://schema.org/Answer"
+                  >
+                    <span itemProp="text">{item.answer}</span>
                   </AccordionContent>
                 </AccordionItem>
               ))}
