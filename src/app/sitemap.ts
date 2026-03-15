@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { COUNTRIES } from "@/lib/constants";
+import { BLOG_POSTS } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://laseryard.com";
@@ -85,5 +86,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     ...locationPages,
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    ...BLOG_POSTS.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
   ];
 }

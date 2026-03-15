@@ -7,6 +7,7 @@ const footerLinks = {
     { label: "About Us", href: "/about" },
     { label: "Our Process", href: "/process" },
     { label: "FAQ", href: "/faq" },
+    { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
   ],
   products: [

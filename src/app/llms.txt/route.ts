@@ -57,6 +57,14 @@ Free online tool to upload your logo and preview how it will look laser-engraved
 - Metal Business Cards in United States: https://laseryard.com/united-states
 - Metal Business Cards in UAE: https://laseryard.com/uae
 - Metal Business Cards in EU: https://laseryard.com/eu
+
+## Blog
+
+- Metal vs Paper Business Cards: Which Makes a Better First Impression?: https://laseryard.com/blog/metal-vs-paper-business-cards
+- NFC Business Cards: The Complete Guide for 2026: https://laseryard.com/blog/nfc-business-cards-guide
+- How to Design a Metal Business Card That Actually Works: https://laseryard.com/blog/how-to-design-metal-business-card
+- Aluminum vs Stainless Steel Business Cards: Which Should You Choose?: https://laseryard.com/blog/metal-business-card-materials-aluminum-vs-steel
+- Are Metal Business Cards Worth It? Here's the Honest Answer: https://laseryard.com/blog/why-metal-business-cards-are-worth-it
 `;
 
   return new Response(content, {
