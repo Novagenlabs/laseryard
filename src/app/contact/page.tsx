@@ -4,11 +4,14 @@ import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { DesktopBlur } from "@/components/ui/DesktopBlur";
 import { MessageCircle, Mail, Clock, MapPin } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
     "Get in touch with Laser Yard. We're here to help with your laser engraving projects. WhatsApp, email, or phone - reach us your way.",
+  alternates: { canonical: "/contact" },
 };
 
 const contactMethods = [
@@ -45,6 +48,9 @@ const businessInfo = [
 export default function ContactPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema([{ name: "Contact", url: "/contact" }])}
+      />
       {/* Hero */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">

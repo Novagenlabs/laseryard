@@ -16,11 +16,8 @@ export function ProductShowcase() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal className="text-center mb-12 sm:mb-16">
-          <p className="text-gold text-sm font-medium uppercase tracking-wider mb-3">
-            Our Products
-          </p>
           <h2 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            Ready-Made <span className="text-gradient-gold">Products</span>
+            Ready-Made <span className="font-extrabold">Products</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             In-stock products, ready to order. Need something custom? We do that too.

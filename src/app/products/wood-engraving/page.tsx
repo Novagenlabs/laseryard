@@ -2,16 +2,34 @@ import { Metadata } from "next";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { WhatsAppCTA } from "@/components/whatsapp/WhatsAppCTA";
 import { ProductIllustration } from "@/components/product-illustrations/ProductIllustration";
+import { JsonLd } from "@/components/JsonLd";
+import { productSchema, breadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Wood Boards & Coasters",
   description:
     "Laser-engraved wooden boards and coasters. Popular with restaurants, corporate gifting, and home decor.",
+  alternates: { canonical: "/products/wood-engraving" },
 };
 
 export default function WoodEngravingPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          productSchema({
+            name: "Wood Boards & Coasters",
+            description:
+              "Laser-engraved wooden boards and coasters for restaurants, corporate gifting, and home decor.",
+            image: "/og-image.jpg",
+            material: "Wood",
+            url: "/products/wood-engraving",
+          }),
+          breadcrumbSchema([
+            { name: "Wood Boards & Coasters", url: "/products/wood-engraving" },
+          ]),
+        ]}
+      />
       {/* Spacer for fixed header */}
       <div className="pt-32" />
 
