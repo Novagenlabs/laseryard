@@ -48,6 +48,15 @@ Free online tool to upload your logo and preview how it will look laser-engraved
 - About Us: https://laseryard.com/about
 - Contact: https://laseryard.com/contact
 - BE UNFORGETTABLE (Metal Cards Landing): https://laseryard.com/unforgettable
+
+## Location Pages
+
+- Metal Business Cards in Nigeria: https://laseryard.com/nigeria
+- Metal Business Cards in Ghana: https://laseryard.com/ghana
+- Metal Business Cards in United Kingdom: https://laseryard.com/united-kingdom
+- Metal Business Cards in United States: https://laseryard.com/united-states
+- Metal Business Cards in UAE: https://laseryard.com/uae
+- Metal Business Cards in EU: https://laseryard.com/eu
 `;
 
   return new Response(content, {

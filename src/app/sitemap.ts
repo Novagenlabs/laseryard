@@ -1,7 +1,15 @@
 import type { MetadataRoute } from "next";
+import { COUNTRIES } from "@/lib/constants";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://laseryard.com";
+
+  const locationPages = COUNTRIES.map((c) => ({
+    url: `${baseUrl}/${c.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
 
   return [
     {
@@ -76,5 +84,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    ...locationPages,
   ];
 }
