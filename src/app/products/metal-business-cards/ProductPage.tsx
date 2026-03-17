@@ -15,6 +15,7 @@ import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { cn } from "@/lib/utils";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { ShippingEstimator } from "@/components/shipping/ShippingEstimator";
 
 type Thickness = "0.4mm" | "0.8mm";
 
@@ -241,6 +242,9 @@ export function ProductPage() {
                     <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 </div>
+
+                {/* Shipping Estimate */}
+                <ShippingEstimator />
               </div>
             </ScrollReveal>
           </div>
