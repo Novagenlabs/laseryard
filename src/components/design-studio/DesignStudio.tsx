@@ -2,12 +2,12 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { RotateCcw, Crosshair, Eye, QrCode, Upload, Check } from "lucide-react";
+import { RotateCcw, Crosshair, Eye, QrCode, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { DesignUploader, PdfUploader } from "./DesignUploader";
 import type { CardSide } from "./DesignUploader";
 import { ThresholdControls } from "./ThresholdControls";
@@ -30,7 +30,7 @@ const CardPreview3D = dynamic(
   }
 );
 
-type Step = "choose" | "upload" | "adjust" | "preview" | "request";
+type Step = "choose" | "upload" | "adjust" | "preview";
 
 interface SideState {
   file: File | null;
@@ -55,15 +55,6 @@ const emptySide: SideState = {
 export function DesignStudio() {
   const isMobile = useIsMobile();
   const [step, setStep] = useState<Step>("choose");
-  const [requestForm, setRequestForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    logo: null as File | null,
-  });
-  const [requestSubmitted, setRequestSubmitted] = useState(false);
-  const [requestLoading, setRequestLoading] = useState(false);
-  const [requestError, setRequestError] = useState<string | null>(null);
   const [activeSide, setActiveSide] = useState<CardSide>("front");
   const [front, setFront] = useState<SideState>(emptySide);
   const [back, setBack] = useState<SideState>(emptySide);
@@ -229,7 +220,7 @@ export function DesignStudio() {
         </ScrollReveal>
 
         {/* Steps indicator */}
-        {step !== "choose" && step !== "request" && (
+        {step !== "choose" && (
           <ScrollReveal delay={0.1}>
             <div className="flex items-center justify-center gap-2 mb-10">
               {(["upload", "adjust", "preview"] as const).map((s, i) => {
@@ -278,162 +269,24 @@ export function DesignStudio() {
                   Upload your artwork and preview it on a metal card in 3D.
                 </p>
               </button>
-              <button
-                onClick={() => setStep("request")}
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I need help designing my metal business card. Can your team help me create something?")}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group p-8 rounded-2xl border border-border bg-card text-left hover:border-foreground/20 transition-all"
               >
                 <Crosshair className="size-8 text-foreground/60 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">I need a design</h3>
                 <p className="text-sm text-muted-foreground">
-                  Share your logo and details. Our design team will create something for you.
+                  Message us on WhatsApp and we'll help create something for you.
                 </p>
-              </button>
-            </div>
-          </ScrollReveal>
-        )}
-
-        {/* Design request form */}
-        {step === "request" && (
-          <ScrollReveal delay={0.1}>
-            <div className="max-w-lg mx-auto mb-10">
-              {requestSubmitted ? (
-                <div className="rounded-2xl border border-border bg-card p-8 text-center">
-                  <div className="size-16 mx-auto rounded-full bg-foreground/5 flex items-center justify-center mb-4">
-                    <Check className="size-8 text-foreground/60" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Request received</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Our design team will reach out to you via email or WhatsApp within 24 hours to discuss your card.
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-6">
-                    Want a faster response? Message us directly:
-                  </p>
-                  <a
-                    href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I just submitted a design request on the website. My name is " + requestForm.name)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity mb-4"
-                  >
-                    Chat on WhatsApp
-                    <ArrowRight className="size-3.5" />
-                  </a>
-                  <br />
-                  <button
-                    onClick={() => { setStep("choose"); setRequestSubmitted(false); }}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Back to Design Studio
-                  </button>
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-5">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">Tell us about your card</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Share your details and our design team will reach out to get started.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Name</label>
-                      <input
-                        type="text"
-                        value={requestForm.name}
-                        onChange={(e) => setRequestForm(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="Your full name"
-                        className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Email</label>
-                      <input
-                        type="email"
-                        value={requestForm.email}
-                        onChange={(e) => setRequestForm(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder="you@company.com"
-                        className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Phone</label>
-                      <input
-                        type="tel"
-                        value={requestForm.phone}
-                        onChange={(e) => setRequestForm(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="+1 (555) 000-0000"
-                        className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Logo (optional)</label>
-                      <label className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-all cursor-pointer">
-                        <Upload className="size-4" />
-                        {requestForm.logo ? requestForm.logo.name : "Upload your logo"}
-                        <input
-                          type="file"
-                          accept="image/*,.pdf,.ai,.eps"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] || null;
-                            setRequestForm(prev => ({ ...prev, logo: file }));
-                          }}
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {requestError && (
-                    <p className="text-sm text-red-500 text-center">{requestError}</p>
-                  )}
-
-                  <button
-                    onClick={async () => {
-                      setRequestLoading(true);
-                      setRequestError(null);
-                      try {
-                        const res = await fetch("/api/design-request", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            name: requestForm.name,
-                            email: requestForm.email,
-                            phone: requestForm.phone,
-                            hasLogo: !!requestForm.logo,
-                          }),
-                        });
-                        if (!res.ok) {
-                          const data = await res.json().catch(() => null);
-                          throw new Error(data?.error || "Something went wrong");
-                        }
-                        setRequestSubmitted(true);
-                      } catch (err) {
-                        setRequestError(err instanceof Error ? err.message : "Failed to send request");
-                      } finally {
-                        setRequestLoading(false);
-                      }
-                    }}
-                    disabled={!requestForm.name || !requestForm.email || !requestForm.phone || requestLoading}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {requestLoading ? "Sending..." : "Send to Design Team"}
-                    {!requestLoading && <ArrowRight className="size-4" />}
-                  </button>
-
-                  <button
-                    onClick={() => setStep("choose")}
-                    className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
-                  >
-                    Back
-                  </button>
-                </div>
-              )}
+              </a>
             </div>
           </ScrollReveal>
         )}
 
         {/* Main content */}
-        {step !== "choose" && step !== "request" && (
+        {step !== "choose" && (
         <div className="grid lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Left panel: Controls */}
           <div className="lg:col-span-2 space-y-6">
@@ -668,16 +521,18 @@ export function DesignStudio() {
                     Love what you see?
                   </p>
                   <p className="text-xs text-muted-foreground mb-4">
-                    Get in touch and we&apos;ll confirm the design and get
+                    Message us on WhatsApp to confirm your design and get
                     started.
                   </p>
-                  <Link
-                    href="/contact"
+                  <a
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I just previewed my design in the Design Studio and I'm ready to order metal business cards. Can we get started?")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
                   >
                     Order These Cards
                     <ArrowRight className="size-4" />
-                  </Link>
+                  </a>
                 </div>
               </ScrollReveal>
             )}
