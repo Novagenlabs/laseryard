@@ -115,6 +115,57 @@ export async function getDeliveryCost(
   };
 }
 
+export async function getExportLocations(): Promise<{
+  locations: { id: number; name: string }[];
+  weights: { id: number; name: string }[];
+}> {
+  const { token, secretKey } = await authenticate();
+
+  const res = await fetch(`${BASE_URL}/orders/export-locations`, {
+    headers: authHeaders(token, secretKey),
+  });
+
+  if (!res.ok) throw new Error(`Fez export locations failed: ${res.status}`);
+
+  const data = await res.json();
+  if (data.status !== "Success") {
+    throw new Error(`Fez export locations error: ${data.description}`);
+  }
+
+  return {
+    locations: data.data.exportLocations,
+    weights: data.data.exportWeights,
+  };
+}
+
+export async function getExportDeliveryCost(
+  exportLocationId: number,
+  weightId: number
+): Promise<{
+  price: number;
+  discountedRate: number;
+}> {
+  const { token, secretKey } = await authenticate();
+
+  const res = await fetch(`${BASE_URL}/orders/export-price`, {
+    method: "POST",
+    headers: authHeaders(token, secretKey),
+    body: JSON.stringify({ exportLocationId, weightId }),
+  });
+
+  if (!res.ok) throw new Error(`Fez export cost failed: ${res.status}`);
+
+  const data = await res.json();
+  if (data.status !== "Success") {
+    throw new Error(`Fez export cost error: ${data.description}`);
+  }
+
+  return {
+    price: parseFloat(data.data.price),
+    discountedRate: parseFloat(data.data.discountedRate),
+  };
+}
+
 export async function trackOrder(orderNumber: string): Promise<{
   order: {
     orderNo: string;
