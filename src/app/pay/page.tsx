@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -33,7 +34,9 @@ export default function PayPage() {
               </p>
             </div>
 
-            <PaymentCheckout />
+            <Suspense fallback={<div className="text-center text-muted-foreground py-8">Loading checkout...</div>}>
+              <PaymentCheckout />
+            </Suspense>
           </div>
         </ScrollReveal>
       </div>
