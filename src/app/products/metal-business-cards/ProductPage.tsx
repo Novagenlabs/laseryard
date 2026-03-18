@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { ShippingEstimator } from "@/components/shipping/ShippingEstimator";
+import { WhopCheckout } from "@/components/payments/WhopCheckout";
 
 type Thickness = "0.4mm" | "0.8mm";
 
@@ -225,14 +226,20 @@ export function ProductPage() {
 
                 {/* CTA */}
                 <div className="space-y-3">
+                  <WhopCheckout
+                    amount={200}
+                    currency="usd"
+                    metadata={{ thickness: selectedThickness, quantity: "30" }}
+                    buttonText={`Order Now - $200`}
+                  />
                   <a
                     href={`https://wa.me/22893184418?text=${encodeURIComponent(`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing and the design process?`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
                   >
-                    Get a Quote
-                    <ArrowRight className="w-4 h-4" />
+                    Need a custom quote? Chat on WhatsApp
+                    <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </a>
                   <Link
                     href="/unforgettable/design-studio"

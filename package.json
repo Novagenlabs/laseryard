@@ -15,6 +15,8 @@
     "@hookform/resolvers": "^5.2.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@whop/checkout": "^0.0.52",
+    "@whop/sdk": "^0.0.35",
     "agentation": "^2.3.2",
     "boring-avatars": "^2.0.4",
     "class-variance-authority": "^0.7.1",
