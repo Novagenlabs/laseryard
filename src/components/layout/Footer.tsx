@@ -9,6 +9,7 @@ const footerLinks = {
     { label: "FAQ", href: "/faq" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
+    { label: "Track Order", href: "/track" },
   ],
   products: [
     { label: "Shop All Products", href: "/shop" },
