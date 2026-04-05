@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const data = await res.json();
 
-    if (!data.status || data.data.status !== "success") {
+    if (!data.status || !data.data || data.data.status !== "success") {
       return NextResponse.json(
         { verified: false, message: data.data?.gateway_response || "Payment not successful" }
       );
