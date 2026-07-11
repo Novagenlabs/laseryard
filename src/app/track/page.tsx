@@ -10,7 +10,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Track Your Order | Laser Yard",
   description:
-    "Track your Laser Yard order in real time. Enter your order number to see delivery status and timeline.",
+    "Track your Laser Yard order in real time. Enter your tracking number to see order status and timeline.",
   alternates: { canonical: "https://laseryard.com/track" },
 };
 
@@ -45,9 +45,9 @@ export default function TrackPage() {
                 Track Your Order
               </h1>
               <p className="text-muted-foreground text-lg">
-                Enter your order number to see real-time delivery status and
-                timeline. You can find your order number in the confirmation
-                message we sent via WhatsApp.
+                Enter your tracking number to see where your order is, from
+                production to delivery. You can find your tracking number in
+                the confirmation message we sent via WhatsApp.
               </p>
             </div>
           </ScrollReveal>
