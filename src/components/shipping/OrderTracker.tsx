@@ -13,7 +13,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-type OrderStatus =
+export type OrderStatus =
   | "received"
   | "in_production"
   | "shipped"
@@ -21,7 +21,7 @@ type OrderStatus =
   | "delivered"
   | "cancelled";
 
-type OrderInfo = {
+export type OrderInfo = {
   trackingNumber: string;
   customerName: string;
   itemDescription: string;
@@ -31,7 +31,7 @@ type OrderInfo = {
   updatedAt: string;
 };
 
-type OrderEvent = {
+export type OrderEvent = {
   status: OrderStatus;
   note: string | null;
   createdAt: string;
@@ -59,12 +59,20 @@ function statusIcon(status: OrderStatus) {
   return STEPS.find((s) => s.status === status)?.icon ?? Package;
 }
 
-export function OrderTracker() {
+export function OrderTracker({
+  override,
+}: {
+  // Dev preview: render this order/timeline instead of live lookup state
+  override?: { order: OrderInfo; events: OrderEvent[] } | null;
+}) {
   const [trackingNumber, setTrackingNumber] = useState("");
-  const [order, setOrder] = useState<OrderInfo | null>(null);
-  const [events, setEvents] = useState<OrderEvent[]>([]);
+  const [fetchedOrder, setFetchedOrder] = useState<OrderInfo | null>(null);
+  const [fetchedEvents, setFetchedEvents] = useState<OrderEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const order = override ? override.order : fetchedOrder;
+  const events = override ? override.events : fetchedEvents;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -73,8 +81,8 @@ export function OrderTracker() {
 
     setLoading(true);
     setError("");
-    setOrder(null);
-    setEvents([]);
+    setFetchedOrder(null);
+    setFetchedEvents([]);
 
     try {
       const res = await fetch("/api/orders/track", {
@@ -88,8 +96,8 @@ export function OrderTracker() {
       if (!res.ok || data.error) {
         setError(data.error || "Could not look up that tracking number.");
       } else {
-        setOrder(data.order);
-        setEvents(data.events || []);
+        setFetchedOrder(data.order);
+        setFetchedEvents(data.events || []);
       }
     } catch {
       setError("Could not track order. Please try again.");
@@ -121,7 +129,8 @@ export function OrderTracker() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
-            value={trackingNumber}
+            value={override ? override.order.trackingNumber : trackingNumber}
+            readOnly={!!override}
             onChange={(e) => setTrackingNumber(e.target.value)}
             placeholder="Enter your tracking number (e.g. LY-XXXX-XXXX)"
             autoCapitalize="characters"
@@ -132,7 +141,7 @@ export function OrderTracker() {
         </div>
         <button
           type="submit"
-          disabled={loading || !trackingNumber.trim()}
+          disabled={loading || (!override && !trackingNumber.trim()) || !!override}
           className="px-6 py-3 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Track"}

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { OrderTracker } from "@/components/shipping/OrderTracker";
+import { OrderTrackerPreview } from "@/components/shipping/OrderTrackerPreview";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
@@ -53,7 +54,11 @@ export default function TrackPage() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>
-            <OrderTracker />
+            {process.env.NODE_ENV === "development" ? (
+              <OrderTrackerPreview />
+            ) : (
+              <OrderTracker />
+            )}
           </ScrollReveal>
         </div>
       </section>
