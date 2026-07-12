@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { OrderTracker } from "@/components/shipping/OrderTracker";
+import { OrderDetails, TrackSearch } from "@/components/shipping/OrderTracker";
 import { OrderTrackerPreview } from "@/components/shipping/OrderTrackerPreview";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
@@ -11,11 +11,18 @@ import { SITE_CONFIG } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Track Your Order | Laser Yard",
   description:
-    "Track your Laser Yard order in real time. Enter your tracking number to see order status and timeline.",
+    "Track your Laser Yard order in real time. Enter your order number to see order status and timeline.",
   alternates: { canonical: "https://laseryard.com/track" },
 };
 
-export default function TrackPage() {
+export default async function TrackPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ order?: string }>;
+}) {
+  const { order } = await searchParams;
+  const orderNumber = order?.trim() || undefined;
+
   const schemas = [
     breadcrumbSchema([
       { name: "Home", url: SITE_CONFIG.url },
@@ -50,9 +57,11 @@ export default function TrackPage() {
 
           <ScrollReveal delay={0.1}>
             {process.env.NODE_ENV === "development" ? (
-              <OrderTrackerPreview />
+              <OrderTrackerPreview orderParam={orderNumber} />
+            ) : orderNumber ? (
+              <OrderDetails trackingNumber={orderNumber} />
             ) : (
-              <OrderTracker />
+              <TrackSearch />
             )}
           </ScrollReveal>
         </div>

@@ -39,6 +39,7 @@ export type Order = {
   customerPhone: string | null;
   itemDescription: string;
   destination: string | null;
+  designUrl: string | null;
   status: OrderStatus;
   createdAt: string;
   updatedAt: string;
@@ -76,6 +77,7 @@ function rowToOrder(row: any): Order {
     customerPhone: row.customer_phone,
     itemDescription: row.item_description,
     destination: row.destination,
+    designUrl: row.design_url,
     status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -117,6 +119,7 @@ export async function createOrder(input: {
   itemDescription: string;
   customerPhone?: string;
   destination?: string;
+  designUrl?: string;
   trackingNumber?: string;
   note?: string;
 }): Promise<Order> {
@@ -126,8 +129,8 @@ export async function createOrder(input: {
     : generateTrackingNumber();
 
   const rows = await sql`
-    INSERT INTO orders (tracking_number, customer_name, customer_phone, item_description, destination)
-    VALUES (${tn}, ${input.customerName}, ${input.customerPhone ?? null}, ${input.itemDescription}, ${input.destination ?? null})
+    INSERT INTO orders (tracking_number, customer_name, customer_phone, item_description, destination, design_url)
+    VALUES (${tn}, ${input.customerName}, ${input.customerPhone ?? null}, ${input.itemDescription}, ${input.destination ?? null}, ${input.designUrl ?? null})
     RETURNING *
   `;
   const order = rowToOrder(rows[0]);

@@ -1,6 +1,8 @@
 # Order Tracking (Neon Postgres)
 
-Customers track orders on `/track` with just a tracking number. No login. State lives in the Neon Postgres database.
+Customers track orders on `/track` with just an order number. No login. State lives in the Neon Postgres database.
+
+The `/track` page is a minimal search bar. Submitting navigates to `/track?order=LY-XXXX-XXXX`, which fetches and shows the full job ticket — so order links are shareable directly (send the customer that URL on WhatsApp).
 
 ## Setup
 
@@ -19,7 +21,7 @@ DATABASE_URL="postgres://..." node scripts/setup-orders-db.mjs
 
 ## Data model
 
-- `orders` — one row per order: `tracking_number` (unique, e.g. `LY-7K2M-QX4H`), `customer_name`, `customer_phone`, `item_description`, `destination`, `status`, timestamps.
+- `orders` — one row per order: `tracking_number` (unique, e.g. `LY-7K2M-QX4H`), `customer_name`, `customer_phone`, `item_description`, `destination`, `design_url` (optional image/SVG of the job, shown on the ticket plate; host it under `public/designs/`), `status`, timestamps.
 - `order_events` — append-only timeline shown to the customer: status + note + timestamp.
 
 Statuses: `received` → `in_production` → `shipped` → `out_for_delivery` → `delivered`, plus `cancelled`.
@@ -32,7 +34,7 @@ Create an order (tracking number auto-generated unless you pass one):
 curl -X POST https://laseryard.com/api/orders \
   -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"customerName":"Ada O.","itemDescription":"50x metal business cards","customerPhone":"+2348012345678","destination":"Lagos"}'
+  -d '{"customerName":"Ada O.","itemDescription":"50x metal business cards","customerPhone":"+2348012345678","destination":"Lagos","designUrl":"/designs/ada-card.svg"}'
 ```
 
 Response includes `order.trackingNumber` — send that to the customer on WhatsApp.

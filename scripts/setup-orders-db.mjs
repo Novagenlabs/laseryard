@@ -18,6 +18,7 @@ await sql`
     customer_phone text,
     item_description text NOT NULL,
     destination text,
+    design_url text,
     status text NOT NULL DEFAULT 'received'
       CHECK (status IN ('received', 'in_production', 'shipped', 'out_for_delivery', 'delivered', 'cancelled')),
     created_at timestamptz NOT NULL DEFAULT now(),
@@ -37,6 +38,11 @@ await sql`
 
 await sql`
   CREATE INDEX IF NOT EXISTS order_events_order_id_idx ON order_events(order_id)
+`;
+
+// migration for tables created before design_url existed
+await sql`
+  ALTER TABLE orders ADD COLUMN IF NOT EXISTS design_url text
 `;
 
 console.log("orders + order_events tables ready");

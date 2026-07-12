@@ -3,7 +3,8 @@
 import { DialRoot, useDialKit } from "dialkit";
 import "dialkit/styles.css";
 import {
-  OrderTracker,
+  OrderDetails,
+  TrackSearch,
   type OrderEvent,
   type OrderInfo,
   type OrderStatus,
@@ -39,6 +40,7 @@ function buildPreview(d: {
   itemDescription: string;
   destination: string;
   placedDaysAgo: number;
+  showDesign: boolean;
 }): { order: OrderInfo; events: OrderEvent[] } {
   const status = d.status as OrderStatus;
   const now = Date.now();
@@ -67,6 +69,7 @@ function buildPreview(d: {
       customerName: d.customerName,
       itemDescription: d.itemDescription,
       destination: d.destination || null,
+      designUrl: d.showDesign ? "/designs/demo-card.svg" : null,
       status,
       createdAt: new Date(placedAt).toISOString(),
       updatedAt: new Date(now).toISOString(),
@@ -75,7 +78,7 @@ function buildPreview(d: {
   };
 }
 
-export function OrderTrackerPreview() {
+export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
   const d = useDialKit(
     "Track Page",
     {
@@ -102,6 +105,7 @@ export function OrderTrackerPreview() {
           placeholder: "Destination",
         },
         placedDaysAgo: [4, 0, 30, 1],
+        showDesign: true,
       },
       look: {
         plateStyle: {
@@ -140,10 +144,17 @@ export function OrderTrackerPreview() {
 
   return (
     <>
-      <OrderTracker
-        override={d.livePreview ? buildPreview(d.state) : null}
-        look={look}
-      />
+      {d.livePreview ? (
+        <OrderDetails
+          trackingNumber="LY-DEMO-CARD"
+          override={buildPreview(d.state)}
+          look={look}
+        />
+      ) : orderParam ? (
+        <OrderDetails trackingNumber={orderParam} look={look} />
+      ) : (
+        <TrackSearch />
+      )}
       <DialRoot />
     </>
   );

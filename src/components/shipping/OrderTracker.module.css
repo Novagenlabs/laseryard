@@ -191,6 +191,14 @@
   text-shadow: 0 1px 0 rgba(255, 248, 220, 0.6);
 }
 
+/* the customer's design shown on the plate */
+.designPreview {
+  max-width: 78%;
+  max-height: 240px;
+  border-radius: 12px;
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.5);
+}
+
 /* corner screws */
 .screw {
   position: absolute;

@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
         customerName: order.customerName,
         itemDescription: order.itemDescription,
         destination: order.destination,
+        designUrl: order.designUrl,
         status: order.status,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
