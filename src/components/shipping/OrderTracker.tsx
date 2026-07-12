@@ -44,6 +44,20 @@ export type OrderEvent = {
   createdAt: string;
 };
 
+// Visual tuning knobs (dev DialKit panel); omit for the production look
+export type TrackerLook = {
+  plateStyle?: "steel" | "anodized" | "brass";
+  laserColor?: string;
+  glow?: number; // 0–2
+  sparkSpeed?: number; // seconds per pass
+  pulseSpeed?: number; // seconds per pulse
+  engraveDepth?: number; // px
+  cardRadius?: number; // px
+  sheen?: boolean;
+  beamEdge?: boolean;
+  screws?: boolean;
+};
+
 const STEPS: { status: OrderStatus; label: string; icon: typeof Package }[] = [
   { status: "received", label: "Received", icon: ClipboardCheck },
   { status: "in_production", label: "In Production", icon: Flame },
@@ -68,9 +82,11 @@ function statusIcon(status: OrderStatus) {
 
 export function OrderTracker({
   override,
+  look,
 }: {
   // Dev preview: render this order/timeline instead of live lookup state
   override?: { order: OrderInfo; events: OrderEvent[] } | null;
+  look?: TrackerLook;
 }) {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [fetchedOrder, setFetchedOrder] = useState<OrderInfo | null>(null);
@@ -129,8 +145,25 @@ export function OrderTracker({
     ? STEPS.findIndex((s) => s.status === order.status)
     : -1;
 
+  const showScrews = look?.screws ?? true;
+  const showBeamEdge = look?.beamEdge ?? true;
+  const plateClass =
+    look?.plateStyle === "anodized"
+      ? styles.plateAnodized
+      : look?.plateStyle === "brass"
+        ? styles.plateBrass
+        : "";
+  const lookVars = {
+    ...(look?.laserColor ? { "--laser": look.laserColor } : {}),
+    ...(look?.glow !== undefined ? { "--glow": look.glow } : {}),
+    ...(look?.sparkSpeed !== undefined ? { "--spark-s": `${look.sparkSpeed}s` } : {}),
+    ...(look?.pulseSpeed !== undefined ? { "--pulse-s": `${look.pulseSpeed}s` } : {}),
+    ...(look?.engraveDepth !== undefined ? { "--engrave": `${look.engraveDepth}px` } : {}),
+    ...(look?.cardRadius !== undefined ? { "--card-r": `${look.cardRadius}px` } : {}),
+  } as React.CSSProperties;
+
   return (
-    <div className={`w-full max-w-2xl mx-auto ${styles.tracker}`}>
+    <div className={`w-full max-w-2xl mx-auto ${styles.tracker}`} style={lookVars}>
       {/* Search Form */}
       <form onSubmit={handleSubmit} className="flex gap-3">
         <div className="relative flex-1">
@@ -165,14 +198,22 @@ export function OrderTracker({
       {order && (
         <div className="mt-8 space-y-5" key={order.trackingNumber + order.status}>
           {/* Job Ticket */}
-          <div className={`${styles.reveal} rounded-2xl bg-card border border-border overflow-hidden shadow-sm`}>
-            <div className={styles.beamEdge} />
+          <div className={`${styles.reveal} ${styles.card} bg-card border border-border overflow-hidden shadow-sm`}>
+            {showBeamEdge && <div className={styles.beamEdge} />}
             <div className="p-5 sm:p-6">
-              <div className={styles.plate}>
-                <span className={styles.screw} style={{ top: 7, left: 7 }} />
-                <span className={styles.screw} style={{ top: 7, right: 7 }} />
-                <span className={styles.screw} style={{ bottom: 7, left: 7 }} />
-                <span className={styles.screw} style={{ bottom: 7, right: 7 }} />
+              <div
+                className={`${styles.plate} ${plateClass} ${
+                  look?.sheen === false ? styles.plateStill : ""
+                }`}
+              >
+                {showScrews && (
+                  <>
+                    <span className={styles.screw} style={{ top: 7, left: 7 }} />
+                    <span className={styles.screw} style={{ top: 7, right: 7 }} />
+                    <span className={styles.screw} style={{ bottom: 7, left: 7 }} />
+                    <span className={styles.screw} style={{ bottom: 7, right: 7 }} />
+                  </>
+                )}
                 <p className={`${plexMono.className} ${styles.plateLabel} text-[10px] font-medium uppercase mb-2`}>
                   Laser Yard · Job Ticket
                 </p>
@@ -184,7 +225,7 @@ export function OrderTracker({
                     className={`${plexMono.className} ${styles.stamp} ${
                       cancelled ? `${styles.stampCancelled} text-red-600` : ""
                     } ${delivered ? "text-gold-dark" : ""} ${
-                      !cancelled && !delivered ? "text-foreground/70" : ""
+                      !cancelled && !delivered ? styles.stampNeutral : ""
                     } text-[11px] font-semibold uppercase`}
                   >
                     {STATUS_LABELS[order.status]}
@@ -215,7 +256,7 @@ export function OrderTracker({
 
           {/* Laser Stepper */}
           {!cancelled && (
-            <div className={`${styles.reveal} ${styles.revealDelay1} p-6 rounded-2xl bg-card border border-border shadow-sm`}>
+            <div className={`${styles.reveal} ${styles.revealDelay1} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
               <div className="flex items-start">
                 {STEPS.map((step, i) => {
                   const done = i <= currentStep;
@@ -242,7 +283,7 @@ export function OrderTracker({
                             ? styles.nodeActive
                             : done
                               ? delivered && i === STEPS.length - 1
-                                ? "bg-gold text-foreground shadow-[0_0_14px_-2px_oklch(0.82_0.19_88)]"
+                                ? styles.nodeFinal
                                 : "bg-foreground text-background"
                               : "bg-card border border-border text-foreground/40"
                         }`}
@@ -269,7 +310,7 @@ export function OrderTracker({
 
           {/* Job Log */}
           {events.length > 0 && (
-            <div className={`${styles.reveal} ${styles.revealDelay2} p-6 rounded-2xl bg-card border border-border shadow-sm`}>
+            <div className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
               <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-6`}>
                 Job Log
               </p>

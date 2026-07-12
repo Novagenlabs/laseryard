@@ -1,8 +1,26 @@
-/* ── Engraving job-ticket look for the order tracker ───────────────── */
+/* ── Engraving job-ticket look for the order tracker ─────────────────
+   Tunable via CSS vars (driven by the dev DialKit panel; defaults here
+   are the production look):
+   --laser     accent/beam color
+   --glow      glow intensity multiplier (0–2)
+   --spark-s   spark travel duration
+   --pulse-s   cutting-head pulse duration
+   --engrave   engraved text depth in px
+   --card-r    result card corner radius
+──────────────────────────────────────────────────────────────────── */
 
-/* strong ease-out (built-ins are too weak) */
 .tracker {
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --laser: oklch(0.82 0.19 88);
+  --glow: 1;
+  --spark-s: 2.2s;
+  --pulse-s: 1.6s;
+  --engrave: 1px;
+  --card-r: 1rem;
+}
+
+.card {
+  border-radius: var(--card-r);
 }
 
 /* one-time staggered reveal when a result lands */
@@ -38,10 +56,11 @@
   transform: scale(0.97);
 }
 
-/* Brushed-metal plaque holding the tracking number */
+/* ── Plaque ────────────────────────────────────────────────────────── */
+
 .plate {
   position: relative;
-  border-radius: 0.9rem;
+  border-radius: calc(var(--card-r) * 0.9);
   padding: 1.4rem 1.6rem;
   background:
     repeating-linear-gradient(
@@ -76,6 +95,10 @@
   pointer-events: none;
 }
 
+.plateStill::after {
+  animation: none;
+}
+
 @keyframes sheen {
   0%,
   62% {
@@ -85,6 +108,87 @@
   100% {
     transform: translateX(120%);
   }
+}
+
+/* engraved (inset) lettering */
+.engraved {
+  color: #4d4b46;
+  text-shadow:
+    0 var(--engrave) 0 rgba(255, 255, 255, 0.85),
+    0 calc(-1 * var(--engrave)) 0 rgba(0, 0, 0, 0.28);
+  letter-spacing: 0.14em;
+}
+
+.plateLabel {
+  color: #8a877f;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.32em;
+}
+
+/* black anodized variant (like the metal cards) */
+.plateAnodized {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #33322d 0%, #201f1c 38%, #2d2c28 62%, #1b1a17 100%);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 28px -16px rgba(0, 0, 0, 0.55);
+  --stamp-ink: #e8e5db;
+}
+
+.plateAnodized::after {
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 58%
+  );
+}
+
+.plateAnodized .engraved {
+  color: #d9d6cc;
+  text-shadow:
+    0 calc(-1 * var(--engrave)) 0 rgba(0, 0, 0, 0.75),
+    0 var(--engrave) 0 rgba(255, 255, 255, 0.14);
+}
+
+.plateAnodized .plateLabel {
+  color: #85826f;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* brass variant */
+.plateBrass {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.3) 1px,
+      rgba(120, 90, 20, 0.05) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #ecdca8 0%, #d8c17f 38%, #e8d69c 62%, #cfb573 100%);
+  border-color: rgba(120, 90, 20, 0.25);
+}
+
+.plateBrass .engraved {
+  color: #6d5b2c;
+  text-shadow:
+    0 var(--engrave) 0 rgba(255, 248, 220, 0.8),
+    0 calc(-1 * var(--engrave)) 0 rgba(90, 70, 20, 0.4);
+}
+
+.plateBrass .plateLabel {
+  color: #9c874c;
+  text-shadow: 0 1px 0 rgba(255, 248, 220, 0.6);
 }
 
 /* corner screws */
@@ -110,28 +214,13 @@
   transform: translate(-50%, -50%) rotate(38deg);
 }
 
-/* engraved (inset) lettering */
-.engraved {
-  color: #4d4b46;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85),
-    0 -1px 0 rgba(0, 0, 0, 0.28);
-  letter-spacing: 0.14em;
-}
-
-.plateLabel {
-  color: #8a877f;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.32em;
-}
-
 /* ── Laser stepper ─────────────────────────────────────────────────── */
 
 /* etched (completed) segment */
 .trackDone {
   background: linear-gradient(90deg, #2b2a27, #454339);
   box-shadow:
-    0 0 6px 0 oklch(0.82 0.19 88 / 0.55),
+    0 0 calc(6px * var(--glow)) 0 color-mix(in oklab, var(--laser) 55%, transparent),
     0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
@@ -147,12 +236,8 @@
 /* the cutting head: node currently being "engraved" */
 .nodeActive {
   background: #17160f;
-  color: oklch(0.88 0.15 93);
-  box-shadow:
-    0 0 0 3px #fff,
-    0 0 0 4.5px oklch(0.82 0.19 88),
-    0 0 18px 2px oklch(0.82 0.19 88 / 0.65);
-  animation: cutPulse 1.6s ease-in-out infinite;
+  color: color-mix(in oklab, var(--laser) 80%, white);
+  animation: cutPulse var(--pulse-s) ease-in-out infinite;
 }
 
 @keyframes cutPulse {
@@ -160,15 +245,22 @@
   100% {
     box-shadow:
       0 0 0 3px #fff,
-      0 0 0 4.5px oklch(0.82 0.19 88),
-      0 0 14px 1px oklch(0.82 0.19 88 / 0.5);
+      0 0 0 4.5px var(--laser),
+      0 0 calc(14px * var(--glow)) 1px color-mix(in oklab, var(--laser) 50%, transparent);
   }
   50% {
     box-shadow:
       0 0 0 3px #fff,
-      0 0 0 4.5px oklch(0.82 0.19 88),
-      0 0 26px 5px oklch(0.82 0.19 88 / 0.8);
+      0 0 0 4.5px var(--laser),
+      0 0 calc(26px * var(--glow)) 5px color-mix(in oklab, var(--laser) 80%, transparent);
   }
+}
+
+/* final node once the job is delivered */
+.nodeFinal {
+  background: var(--laser);
+  color: #17160f;
+  box-shadow: 0 0 calc(14px * var(--glow)) -2px var(--laser);
 }
 
 /* spark that travels along the segment feeding the active node */
@@ -180,9 +272,9 @@
   height: 7px;
   margin-top: -3.5px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 25%, oklch(0.82 0.19 88) 60%, transparent 75%);
-  filter: drop-shadow(0 0 6px oklch(0.82 0.19 88));
-  animation: sparkRun 2.2s linear infinite;
+  background: radial-gradient(circle, #fff 0 25%, var(--laser) 60%, transparent 75%);
+  filter: drop-shadow(0 0 calc(6px * var(--glow)) var(--laser));
+  animation: sparkRun var(--spark-s) linear infinite;
 }
 
 @keyframes sparkRun {
@@ -216,14 +308,14 @@
 
 .logLatestDot {
   box-shadow:
-    0 0 0 4px oklch(0.82 0.19 88 / 0.25),
-    0 0 12px 1px oklch(0.82 0.19 88 / 0.5);
+    0 0 0 4px color-mix(in oklab, var(--laser) 25%, transparent),
+    0 0 calc(12px * var(--glow)) 1px color-mix(in oklab, var(--laser) 50%, transparent);
 }
 
 .logLatestDotCancelled {
   box-shadow:
     0 0 0 4px rgba(220, 38, 38, 0.18),
-    0 0 12px 1px rgba(220, 38, 38, 0.35);
+    0 0 calc(12px * var(--glow)) 1px rgba(220, 38, 38, 0.35);
 }
 
 /* ── Status stamps ─────────────────────────────────────────────────── */
@@ -235,6 +327,10 @@
   padding: 0.3rem 0.65rem;
   line-height: 1;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.stampNeutral {
+  color: var(--stamp-ink, rgba(0, 0, 0, 0.62));
 }
 
 .stampCancelled {
@@ -250,9 +346,9 @@
   background: linear-gradient(
     90deg,
     transparent,
-    oklch(0.82 0.19 88 / 0.15) 20%,
-    oklch(0.82 0.19 88) 50%,
-    oklch(0.82 0.19 88 / 0.15) 80%,
+    color-mix(in oklab, var(--laser) 15%, transparent) 20%,
+    var(--laser) 50%,
+    color-mix(in oklab, var(--laser) 15%, transparent) 80%,
     transparent
   );
   background-size: 200% 100%;

@@ -7,10 +7,12 @@ import {
   type OrderEvent,
   type OrderInfo,
   type OrderStatus,
+  type TrackerLook,
 } from "./OrderTracker";
 
 // Dev-only: DialKit panel to flip the /track page through every order state
-// without touching the database. Rendered only when NODE_ENV=development.
+// and tune the job-ticket look, without touching the database.
+// Rendered only when NODE_ENV=development.
 
 const FLOW: OrderStatus[] = [
   "received",
@@ -75,37 +77,73 @@ function buildPreview(d: {
 
 export function OrderTrackerPreview() {
   const d = useDialKit(
-    "Track Page States",
+    "Track Page",
     {
       livePreview: true, // off = the real page (form + DB lookup)
-      status: {
-        type: "select",
-        default: "in_production",
-        options: [...FLOW, "cancelled"],
+      state: {
+        status: {
+          type: "select",
+          default: "in_production",
+          options: [...FLOW, "cancelled"],
+        },
+        customerName: {
+          type: "text",
+          default: "Ada Okafor",
+          placeholder: "Customer name",
+        },
+        itemDescription: {
+          type: "text",
+          default: "100x Metal Business Cards (black anodized, custom logo)",
+          placeholder: "Item description",
+        },
+        destination: {
+          type: "text",
+          default: "Lekki, Lagos",
+          placeholder: "Destination",
+        },
+        placedDaysAgo: [4, 0, 30, 1],
       },
-      customerName: {
-        type: "text",
-        default: "Ada Okafor",
-        placeholder: "Customer name",
+      look: {
+        plateStyle: {
+          type: "select",
+          default: "steel",
+          options: ["steel", "anodized", "brass"],
+        },
+        laserColor: { type: "color", default: "#eec335" },
+        glow: [1, 0, 2, 0.05],
+        engraveDepth: [1, 0, 2.5, 0.1],
+        cardRadius: [16, 0, 28, 1],
+        sheen: true,
+        beamEdge: true,
+        screws: true,
       },
-      itemDescription: {
-        type: "text",
-        default: "100x Metal Business Cards (black anodized, custom logo)",
-        placeholder: "Item description",
+      motion: {
+        sparkSpeed: [2.2, 0.5, 5, 0.1],
+        pulseSpeed: [1.6, 0.5, 4, 0.1],
       },
-      destination: {
-        type: "text",
-        default: "Lekki, Lagos",
-        placeholder: "Destination",
-      },
-      placedDaysAgo: [4, 0, 30, 1],
     },
-    { id: "track-page-states", persist: true }
+    { id: "track-page-v2", persist: true }
   );
+
+  const look: TrackerLook = {
+    plateStyle: d.look.plateStyle as TrackerLook["plateStyle"],
+    laserColor: d.look.laserColor,
+    glow: d.look.glow,
+    engraveDepth: d.look.engraveDepth,
+    cardRadius: d.look.cardRadius,
+    sheen: d.look.sheen,
+    beamEdge: d.look.beamEdge,
+    screws: d.look.screws,
+    sparkSpeed: d.motion.sparkSpeed,
+    pulseSpeed: d.motion.pulseSpeed,
+  };
 
   return (
     <>
-      <OrderTracker override={d.livePreview ? buildPreview(d) : null} />
+      <OrderTracker
+        override={d.livePreview ? buildPreview(d.state) : null}
+        look={look}
+      />
       <DialRoot />
     </>
   );
