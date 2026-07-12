@@ -41,7 +41,7 @@ export default function TrackPage() {
               <span className="text-foreground">Track Order</span>
             </nav>
 
-            <div className="max-w-2xl mb-12">
+            <div className="max-w-2xl mx-auto mb-12 text-center">
               <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-extrabold tracking-tight">
                 Track Your Order
               </h1>
