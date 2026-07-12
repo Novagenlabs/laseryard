@@ -133,7 +133,44 @@
     return data;
   }
 
-  async function uploadDesign(file) {
+  // Artwork displays on a ~360px card, so anything huge is wasted bytes.
+  // Small SVGs stay vector; big SVGs and big rasters get rendered to a
+  // 1440px-wide WebP before upload.
+  const KEEP_SVG_UNDER = 1.5 * 1024 * 1024;
+  const KEEP_RASTER_UNDER = 500 * 1024;
+  const TARGET_WIDTH = 1440;
+
+  async function prepareArtwork(file) {
+    const isSvg = file.type === "image/svg+xml";
+    if (isSvg && file.size <= KEEP_SVG_UNDER) return file;
+    if (!isSvg && file.size <= KEEP_RASTER_UNDER) return file;
+
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = () => rej(new Error("Could not read that image"));
+        i.src = url;
+      });
+      const w0 = img.naturalWidth || img.width;
+      const h0 = img.naturalHeight || img.height;
+      if (!w0 || !h0) throw new Error("Could not read the image dimensions");
+      const scale = Math.min(1, TARGET_WIDTH / w0);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(w0 * scale);
+      canvas.height = Math.round(h0 * scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise((r) => canvas.toBlob(r, "image/webp", 0.85));
+      if (!blob) throw new Error("Compression failed");
+      return new File([blob], file.name.replace(/\.\w+$/, "") + ".webp", { type: "image/webp" });
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function uploadDesign(rawFile) {
+    const file = await prepareArtwork(rawFile);
     const fd = new FormData();
     fd.append("file", file);
     const res = await fetch(store.base.replace(/\/$/, "") + "/api/designs", {
