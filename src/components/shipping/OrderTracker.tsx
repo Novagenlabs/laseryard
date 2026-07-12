@@ -173,7 +173,7 @@ export function OrderTracker({
             value={override ? override.order.trackingNumber : trackingNumber}
             readOnly={!!override}
             onChange={(e) => setTrackingNumber(e.target.value)}
-            placeholder="LY-XXXX-XXXX"
+            placeholder="Enter tracking number"
             autoCapitalize="characters"
             autoCorrect="off"
             spellCheck={false}

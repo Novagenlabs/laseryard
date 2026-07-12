@@ -42,14 +42,9 @@ export default function TrackPage() {
             </nav>
 
             <div className="max-w-2xl mb-12">
-              <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
+              <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-extrabold tracking-tight">
                 Track Your Order
               </h1>
-              <p className="text-muted-foreground text-lg">
-                Enter your tracking number to see where your order is, from
-                production to delivery. You can find your tracking number in
-                the confirmation message we sent via WhatsApp.
-              </p>
             </div>
           </ScrollReveal>
 
