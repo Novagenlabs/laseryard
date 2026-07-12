@@ -151,6 +151,56 @@ export async function createOrder(input: {
   return order;
 }
 
+// Update order details (not status). Undefined fields are left unchanged;
+// empty strings clear the optional fields.
+export async function updateOrderDetails(
+  trackingNumber: string,
+  fields: {
+    customerName?: string;
+    customerPhone?: string;
+    itemDescription?: string;
+    destination?: string;
+    designUrl?: string;
+  }
+): Promise<Order | null> {
+  const sql = getDb();
+  const tn = normalizeTrackingNumber(trackingNumber);
+
+  const existing = await sql`
+    SELECT * FROM orders WHERE tracking_number = ${tn} LIMIT 1
+  `;
+  if (existing.length === 0) return null;
+  const cur = rowToOrder(existing[0]);
+
+  const merged = {
+    customerName: fields.customerName ?? cur.customerName,
+    customerPhone:
+      fields.customerPhone === undefined
+        ? cur.customerPhone
+        : fields.customerPhone || null,
+    itemDescription: fields.itemDescription ?? cur.itemDescription,
+    destination:
+      fields.destination === undefined
+        ? cur.destination
+        : fields.destination || null,
+    designUrl:
+      fields.designUrl === undefined ? cur.designUrl : fields.designUrl || null,
+  };
+
+  const rows = await sql`
+    UPDATE orders SET
+      customer_name = ${merged.customerName},
+      customer_phone = ${merged.customerPhone},
+      item_description = ${merged.itemDescription},
+      destination = ${merged.destination},
+      design_url = ${merged.designUrl},
+      updated_at = now()
+    WHERE tracking_number = ${tn}
+    RETURNING *
+  `;
+  return rowToOrder(rows[0]);
+}
+
 export async function updateOrderStatus(
   trackingNumber: string,
   status: OrderStatus,

@@ -53,6 +53,23 @@ curl -X POST https://laseryard.com/api/orders \
 
 Response includes `order.trackingNumber` — send that to the customer on WhatsApp.
 
+Upload artwork (stored in Neon, survives deploys; returns the `designUrl` to attach to an order):
+
+```
+curl -X POST https://laseryard.com/api/designs \
+  -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
+  -F "file=@card.svg"
+```
+
+Edit order details (silent, no timeline event; empty string clears an optional field):
+
+```
+curl -X PATCH https://laseryard.com/api/orders/LY-7K2M-QX4H \
+  -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"itemDescription":"75x metal cards","designUrl":"/api/designs/<id>"}'
+```
+
 Update status (adds a timeline event; `note` optional, a sensible default is used):
 
 ```

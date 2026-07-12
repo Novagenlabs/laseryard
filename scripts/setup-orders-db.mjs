@@ -40,9 +40,19 @@ await sql`
   CREATE INDEX IF NOT EXISTS order_events_order_id_idx ON order_events(order_id)
 `;
 
+await sql`
+  CREATE TABLE IF NOT EXISTS designs (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    filename text NOT NULL,
+    content_type text NOT NULL,
+    data text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  )
+`;
+
 // migration for tables created before design_url existed
 await sql`
   ALTER TABLE orders ADD COLUMN IF NOT EXISTS design_url text
 `;
 
-console.log("orders + order_events tables ready");
+console.log("orders + order_events + designs tables ready");
