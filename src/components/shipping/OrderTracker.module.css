@@ -1,0 +1,497 @@
+/* ── Engraving job-ticket look for the order tracker ─────────────────
+   Tunable via CSS vars (driven by the dev DialKit panel; defaults here
+   are the production look):
+   --laser     accent/beam color
+   --glow      glow intensity multiplier (0–2)
+   --spark-s   spark travel duration
+   --pulse-s   cutting-head pulse duration
+   --engrave   engraved text depth in px
+   --card-r    result card corner radius
+──────────────────────────────────────────────────────────────────── */
+
+.tracker {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --laser: oklch(0.82 0.19 88);
+  --glow: 1;
+  --spark-s: 2.2s;
+  --pulse-s: 1.6s;
+  --engrave: 1px;
+  --card-r: 1rem;
+}
+
+.card {
+  border-radius: var(--card-r);
+}
+
+/* one-time staggered reveal when a result lands */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: reveal 240ms var(--ease-out-strong) forwards;
+}
+
+.revealDelay1 {
+  animation-delay: 60ms;
+}
+
+.revealDelay2 {
+  animation-delay: 120ms;
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* pressable feedback on the Track button */
+.trackButton {
+  transition:
+    transform 160ms var(--ease-out-strong),
+    opacity 160ms ease;
+}
+
+.trackButton:active {
+  transform: scale(0.97);
+}
+
+/* ── Plaque ────────────────────────────────────────────────────────── */
+
+.plate {
+  position: relative;
+  border-radius: calc(var(--card-r) * 0.9);
+  padding: 1.4rem 1.6rem;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.35) 1px,
+      rgba(0, 0, 0, 0.02) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(
+      105deg,
+      oklab(97.3% -0.0001 0.004) 0%,
+      oklab(83.1% 0 0) 38%,
+      oklab(96.4% -0.0001 0.004) 62%,
+      oklab(92.2% -0.0005 0.005) 100%
+    );
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.06),
+    0 12px 28px -18px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+/* sweeping light across the metal */
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  animation: sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.plateStill::after {
+  animation: none;
+}
+
+@keyframes sheen {
+  0%,
+  62% {
+    transform: translateX(-120%);
+  }
+  82%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* engraved (inset) lettering */
+.engraved {
+  color: #4d4b46;
+  text-shadow:
+    0 var(--engrave) 0 rgba(255, 255, 255, 0.85),
+    0 calc(-1 * var(--engrave)) 0 rgba(0, 0, 0, 0.28);
+  letter-spacing: 0.14em;
+}
+
+.plateLabel {
+  color: #8a877f;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.32em;
+}
+
+/* black anodized variant (like the metal cards) */
+.plateAnodized {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #33322d 0%, #201f1c 38%, #2d2c28 62%, #1b1a17 100%);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 28px -16px rgba(0, 0, 0, 0.55);
+  --stamp-ink: #e8e5db;
+}
+
+.plateAnodized::after {
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 58%
+  );
+}
+
+.plateAnodized .engraved {
+  color: #d9d6cc;
+  text-shadow:
+    0 calc(-1 * var(--engrave)) 0 rgba(0, 0, 0, 0.75),
+    0 var(--engrave) 0 rgba(255, 255, 255, 0.14);
+}
+
+.plateAnodized .plateLabel {
+  color: #85826f;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* brass variant */
+.plateBrass {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.3) 1px,
+      rgba(120, 90, 20, 0.05) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #ecdca8 0%, #d8c17f 38%, #e8d69c 62%, #cfb573 100%);
+  border-color: rgba(120, 90, 20, 0.25);
+}
+
+.plateBrass .engraved {
+  color: #6d5b2c;
+  text-shadow:
+    0 var(--engrave) 0 rgba(255, 248, 220, 0.8),
+    0 calc(-1 * var(--engrave)) 0 rgba(90, 70, 20, 0.4);
+}
+
+.plateBrass .plateLabel {
+  color: #9c874c;
+  text-shadow: 0 1px 0 rgba(255, 248, 220, 0.6);
+}
+
+/* ── Job card mockup: the customer's design as a physical card ────── */
+
+.jobCardWrap {
+  position: relative;
+  height: 215px;
+}
+
+/* ambient glow: the artwork itself, blurred, bleeding behind the card */
+.jobCardAmbient {
+  position: absolute;
+  inset: 8px 4px -2px 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 6px);
+  object-fit: cover;
+  filter: blur(26px) saturate(1.5);
+  opacity: 0.5;
+  border-radius: 24px;
+}
+
+.jobCard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 18px 36px -18px rgba(0, 0, 0, 0.5),
+    0 6px 14px -8px rgba(0, 0, 0, 0.35);
+}
+
+.jobCardFace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* print grain */
+.jobCardTexture {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* directional surface lighting */
+.jobCardGloss {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.06) 26%,
+    rgba(255, 255, 255, 0) 45%,
+    rgba(0, 0, 0, 0.05) 78%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  pointer-events: none;
+}
+
+/* animated light sweep across the card */
+.jobCardSheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  animation: sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* rim: edge thickness + top light / bottom shade */
+.jobCardRim {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* floating status chip when artwork covers the card */
+.stampFloating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(12, 11, 8, 0.72);
+  backdrop-filter: blur(4px);
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jobCardSheen {
+    animation: none;
+  }
+}
+
+/* corner screws */
+.screw {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffffff, #b9b7b1 55%, #8d8b85);
+  box-shadow:
+    inset 0 -1px 1px rgba(0, 0, 0, 0.35),
+    0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.screw::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%) rotate(38deg);
+}
+
+/* ── Laser stepper ─────────────────────────────────────────────────── */
+
+/* etched (completed) segment */
+.trackDone {
+  background: linear-gradient(90deg, #2b2a27, #454339);
+  box-shadow:
+    0 0 calc(6px * var(--glow)) 0 color-mix(in oklab, var(--laser) 55%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* raw (upcoming) segment: faint guide line */
+.trackTodo {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.16) 0 5px,
+    transparent 5px 10px
+  );
+}
+
+/* the cutting head: node currently being "engraved" */
+.nodeActive {
+  background: #000000;
+  color: #ffffff;
+  animation: cutPulse var(--pulse-s) ease-in-out infinite;
+}
+
+@keyframes cutPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(255, 245, 182, 0.93),
+      0 0 0 4.5px #1a1914,
+      0 0 calc(14px * var(--glow)) 1px rgba(243, 243, 243, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(255, 245, 182, 0.93),
+      0 0 0 4.5px #1a1914,
+      0 0 calc(18px * var(--glow)) 2px rgba(243, 243, 243, 0.65);
+  }
+}
+
+/* final node once the job is delivered */
+.nodeFinal {
+  background: var(--laser);
+  color: #17160f;
+  box-shadow: 0 0 calc(14px * var(--glow)) -2px var(--laser);
+}
+
+/* spark that travels along the segment feeding the active node */
+.spark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 25%, var(--laser) 60%, transparent 75%);
+  filter: drop-shadow(0 0 calc(6px * var(--glow)) var(--laser));
+  animation: sparkRun var(--spark-s) linear infinite;
+}
+
+@keyframes sparkRun {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 7px);
+    opacity: 0;
+  }
+}
+
+/* ── Job log (timeline) ────────────────────────────────────────────── */
+
+/* laser-scored rail */
+.rail {
+  width: 2px;
+  flex: 1;
+  min-height: 2rem;
+  margin: 4px 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.08));
+  border-radius: 2px;
+}
+
+.logLatestDot {
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--laser) 25%, transparent),
+    0 0 calc(12px * var(--glow)) 1px color-mix(in oklab, var(--laser) 50%, transparent);
+}
+
+.logLatestDotCancelled {
+  box-shadow:
+    0 0 0 4px rgba(220, 38, 38, 0.18),
+    0 0 calc(12px * var(--glow)) 1px rgba(220, 38, 38, 0.35);
+}
+
+/* ── Status stamps ─────────────────────────────────────────────────── */
+
+.stamp {
+  letter-spacing: 0.18em;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.stampNeutral {
+  color: var(--stamp-ink, rgba(0, 0, 0, 0.62));
+  border-color: var(--stamp-border, rgba(0, 0, 0, 0.55));
+}
+
+.stampCancelled {
+  transform: rotate(-3deg);
+  border-width: 2px;
+  border-style: double;
+}
+
+/* thin scanning beam across the top of the ticket */
+.beamEdge {
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--laser) 15%, transparent) 20%,
+    var(--laser) 50%,
+    color-mix(in oklab, var(--laser) 15%, transparent) 80%,
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: beamScan 3.4s ease-in-out infinite;
+}
+
+@keyframes beamScan {
+  0%,
+  100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate::after,
+  .spark,
+  .beamEdge,
+  .nodeActive {
+    animation: none;
+  }
+
+  /* keep the fade, drop the movement */
+  .reveal {
+    transform: none;
+    animation: reveal 200ms ease forwards;
+  }
+}

@@ -1,0 +1,10 @@
+<svg width="520" height="300" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="516" height="296" rx="18" fill="#1B1A17"/>
+  <rect x="2" y="2" width="516" height="296" rx="18" stroke="#3A3833" stroke-width="1.5"/>
+  <circle cx="78" cy="96" r="30" stroke="#D8D5CC" stroke-width="2.5"/>
+  <path d="M60 108 L78 74 L96 108" stroke="#EEC335" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="48" y="188" font-family="Georgia, serif" font-size="30" letter-spacing="2" fill="#D8D5CC">ADA OKAFOR</text>
+  <text x="48" y="216" font-family="Courier New, monospace" font-size="13" letter-spacing="4" fill="#8B887F">FOUNDER · OKAFOR STUDIO</text>
+  <text x="48" y="258" font-family="Courier New, monospace" font-size="12" letter-spacing="2" fill="#6E6B63">+234 801 234 5678 · LAGOS</text>
+  <path d="M418 48 h54 M418 60 h54 M418 72 h34" stroke="#3A3833" stroke-width="2" stroke-linecap="round"/>
+</svg>
