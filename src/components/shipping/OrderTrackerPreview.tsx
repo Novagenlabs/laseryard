@@ -118,8 +118,8 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
         engraveDepth: [1, 0, 2.5, 0.1],
         cardRadius: [16, 0, 28, 1],
         sheen: true,
-        beamEdge: true,
-        screws: true,
+        beamEdge: false,
+        screws: false,
       },
       motion: {
         sparkSpeed: [2.2, 0.5, 5, 0.1],

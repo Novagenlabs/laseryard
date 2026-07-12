@@ -108,6 +108,9 @@ export function TrackSearch() {
 
   return (
     <div className={`w-full max-w-2xl mx-auto ${styles.tracker}`}>
+      <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-[40px] font-extrabold tracking-tight text-center mb-12">
+        Track Your Order
+      </h1>
       <form onSubmit={handleSubmit} className="flex gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -188,8 +191,8 @@ export function OrderDetails({
     ? STEPS.findIndex((s) => s.status === order.status)
     : -1;
 
-  const showScrews = look?.screws ?? true;
-  const showBeamEdge = look?.beamEdge ?? true;
+  const showScrews = look?.screws ?? false;
+  const showBeamEdge = look?.beamEdge ?? false;
   const plateClass =
     look?.plateStyle === "anodized"
       ? styles.plateAnodized
@@ -207,9 +210,26 @@ export function OrderDetails({
 
   const loading = !override && !fetched && !error;
 
+  const header = (
+    <>
+      <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-[40px] font-extrabold tracking-tight text-center">
+        Order {(order?.trackingNumber ?? trackingNumber).toUpperCase()}
+      </h1>
+      <div className="w-full flex mt-2">
+        <Link
+          href="/track"
+          className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors"
+        >
+          <span aria-hidden>&lsaquo;</span> Back
+        </Link>
+      </div>
+    </>
+  );
+
   if (loading) {
     return (
       <div className={`w-full max-w-2xl mx-auto ${styles.tracker}`}>
+        {header}
         <div className="flex items-center justify-center gap-3 py-16 text-muted-foreground">
           <Loader2 className="w-5 h-5 animate-spin" />
           <span className={`${plexMono.className} text-sm tracking-widest uppercase`}>
@@ -223,12 +243,12 @@ export function OrderDetails({
   if (error || !order) {
     return (
       <div className={`w-full max-w-2xl mx-auto ${styles.tracker}`}>
-        <div className={`${styles.reveal} p-6 rounded-xl bg-red-500/10 border border-red-500/20 text-center`}>
+        {header}
+        <div className={`${styles.reveal} mt-8 p-6 rounded-xl bg-red-500/10 border border-red-500/20 text-center`}>
           <p className="text-sm text-red-500">
             {error || "No order found with that number."}
           </p>
         </div>
-        <TrackAnotherLink />
       </div>
     );
   }
@@ -238,15 +258,16 @@ export function OrderDetails({
       className={`w-full max-w-2xl mx-auto ${styles.tracker}`}
       style={lookVars}
     >
-      <div className="space-y-5" key={order.trackingNumber + order.status}>
+      {header}
+      <div className="space-y-4 mt-8" key={order.trackingNumber + order.status}>
         {/* Job Ticket */}
-        <div className={`${styles.reveal} ${styles.card} bg-card border border-border overflow-hidden shadow-sm`}>
+        <div className={`${styles.reveal} ${styles.card} bg-card border border-border overflow-hidden`}>
           {showBeamEdge && <div className={styles.beamEdge} />}
-          <div className="p-5 sm:p-6">
+          <div className="p-6 flex flex-col sm:flex-row gap-5 items-start">
             <div
               className={`${styles.plate} ${plateClass} ${
                 look?.sheen === false ? styles.plateStill : ""
-              }`}
+              } w-full sm:w-[360px] h-[215px] shrink-0 flex flex-col gap-2`}
             >
               {showScrews && (
                 <>
@@ -256,11 +277,11 @@ export function OrderDetails({
                   <span className={styles.screw} style={{ bottom: 7, right: 7 }} />
                 </>
               )}
-              <p className={`${plexMono.className} ${styles.plateLabel} text-[10px] font-medium uppercase mb-2`}>
+              <p className={`${plexMono.className} ${styles.plateLabel} text-[10px] font-medium uppercase`}>
                 Laser Yard · Job Ticket
               </p>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className={`${plexMono.className} ${styles.engraved} text-xl sm:text-2xl font-semibold`}>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className={`${plexMono.className} ${styles.engraved} text-[26px] leading-8 font-semibold`}>
                   {order.trackingNumber}
                 </h3>
                 <span
@@ -268,7 +289,7 @@ export function OrderDetails({
                     cancelled ? `${styles.stampCancelled} text-red-600` : ""
                   } ${delivered ? "text-gold-dark" : ""} ${
                     !cancelled && !delivered ? styles.stampNeutral : ""
-                  } text-[11px] font-semibold uppercase`}
+                  } text-[11px] font-semibold uppercase shrink-0`}
                 >
                   {STATUS_LABELS[order.status]}
                 </span>
@@ -276,7 +297,7 @@ export function OrderDetails({
 
               {/* The job itself: customer's design on the plate */}
               {order.designUrl && (
-                <div className="flex justify-center pt-5 pb-2">
+                <div className="flex flex-1 min-h-0 justify-center items-center pt-1">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={order.designUrl}
@@ -287,19 +308,19 @@ export function OrderDetails({
               )}
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm mt-5">
-              <div>
-                <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1`}>
+            <div className="flex flex-col gap-6 text-sm flex-1">
+              <div className="flex flex-col gap-1">
+                <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}>
                   Order
                 </p>
                 <p className="font-medium">{order.itemDescription}</p>
-                <p className="text-muted-foreground text-xs mt-0.5">
+                <p className="text-muted-foreground text-xs">
                   for {order.customerName}
                   {order.destination ? ` · ${order.destination}` : ""}
                 </p>
               </div>
-              <div>
-                <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1`}>
+              <div className="flex flex-col gap-1">
+                <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}>
                   Placed
                 </p>
                 <p className="font-medium">{formatDate(order.createdAt)}</p>
@@ -411,21 +432,7 @@ export function OrderDetails({
           </div>
         )}
 
-        <TrackAnotherLink />
       </div>
-    </div>
-  );
-}
-
-function TrackAnotherLink() {
-  return (
-    <div className="flex justify-center pt-4">
-      <Link
-        href="/track"
-        className={`${plexMono.className} text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors`}
-      >
-        Track another order
-      </Link>
     </div>
   );
 }
