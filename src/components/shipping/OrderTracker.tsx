@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { IBM_Plex_Mono } from "next/font/google";
 import {
   Search,
   Loader2,
@@ -12,6 +13,12 @@ import {
   ClipboardCheck,
   XCircle,
 } from "lucide-react";
+import styles from "./OrderTracker.module.css";
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+});
 
 export type OrderStatus =
   | "received"
@@ -117,12 +124,13 @@ export function OrderTracker({
   }
 
   const cancelled = order?.status === "cancelled";
+  const delivered = order?.status === "delivered";
   const currentStep = order
     ? STEPS.findIndex((s) => s.status === order.status)
     : -1;
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className={`w-full max-w-2xl mx-auto ${styles.tracker}`}>
       {/* Search Form */}
       <form onSubmit={handleSubmit} className="flex gap-3">
         <div className="relative flex-1">
@@ -132,68 +140,86 @@ export function OrderTracker({
             value={override ? override.order.trackingNumber : trackingNumber}
             readOnly={!!override}
             onChange={(e) => setTrackingNumber(e.target.value)}
-            placeholder="Enter your tracking number (e.g. LY-XXXX-XXXX)"
+            placeholder="LY-XXXX-XXXX"
             autoCapitalize="characters"
             autoCorrect="off"
             spellCheck={false}
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-shadow"
+            className={`${plexMono.className} w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background text-sm tracking-widest uppercase placeholder:normal-case placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-gold/70 transition-shadow`}
           />
         </div>
         <button
           type="submit"
           disabled={loading || (!override && !trackingNumber.trim()) || !!override}
-          className="px-6 py-3 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+          className={`${styles.trackButton} px-6 py-3 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-90 disabled:opacity-50`}
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Track"}
         </button>
       </form>
 
       {error && (
-        <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+        <div className={`${styles.reveal} mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20`}>
           <p className="text-sm text-red-500">{error}</p>
         </div>
       )}
 
       {order && (
-        <div className="mt-8 space-y-6">
-          {/* Order Summary */}
-          <div className="p-6 rounded-xl bg-card border border-border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">{order.trackingNumber}</h3>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  cancelled
-                    ? "bg-red-500/10 text-red-500"
-                    : order.status === "delivered"
-                      ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                      : "bg-foreground/10"
-                }`}
-              >
-                {STATUS_LABELS[order.status]}
-              </span>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground mb-1">Order</p>
-                <p className="font-medium">{order.itemDescription}</p>
-                <p className="text-muted-foreground text-xs mt-0.5">
-                  for {order.customerName}
-                  {order.destination ? ` · ${order.destination}` : ""}
+        <div className="mt-8 space-y-5" key={order.trackingNumber + order.status}>
+          {/* Job Ticket */}
+          <div className={`${styles.reveal} rounded-2xl bg-card border border-border overflow-hidden shadow-sm`}>
+            <div className={styles.beamEdge} />
+            <div className="p-5 sm:p-6">
+              <div className={styles.plate}>
+                <span className={styles.screw} style={{ top: 7, left: 7 }} />
+                <span className={styles.screw} style={{ top: 7, right: 7 }} />
+                <span className={styles.screw} style={{ bottom: 7, left: 7 }} />
+                <span className={styles.screw} style={{ bottom: 7, right: 7 }} />
+                <p className={`${plexMono.className} ${styles.plateLabel} text-[10px] font-medium uppercase mb-2`}>
+                  Laser Yard · Job Ticket
                 </p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className={`${plexMono.className} ${styles.engraved} text-xl sm:text-2xl font-semibold`}>
+                    {order.trackingNumber}
+                  </h3>
+                  <span
+                    className={`${plexMono.className} ${styles.stamp} ${
+                      cancelled ? `${styles.stampCancelled} text-red-600` : ""
+                    } ${delivered ? "text-gold-dark" : ""} ${
+                      !cancelled && !delivered ? "text-foreground/70" : ""
+                    } text-[11px] font-semibold uppercase`}
+                  >
+                    {STATUS_LABELS[order.status]}
+                  </span>
+                </div>
               </div>
-              <div>
-                <p className="text-muted-foreground mb-1">Placed</p>
-                <p className="font-medium">{formatDate(order.createdAt)}</p>
+
+              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm mt-5">
+                <div>
+                  <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1`}>
+                    Order
+                  </p>
+                  <p className="font-medium">{order.itemDescription}</p>
+                  <p className="text-muted-foreground text-xs mt-0.5">
+                    for {order.customerName}
+                    {order.destination ? ` · ${order.destination}` : ""}
+                  </p>
+                </div>
+                <div>
+                  <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1`}>
+                    Placed
+                  </p>
+                  <p className="font-medium">{formatDate(order.createdAt)}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Progress Stepper */}
+          {/* Laser Stepper */}
           {!cancelled && (
-            <div className="p-6 rounded-xl bg-card border border-border">
+            <div className={`${styles.reveal} ${styles.revealDelay1} p-6 rounded-2xl bg-card border border-border shadow-sm`}>
               <div className="flex items-start">
                 {STEPS.map((step, i) => {
                   const done = i <= currentStep;
+                  const active = i === currentStep && !delivered;
                   const Icon = step.icon;
                   return (
                     <div
@@ -201,24 +227,31 @@ export function OrderTracker({
                       className="flex-1 flex flex-col items-center relative"
                     >
                       {i > 0 && (
-                        <div
-                          className={`absolute top-4 right-1/2 w-full h-0.5 ${
-                            done ? "bg-foreground" : "bg-border"
-                          }`}
-                        />
+                        <div className="absolute top-4 right-1/2 w-full h-[3px] -mt-px overflow-visible rounded-full">
+                          <div
+                            className={`h-full w-full rounded-full ${
+                              done ? styles.trackDone : styles.trackTodo
+                            }`}
+                          />
+                          {active && <span className={styles.spark} />}
+                        </div>
                       )}
                       <div
                         className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center ${
-                          done
-                            ? "bg-foreground text-background"
-                            : "bg-card border border-border text-foreground/40"
+                          active
+                            ? styles.nodeActive
+                            : done
+                              ? delivered && i === STEPS.length - 1
+                                ? "bg-gold text-foreground shadow-[0_0_14px_-2px_oklch(0.82_0.19_88)]"
+                                : "bg-foreground text-background"
+                              : "bg-card border border-border text-foreground/40"
                         }`}
                       >
                         <Icon className="w-4 h-4" />
                       </div>
                       <p
                         className={`mt-2 text-[11px] sm:text-xs text-center leading-tight ${
-                          i === currentStep
+                          active
                             ? "font-semibold"
                             : done
                               ? "text-foreground/70"
@@ -234,28 +267,33 @@ export function OrderTracker({
             </div>
           )}
 
-          {/* Timeline */}
+          {/* Job Log */}
           {events.length > 0 && (
-            <div className="p-6 rounded-xl bg-card border border-border">
-              <h3 className="font-semibold mb-6">Order Timeline</h3>
+            <div className={`${styles.reveal} ${styles.revealDelay2} p-6 rounded-2xl bg-card border border-border shadow-sm`}>
+              <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-6`}>
+                Job Log
+              </p>
               <div className="space-y-0">
                 {events.map((entry, i) => {
                   const Icon = statusIcon(entry.status);
+                  const latest = i === 0;
                   return (
                     <div key={i} className="flex gap-4">
                       <div className="flex flex-col items-center">
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            i === 0
-                              ? "bg-foreground text-background"
+                            latest
+                              ? `bg-foreground text-background ${
+                                  entry.status === "cancelled"
+                                    ? styles.logLatestDotCancelled
+                                    : styles.logLatestDot
+                                }`
                               : "bg-foreground/10 text-foreground/60"
                           }`}
                         >
                           <Icon className="w-4 h-4" />
                         </div>
-                        {i < events.length - 1 && (
-                          <div className="w-px h-full min-h-8 bg-border my-1" />
-                        )}
+                        {i < events.length - 1 && <div className={styles.rail} />}
                       </div>
 
                       <div className={i === events.length - 1 ? "pb-0" : "pb-6"}>
@@ -267,7 +305,7 @@ export function OrderTracker({
                             {entry.note}
                           </p>
                         )}
-                        <p className="text-muted-foreground/60 text-xs mt-1">
+                        <p className={`${plexMono.className} text-muted-foreground/70 text-[11px] mt-1`}>
                           {formatDate(entry.createdAt)}
                         </p>
                       </div>

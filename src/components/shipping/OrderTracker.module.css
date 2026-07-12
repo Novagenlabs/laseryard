@@ -1,0 +1,285 @@
+/* ── Engraving job-ticket look for the order tracker ───────────────── */
+
+/* strong ease-out (built-ins are too weak) */
+.tracker {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* one-time staggered reveal when a result lands */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: reveal 240ms var(--ease-out-strong) forwards;
+}
+
+.revealDelay1 {
+  animation-delay: 60ms;
+}
+
+.revealDelay2 {
+  animation-delay: 120ms;
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* pressable feedback on the Track button */
+.trackButton {
+  transition:
+    transform 160ms var(--ease-out-strong),
+    opacity 160ms ease;
+}
+
+.trackButton:active {
+  transform: scale(0.97);
+}
+
+/* Brushed-metal plaque holding the tracking number */
+.plate {
+  position: relative;
+  border-radius: 0.9rem;
+  padding: 1.4rem 1.6rem;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.35) 1px,
+      rgba(0, 0, 0, 0.02) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #f7f6f3 0%, #e9e8e4 38%, #f4f3f0 62%, #e6e5e1 100%);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.06),
+    0 12px 28px -18px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+/* sweeping light across the metal */
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  animation: sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sheen {
+  0%,
+  62% {
+    transform: translateX(-120%);
+  }
+  82%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* corner screws */
+.screw {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffffff, #b9b7b1 55%, #8d8b85);
+  box-shadow:
+    inset 0 -1px 1px rgba(0, 0, 0, 0.35),
+    0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.screw::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%) rotate(38deg);
+}
+
+/* engraved (inset) lettering */
+.engraved {
+  color: #4d4b46;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 -1px 0 rgba(0, 0, 0, 0.28);
+  letter-spacing: 0.14em;
+}
+
+.plateLabel {
+  color: #8a877f;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.32em;
+}
+
+/* ── Laser stepper ─────────────────────────────────────────────────── */
+
+/* etched (completed) segment */
+.trackDone {
+  background: linear-gradient(90deg, #2b2a27, #454339);
+  box-shadow:
+    0 0 6px 0 oklch(0.82 0.19 88 / 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* raw (upcoming) segment: faint guide line */
+.trackTodo {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.16) 0 5px,
+    transparent 5px 10px
+  );
+}
+
+/* the cutting head: node currently being "engraved" */
+.nodeActive {
+  background: #17160f;
+  color: oklch(0.88 0.15 93);
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 4.5px oklch(0.82 0.19 88),
+    0 0 18px 2px oklch(0.82 0.19 88 / 0.65);
+  animation: cutPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cutPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px #fff,
+      0 0 0 4.5px oklch(0.82 0.19 88),
+      0 0 14px 1px oklch(0.82 0.19 88 / 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px #fff,
+      0 0 0 4.5px oklch(0.82 0.19 88),
+      0 0 26px 5px oklch(0.82 0.19 88 / 0.8);
+  }
+}
+
+/* spark that travels along the segment feeding the active node */
+.spark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 25%, oklch(0.82 0.19 88) 60%, transparent 75%);
+  filter: drop-shadow(0 0 6px oklch(0.82 0.19 88));
+  animation: sparkRun 2.2s linear infinite;
+}
+
+@keyframes sparkRun {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 7px);
+    opacity: 0;
+  }
+}
+
+/* ── Job log (timeline) ────────────────────────────────────────────── */
+
+/* laser-scored rail */
+.rail {
+  width: 2px;
+  flex: 1;
+  min-height: 2rem;
+  margin: 4px 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.08));
+  border-radius: 2px;
+}
+
+.logLatestDot {
+  box-shadow:
+    0 0 0 4px oklch(0.82 0.19 88 / 0.25),
+    0 0 12px 1px oklch(0.82 0.19 88 / 0.5);
+}
+
+.logLatestDotCancelled {
+  box-shadow:
+    0 0 0 4px rgba(220, 38, 38, 0.18),
+    0 0 12px 1px rgba(220, 38, 38, 0.35);
+}
+
+/* ── Status stamps ─────────────────────────────────────────────────── */
+
+.stamp {
+  letter-spacing: 0.18em;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.stampCancelled {
+  transform: rotate(-3deg);
+  border-width: 2px;
+  border-style: double;
+}
+
+/* thin scanning beam across the top of the ticket */
+.beamEdge {
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.82 0.19 88 / 0.15) 20%,
+    oklch(0.82 0.19 88) 50%,
+    oklch(0.82 0.19 88 / 0.15) 80%,
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: beamScan 3.4s ease-in-out infinite;
+}
+
+@keyframes beamScan {
+  0%,
+  100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate::after,
+  .spark,
+  .beamEdge,
+  .nodeActive {
+    animation: none;
+  }
+
+  /* keep the fade, drop the movement */
+  .reveal {
+    transform: none;
+    animation: reveal 200ms ease forwards;
+  }
+}
