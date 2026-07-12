@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createOrder } from "@/lib/orders";
+import { createOrder, listOrders } from "@/lib/orders";
 import { isAdminRequest } from "@/lib/admin-auth";
+
+// Admin: list recent orders (newest first).
+export async function GET(request: NextRequest) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const orders = await listOrders();
+    return NextResponse.json({ orders });
+  } catch (e) {
+    console.error("Order list error:", e);
+    return NextResponse.json({ error: "Failed to list orders" }, { status: 500 });
+  }
+}
 
 // Admin: create a new trackable order.
 // curl -X POST https://laseryard.com/api/orders \

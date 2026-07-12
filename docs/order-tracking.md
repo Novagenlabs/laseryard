@@ -13,6 +13,8 @@ DATABASE_URL=postgres://...   # Neon connection string (pooled endpoint is fine)
 ORDERS_ADMIN_KEY=<long random secret>   # e.g. openssl rand -hex 32
 ```
 
+`ORDERS_ADMIN_KEY` accepts multiple comma-separated keys — give each connected app (admin console, Hermes, POS, ...) its own key so any one can be revoked without breaking the others.
+
 2. Create the tables (one-time):
 
 ```
@@ -26,7 +28,19 @@ DATABASE_URL="postgres://..." node scripts/setup-orders-db.mjs
 
 Statuses: `received` → `in_production` → `shipped` → `out_for_delivery` → `delivered`, plus `cancelled`.
 
+## Orders Console
+
+`/admin/orders` is a browser console for day-to-day use: paste an API key once (stored in that browser), create orders, flip statuses, and copy customer share links. It is a thin client over the same admin API below.
+
 ## Admin API (Bearer ORDERS_ADMIN_KEY)
+
+Any app with a key can drive orders programmatically.
+
+List recent orders:
+
+```
+curl https://laseryard.com/api/orders -H "Authorization: Bearer $ORDERS_ADMIN_KEY"
+```
 
 Create an order (tracking number auto-generated unless you pass one):
 

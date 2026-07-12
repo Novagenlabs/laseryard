@@ -114,6 +114,14 @@ export async function getOrderWithEvents(
   return { order, events: events.map(rowToEvent) };
 }
 
+export async function listOrders(limit = 100): Promise<Order[]> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT * FROM orders ORDER BY created_at DESC LIMIT ${limit}
+  `;
+  return rows.map(rowToOrder);
+}
+
 export async function createOrder(input: {
   customerName: string;
   itemDescription: string;
