@@ -1,25 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getOrderWithEvents, isValidStatus, updateOrderStatus, ORDER_STATUSES } from "@/lib/orders";
-import { isAdminRequest } from "@/lib/admin-auth";
+import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
+
+export function OPTIONS() {
+  return adminPreflight();
+}
 
 type RouteContext = { params: Promise<{ trackingNumber: string }> };
 
 // Admin: fetch full order (including phone) with its event history.
 export async function GET(request: NextRequest, context: RouteContext) {
   if (!isAdminRequest(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return adminJson({ error: "Unauthorized" }, 401);
   }
 
   try {
     const { trackingNumber } = await context.params;
     const result = await getOrderWithEvents(trackingNumber);
     if (!result) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return adminJson({ error: "Order not found" }, 404);
     }
-    return NextResponse.json(result);
+    return adminJson(result);
   } catch (e) {
     console.error("Order fetch error:", e);
-    return NextResponse.json({ error: "Failed to fetch order" }, { status: 500 });
+    return adminJson({ error: "Failed to fetch order" }, 500);
   }
 }
 
@@ -30,7 +34,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 //   -d '{"status":"shipped","note":"Handed to Fez, waybill 12345"}'
 export async function PATCH(request: NextRequest, context: RouteContext) {
   if (!isAdminRequest(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return adminJson({ error: "Unauthorized" }, 401);
   }
 
   try {
@@ -39,9 +43,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const { status, note } = body ?? {};
 
     if (!status || typeof status !== "string" || !isValidStatus(status)) {
-      return NextResponse.json(
+      return adminJson(
         { error: `status must be one of: ${[...ORDER_STATUSES, "cancelled"].join(", ")}` },
-        { status: 400 }
+        400
       );
     }
 
@@ -51,15 +55,12 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       typeof note === "string" ? note : undefined
     );
     if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return adminJson({ error: "Order not found" }, 404);
     }
 
-    return NextResponse.json({ order });
+    return adminJson({ order });
   } catch (e) {
     console.error("Order status update error:", e);
-    return NextResponse.json(
-      { error: "Failed to update order" },
-      { status: 500 }
-    );
+    return adminJson({ error: "Failed to update order" }, 500);
   }
 }

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laser Yard · Orders Console</title>
+<!--
+  Standalone local console for the Laser Yard orders API.
+  Open this file directly in a browser (double-click / `open tools/orders-console.html`).
+  It is NOT served by the website — it talks to the admin API over CORS
+  with your ORDERS_ADMIN_KEY. Settings persist in this browser only.
+-->
+<style>
+  :root {
+    --ink: #17181d; --muted: #6f7076; --border: rgba(0,0,0,0.1);
+    --gold: #eec335; --bg: #fdfdfd; --card: #ffffff; --red: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: "Poppins", system-ui, sans-serif;
+    background: var(--bg); color: var(--ink);
+    padding: 48px 20px; min-height: 100vh;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 28px; }
+  input, select {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: 10px; font: inherit; font-size: 14px; background: var(--bg);
+  }
+  input:focus, select:focus { outline: 2px solid rgba(238,195,53,0.7); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid .full { grid-column: 1 / -1; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+  button {
+    font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+    border-radius: 10px; padding: 10px 18px; border: 1px solid var(--border);
+    background: var(--card); transition: transform 160ms cubic-bezier(0.23,1,0.32,1);
+  }
+  button:active { transform: scale(0.97); }
+  button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .order {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .order .info { flex: 1; min-width: 220px; }
+  .order .tn { font-weight: 600; font-size: 14px; }
+  .order .item { font-size: 14px; }
+  .order .meta { font-size: 12px; color: var(--muted); }
+  .order select { width: auto; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .copy { border: none; background: none; padding: 2px 6px; color: var(--muted); font-size: 12px; }
+  .copy:hover { color: var(--ink); }
+  .error { color: var(--red); font-size: 14px; margin: 10px 0; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .settings-grid { display: grid; grid-template-columns: 2fr 3fr auto; gap: 10px; align-items: center; }
+  @media (max-width: 620px) { .settings-grid { grid-template-columns: 1fr; } }
+  .empty { color: var(--muted); font-size: 14px; padding: 24px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row">
+    <h1>Laser Yard · Orders Console</h1>
+    <div style="display:flex; gap:8px;">
+      <button id="refreshBtn" type="button">Refresh</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Connection</div>
+    <form id="settingsForm" class="settings-grid">
+      <input id="apiBase" placeholder="API base, e.g. https://laseryard.com" />
+      <input id="apiKey" type="password" placeholder="ORDERS_ADMIN_KEY" />
+      <button class="primary" type="submit">Connect</button>
+    </form>
+    <p class="hint">Stored in this browser only. Point the base at http://localhost:3000 while developing.</p>
+  </div>
+
+  <div id="error" class="error" hidden></div>
+
+  <div class="card">
+    <div class="eyebrow">New Order</div>
+    <form id="createForm">
+      <div class="grid">
+        <input id="fName" placeholder="Customer name *" required />
+        <input id="fPhone" placeholder="Phone (optional)" />
+        <input id="fItem" class="full" placeholder="Item description *" required />
+        <input id="fDest" placeholder="Destination (optional)" />
+        <input id="fDesign" placeholder="Design URL, e.g. /designs/card.svg (optional)" />
+      </div>
+      <button class="primary" type="submit" style="margin-top:14px;">Create order</button>
+      <p class="hint">The customer share link is copied to your clipboard on creation.</p>
+    </form>
+  </div>
+
+  <div class="eyebrow">Orders</div>
+  <div id="orders"><p class="empty">Connect to load orders.</p></div>
+</div>
+
+<script>
+  const STATUSES = ["received","in_production","shipped","out_for_delivery","delivered","cancelled"];
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get base() { return localStorage.getItem("ly-api-base") || "https://laseryard.com"; },
+    set base(v) { localStorage.setItem("ly-api-base", v); },
+    get key() { return localStorage.getItem("ly-api-key") || ""; },
+    set key(v) { localStorage.setItem("ly-api-key", v); },
+  };
+
+  function showError(msg) {
+    const el = $("error");
+    el.textContent = msg || "";
+    el.hidden = !msg;
+  }
+
+  async function api(path, opts = {}) {
+    const res = await fetch(store.base.replace(/\/$/, "") + path, {
+      ...opts,
+      headers: {
+        "Authorization": "Bearer " + store.key,
+        ...(opts.body ? { "Content-Type": "application/json" } : {}),
+        ...(opts.headers || {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ("HTTP " + res.status));
+    return data;
+  }
+
+  function shareLink(tn) {
+    return store.base.replace(/\/$/, "") + "/track?order=" + encodeURIComponent(tn);
+  }
+
+  function copyLink(tn, btn) {
+    navigator.clipboard.writeText(shareLink(tn)).then(() => {
+      const prev = btn.textContent;
+      btn.textContent = "copied";
+      setTimeout(() => (btn.textContent = prev), 1600);
+    });
+  }
+
+  function renderOrders(orders) {
+    const box = $("orders");
+    box.innerHTML = "";
+    if (!orders.length) {
+      box.innerHTML = '<p class="empty">No orders yet.</p>';
+      return;
+    }
+    for (const o of orders) {
+      const div = document.createElement("div");
+      div.className = "order";
+
+      const info = document.createElement("div");
+      info.className = "info";
+      const tnRow = document.createElement("div");
+      const tn = document.createElement("span");
+      tn.className = "tn mono";
+      tn.textContent = o.trackingNumber;
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "copy mono";
+      copy.textContent = "copy link";
+      copy.onclick = () => copyLink(o.trackingNumber, copy);
+      tnRow.append(tn, copy);
+      const item = document.createElement("div");
+      item.className = "item";
+      item.textContent = o.itemDescription;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = [o.customerName, o.destination, o.customerPhone].filter(Boolean).join(" · ");
+      info.append(tnRow, item, meta);
+
+      const sel = document.createElement("select");
+      sel.className = "mono";
+      for (const s of STATUSES) {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s.replaceAll("_", " ");
+        if (s === o.status) opt.selected = true;
+        sel.append(opt);
+      }
+      sel.onchange = async () => {
+        showError("");
+        try {
+          await api("/api/orders/" + encodeURIComponent(o.trackingNumber), {
+            method: "PATCH",
+            body: JSON.stringify({ status: sel.value }),
+          });
+        } catch (e) {
+          showError(e.message);
+        }
+        load();
+      };
+
+      div.append(info, sel);
+      box.append(div);
+    }
+  }
+
+  async function load() {
+    if (!store.key) return;
+    showError("");
+    try {
+      const data = await api("/api/orders");
+      renderOrders(data.orders);
+    } catch (e) {
+      showError(e.message === "Unauthorized" ? "That API key was rejected." : e.message);
+    }
+  }
+
+  $("settingsForm").onsubmit = (e) => {
+    e.preventDefault();
+    if ($("apiBase").value.trim()) store.base = $("apiBase").value.trim();
+    if ($("apiKey").value.trim()) store.key = $("apiKey").value.trim();
+    $("apiKey").value = "";
+    load();
+  };
+
+  $("createForm").onsubmit = async (e) => {
+    e.preventDefault();
+    showError("");
+    try {
+      const data = await api("/api/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          customerName: $("fName").value.trim(),
+          itemDescription: $("fItem").value.trim(),
+          customerPhone: $("fPhone").value.trim() || undefined,
+          destination: $("fDest").value.trim() || undefined,
+          designUrl: $("fDesign").value.trim() || undefined,
+        }),
+      });
+      $("createForm").reset();
+      copyLink(data.order.trackingNumber, document.createElement("button"));
+      load();
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  $("refreshBtn").onclick = load;
+  $("apiBase").value = store.base;
+  load();
+</script>
+</body>
+</html>

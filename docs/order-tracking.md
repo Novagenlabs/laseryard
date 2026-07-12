@@ -28,9 +28,9 @@ DATABASE_URL="postgres://..." node scripts/setup-orders-db.mjs
 
 Statuses: `received` → `in_production` → `shipped` → `out_for_delivery` → `delivered`, plus `cancelled`.
 
-## Orders Console
+## Orders Console (local app)
 
-`/admin/orders` is a browser console for day-to-day use: paste an API key once (stored in that browser), create orders, flip statuses, and copy customer share links. It is a thin client over the same admin API below.
+`tools/orders-console.html` is a standalone local console — it is NOT served by the website. Open the file directly in a browser (`open tools/orders-console.html`), point it at the API base (production or http://localhost:3000), paste an API key once, and you can create orders, flip statuses, and copy customer share links. It talks to the admin API below over CORS; settings stay in that browser.
 
 ## Admin API (Bearer ORDERS_ADMIN_KEY)
 

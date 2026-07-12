@@ -1,5 +1,22 @@
 import { timingSafeEqual } from "node:crypto";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+// The admin API is meant to be driven by external apps (local console,
+// Hermes, POS), so admin routes answer cross-origin requests; auth is
+// the bearer key, not the origin.
+export const ADMIN_CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type",
+} as const;
+
+export function adminJson(data: unknown, status = 200) {
+  return NextResponse.json(data, { status, headers: ADMIN_CORS_HEADERS });
+}
+
+export function adminPreflight() {
+  return new NextResponse(null, { status: 204, headers: ADMIN_CORS_HEADERS });
+}
 
 // ORDERS_ADMIN_KEY supports multiple comma-separated keys so each
 // connected app (admin UI, Hermes, POS, ...) can have its own key.

@@ -1,19 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createOrder, listOrders } from "@/lib/orders";
-import { isAdminRequest } from "@/lib/admin-auth";
+import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
+
+export function OPTIONS() {
+  return adminPreflight();
+}
 
 // Admin: list recent orders (newest first).
 export async function GET(request: NextRequest) {
   if (!isAdminRequest(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return adminJson({ error: "Unauthorized" }, 401);
   }
 
   try {
     const orders = await listOrders();
-    return NextResponse.json({ orders });
+    return adminJson({ orders });
   } catch (e) {
     console.error("Order list error:", e);
-    return NextResponse.json({ error: "Failed to list orders" }, { status: 500 });
+    return adminJson({ error: "Failed to list orders" }, 500);
   }
 }
 
@@ -24,7 +28,7 @@ export async function GET(request: NextRequest) {
 //   -d '{"customerName":"Ada O.","itemDescription":"50x metal business cards","destination":"Lagos"}'
 export async function POST(request: NextRequest) {
   if (!isAdminRequest(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return adminJson({ error: "Unauthorized" }, 401);
   }
 
   try {
@@ -33,16 +37,10 @@ export async function POST(request: NextRequest) {
       body ?? {};
 
     if (!customerName || typeof customerName !== "string") {
-      return NextResponse.json(
-        { error: "customerName is required" },
-        { status: 400 }
-      );
+      return adminJson({ error: "customerName is required" }, 400);
     }
     if (!itemDescription || typeof itemDescription !== "string") {
-      return NextResponse.json(
-        { error: "itemDescription is required" },
-        { status: 400 }
-      );
+      return adminJson({ error: "itemDescription is required" }, 400);
     }
 
     const order = await createOrder({
@@ -55,18 +53,12 @@ export async function POST(request: NextRequest) {
       note: typeof note === "string" ? note : undefined,
     });
 
-    return NextResponse.json({ order }, { status: 201 });
+    return adminJson({ order }, 201);
   } catch (e) {
     if (e instanceof Error && e.message.includes("duplicate key")) {
-      return NextResponse.json(
-        { error: "That tracking number already exists" },
-        { status: 409 }
-      );
+      return adminJson({ error: "That tracking number already exists" }, 409);
     }
     console.error("Order creation error:", e);
-    return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 }
-    );
+    return adminJson({ error: "Failed to create order" }, 500);
   }
 }
