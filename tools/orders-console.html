@@ -60,6 +60,15 @@
   .settings-grid { display: grid; grid-template-columns: 2fr 3fr auto; gap: 10px; align-items: center; }
   @media (max-width: 620px) { .settings-grid { grid-template-columns: 1fr; } }
   .empty { color: var(--muted); font-size: 14px; padding: 24px 0; }
+  .spinner {
+    display: inline-block; width: 13px; height: 13px; vertical-align: -2px;
+    border: 2px solid rgba(0,0,0,0.15); border-top-color: var(--ink);
+    border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 7px;
+  }
+  button.primary .spinner { border-color: rgba(255,255,255,0.3); border-top-color: #fff; }
+  .loadingRow { display: flex; align-items: center; color: var(--muted); font-size: 14px; padding: 20px 0; }
+  .loadingRow .spinner { margin-right: 10px; }
+  select:disabled { opacity: 0.5; }
 </style>
 </head>
 <body>
@@ -112,6 +121,17 @@
     get key() { return localStorage.getItem("ly-api-key") || ""; },
     set key(v) { localStorage.setItem("ly-api-key", v); },
   };
+
+  function setBusy(btn, on, busyLabel) {
+    if (on) {
+      btn.dataset.label = btn.textContent;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>' + (busyLabel || btn.dataset.label);
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.label;
+    }
+  }
 
   function showError(msg) {
     const el = $("error");
@@ -237,6 +257,7 @@
       }
       sel.onchange = async () => {
         showError("");
+        sel.disabled = true;
         try {
           await api("/api/orders/" + encodeURIComponent(o.trackingNumber), {
             method: "PATCH",
@@ -245,7 +266,7 @@
         } catch (e) {
           showError(e.message);
         }
-        load();
+        await load();
       };
 
       const editBtn = document.createElement("button");
@@ -264,12 +285,14 @@
       delBtn.onclick = async () => {
         if (!confirm("Delete " + o.trackingNumber + " (" + o.customerName + ")? The customer's tracking link will stop working.")) return;
         showError("");
+        setBusy(delBtn, true, "Deleting…");
         try {
           await api("/api/orders/" + encodeURIComponent(o.trackingNumber), { method: "DELETE" });
         } catch (e) {
           showError(e.message);
+          setBusy(delBtn, false);
         }
-        load();
+        await load();
       };
 
       div.append(info, sel, editBtn, delBtn);
@@ -307,9 +330,14 @@
     form.onsubmit = async (e) => {
       e.preventDefault();
       showError("");
+      setBusy(save, true, eFile.files[0] ? "Uploading design…" : "Saving…");
       try {
         let designUrl = eDesign.value.trim();
-        if (eFile.files[0]) designUrl = await uploadDesign(eFile.files[0]);
+        if (eFile.files[0]) {
+          designUrl = await uploadDesign(eFile.files[0]);
+          setBusy(save, false);
+          setBusy(save, true, "Saving…");
+        }
         await api("/api/orders/" + encodeURIComponent(o.trackingNumber), {
           method: "PATCH",
           body: JSON.stringify({
@@ -320,9 +348,10 @@
             designUrl,
           }),
         });
-        load();
+        await load();
       } catch (err) {
         showError(err.message);
+        setBusy(save, false);
       }
     };
     return form;
@@ -331,29 +360,42 @@
   async function load() {
     if (!store.key) return;
     showError("");
+    if (!$("orders").querySelector(".order")) {
+      $("orders").innerHTML = '<div class="loadingRow"><span class="spinner"></span>Loading orders…</div>';
+    }
     try {
       const data = await api("/api/orders");
       renderOrders(data.orders);
     } catch (e) {
+      $("orders").innerHTML = '<p class="empty">Could not load orders.</p>';
       showError(e.message === "Unauthorized" ? "That API key was rejected." : e.message);
     }
   }
 
-  $("settingsForm").onsubmit = (e) => {
+  $("settingsForm").onsubmit = async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector("button");
     if ($("apiBase").value.trim()) store.base = $("apiBase").value.trim();
     if ($("apiKey").value.trim()) store.key = $("apiKey").value.trim();
     $("apiKey").value = "";
-    load();
+    setBusy(btn, true, "Connecting…");
+    await load();
+    setBusy(btn, false);
   };
 
   $("createForm").onsubmit = async (e) => {
     e.preventDefault();
     showError("");
+    const btn = e.target.querySelector("button.primary");
+    const file = $("fFile").files[0];
+    setBusy(btn, true, file ? "Uploading design…" : "Creating…");
     try {
       let designUrl = $("fDesign").value.trim() || undefined;
-      const file = $("fFile").files[0];
-      if (file) designUrl = await uploadDesign(file);
+      if (file) {
+        designUrl = await uploadDesign(file);
+        setBusy(btn, false);
+        setBusy(btn, true, "Creating…");
+      }
       const data = await api("/api/orders", {
         method: "POST",
         body: JSON.stringify({
@@ -366,13 +408,19 @@
       });
       $("createForm").reset();
       copyLink(data.order.trackingNumber, document.createElement("button"));
-      load();
+      await load();
     } catch (err) {
       showError(err.message);
+    } finally {
+      setBusy(btn, false);
     }
   };
 
-  $("refreshBtn").onclick = load;
+  $("refreshBtn").onclick = async () => {
+    setBusy($("refreshBtn"), true, "Refreshing…");
+    await load();
+    setBusy($("refreshBtn"), false);
+  };
   $("apiBase").value = store.base;
   load();
 </script>
