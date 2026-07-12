@@ -1,6 +1,4 @@
 import { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { OrderDetails, TrackSearch } from "@/components/shipping/OrderTracker";
 import { OrderTrackerPreview } from "@/components/shipping/OrderTrackerPreview";
 import { JsonLd } from "@/components/JsonLd";
@@ -37,20 +35,6 @@ export default async function TrackPage({
       <section className="pt-40 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-              <Link
-                href="/"
-                className="hover:text-foreground transition-colors"
-              >
-                Home
-              </Link>
-              <ArrowRight className="w-3 h-3" aria-hidden />
-              <span className="text-foreground">Track Order</span>
-            </nav>
-
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.1}>
             {process.env.NODE_ENV === "development" ? (
               <OrderTrackerPreview orderParam={orderNumber} />
             ) : orderNumber ? (

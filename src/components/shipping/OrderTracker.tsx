@@ -264,20 +264,26 @@ export function OrderDetails({
         <div className={`${styles.reveal} ${styles.card} bg-card border border-border overflow-hidden`}>
           {showBeamEdge && <div className={styles.beamEdge} />}
           <div className="p-6 flex flex-col sm:flex-row gap-5 items-start">
-            <div
-              className={`${styles.plate} ${plateClass} ${
-                look?.sheen === false ? styles.plateStill : ""
-              } w-full sm:w-[360px] h-[215px] shrink-0 flex flex-col gap-2`}
-            >
-              {order.designUrl ? (
-                <>
-                  {/* The card IS the customer's design */}
+            {order.designUrl ? (
+              <div className={`${styles.jobCardWrap} w-full sm:w-[360px] shrink-0`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={order.designUrl}
+                  alt=""
+                  aria-hidden
+                  className={styles.jobCardAmbient}
+                />
+                <div className={styles.jobCard}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={order.designUrl}
                     alt={`Design preview for ${order.trackingNumber}`}
-                    className={styles.designFace}
+                    className={styles.jobCardFace}
                   />
+                  <div className={styles.jobCardTexture} />
+                  <div className={styles.jobCardGloss} />
+                  {look?.sheen !== false && <div className={styles.jobCardSheen} />}
+                  <div className={styles.jobCardRim} />
                   <span
                     className={`${plexMono.className} ${styles.stamp} ${styles.stampFloating} ${
                       cancelled ? styles.stampCancelled : ""
@@ -285,9 +291,14 @@ export function OrderDetails({
                   >
                     {STATUS_LABELS[order.status]}
                   </span>
-                </>
-              ) : (
-                <>
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`${styles.plate} ${plateClass} ${
+                  look?.sheen === false ? styles.plateStill : ""
+                } w-full sm:w-[360px] h-[215px] shrink-0 flex flex-col gap-2`}
+              >
                   {showScrews && (
                     <>
                       <span className={styles.screw} style={{ top: 7, left: 7 }} />
@@ -313,9 +324,8 @@ export function OrderDetails({
                       {STATUS_LABELS[order.status]}
                     </span>
                   </div>
-                </>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="flex flex-col gap-6 text-sm flex-1">
               <div className="flex flex-col gap-1">
