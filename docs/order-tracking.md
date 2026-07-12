@@ -79,6 +79,13 @@ curl -X PATCH https://laseryard.com/api/orders/LY-7K2M-QX4H \
   -d '{"status":"shipped","note":"Handed to Fez, waybill 12345"}'
 ```
 
+Delete an order (timeline events and stored artwork go with it):
+
+```
+curl -X DELETE https://laseryard.com/api/orders/LY-7K2M-QX4H \
+  -H "Authorization: Bearer $ORDERS_ADMIN_KEY"
+```
+
 Fetch full order (admin view, includes phone):
 
 ```

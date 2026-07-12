@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getOrderWithEvents, isValidStatus, updateOrderDetails, updateOrderStatus, ORDER_STATUSES } from "@/lib/orders";
+import { deleteOrder, getOrderWithEvents, isValidStatus, updateOrderDetails, updateOrderStatus, ORDER_STATUSES } from "@/lib/orders";
 import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
 
 export function OPTIONS() {
@@ -89,5 +89,25 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   } catch (e) {
     console.error("Order status update error:", e);
     return adminJson({ error: "Failed to update order" }, 500);
+  }
+}
+
+// Admin: delete an order (timeline events cascade; attached artwork in
+// the designs table is removed too).
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  if (!isAdminRequest(request)) {
+    return adminJson({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const { trackingNumber } = await context.params;
+    const deleted = await deleteOrder(trackingNumber);
+    if (!deleted) {
+      return adminJson({ error: "Order not found" }, 404);
+    }
+    return adminJson({ deleted: true });
+  } catch (e) {
+    console.error("Order delete error:", e);
+    return adminJson({ error: "Failed to delete order" }, 500);
   }
 }

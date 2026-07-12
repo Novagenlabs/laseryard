@@ -220,7 +220,22 @@
         div.append(buildEditForm(o));
       };
 
-      div.append(info, sel, editBtn);
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.textContent = "Delete";
+      delBtn.style.color = "var(--red)";
+      delBtn.onclick = async () => {
+        if (!confirm("Delete " + o.trackingNumber + " (" + o.customerName + ")? The customer's tracking link will stop working.")) return;
+        showError("");
+        try {
+          await api("/api/orders/" + encodeURIComponent(o.trackingNumber), { method: "DELETE" });
+        } catch (e) {
+          showError(e.message);
+        }
+        load();
+      };
+
+      div.append(info, sel, editBtn, delBtn);
       box.append(div);
     }
   }

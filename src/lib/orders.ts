@@ -201,6 +201,25 @@ export async function updateOrderDetails(
   return rowToOrder(rows[0]);
 }
 
+// Delete an order (events cascade via FK). If the artwork lives in our
+// designs table, remove that too.
+export async function deleteOrder(trackingNumber: string): Promise<boolean> {
+  const sql = getDb();
+  const tn = normalizeTrackingNumber(trackingNumber);
+
+  const rows = await sql`
+    DELETE FROM orders WHERE tracking_number = ${tn} RETURNING design_url
+  `;
+  if (rows.length === 0) return false;
+
+  const designUrl: string | null = rows[0].design_url;
+  const m = designUrl?.match(/^\/api\/designs\/([0-9a-f-]{36})$/i);
+  if (m) {
+    await sql`DELETE FROM designs WHERE id = ${m[1]}`;
+  }
+  return true;
+}
+
 export async function updateOrderStatus(
   trackingNumber: string,
   status: OrderStatus,
