@@ -269,42 +269,51 @@ export function OrderDetails({
                 look?.sheen === false ? styles.plateStill : ""
               } w-full sm:w-[360px] h-[215px] shrink-0 flex flex-col gap-2`}
             >
-              {showScrews && (
+              {order.designUrl ? (
                 <>
-                  <span className={styles.screw} style={{ top: 7, left: 7 }} />
-                  <span className={styles.screw} style={{ top: 7, right: 7 }} />
-                  <span className={styles.screw} style={{ bottom: 7, left: 7 }} />
-                  <span className={styles.screw} style={{ bottom: 7, right: 7 }} />
-                </>
-              )}
-              <p className={`${plexMono.className} ${styles.plateLabel} text-[10px] font-medium uppercase`}>
-                Laser Yard · Job Ticket
-              </p>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className={`${plexMono.className} ${styles.engraved} text-[26px] leading-8 font-semibold`}>
-                  {order.trackingNumber}
-                </h3>
-                <span
-                  className={`${plexMono.className} ${styles.stamp} ${
-                    cancelled ? `${styles.stampCancelled} text-red-600` : ""
-                  } ${delivered ? "text-gold-dark" : ""} ${
-                    !cancelled && !delivered ? styles.stampNeutral : ""
-                  } text-[11px] font-semibold uppercase shrink-0`}
-                >
-                  {STATUS_LABELS[order.status]}
-                </span>
-              </div>
-
-              {/* The job itself: customer's design on the plate */}
-              {order.designUrl && (
-                <div className="flex flex-1 min-h-0 justify-center items-center pt-1">
+                  {/* The card IS the customer's design */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={order.designUrl}
                     alt={`Design preview for ${order.trackingNumber}`}
-                    className={styles.designPreview}
+                    className={styles.designFace}
                   />
-                </div>
+                  <span
+                    className={`${plexMono.className} ${styles.stamp} ${styles.stampFloating} ${
+                      cancelled ? styles.stampCancelled : ""
+                    } text-[11px] font-semibold uppercase`}
+                  >
+                    {STATUS_LABELS[order.status]}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {showScrews && (
+                    <>
+                      <span className={styles.screw} style={{ top: 7, left: 7 }} />
+                      <span className={styles.screw} style={{ top: 7, right: 7 }} />
+                      <span className={styles.screw} style={{ bottom: 7, left: 7 }} />
+                      <span className={styles.screw} style={{ bottom: 7, right: 7 }} />
+                    </>
+                  )}
+                  <p className={`${plexMono.className} ${styles.plateLabel} text-[10px] font-medium uppercase`}>
+                    Laser Yard · Job Ticket
+                  </p>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className={`${plexMono.className} ${styles.engraved} text-[26px] leading-8 font-semibold`}>
+                      {order.trackingNumber}
+                    </h3>
+                    <span
+                      className={`${plexMono.className} ${styles.stamp} ${
+                        cancelled ? `${styles.stampCancelled} text-red-600` : ""
+                      } ${delivered ? "text-gold-dark" : ""} ${
+                        !cancelled && !delivered ? styles.stampNeutral : ""
+                      } text-[11px] font-semibold uppercase shrink-0`}
+                    >
+                      {STATUS_LABELS[order.status]}
+                    </span>
+                  </div>
+                </>
               )}
             </div>
 

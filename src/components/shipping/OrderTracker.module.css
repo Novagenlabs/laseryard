@@ -197,12 +197,25 @@
   text-shadow: 0 1px 0 rgba(255, 248, 220, 0.6);
 }
 
-/* the customer's design shown on the plate */
-.designPreview {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
+/* the customer's design as the card face (full-bleed on the plate) */
+.designFace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* floating status chip when artwork covers the card */
+.stampFloating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(12, 11, 8, 0.72);
+  backdrop-filter: blur(4px);
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 /* corner screws */

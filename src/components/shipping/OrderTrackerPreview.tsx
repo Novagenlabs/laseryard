@@ -69,7 +69,7 @@ function buildPreview(d: {
       customerName: d.customerName,
       itemDescription: d.itemDescription,
       destination: d.destination || null,
-      designUrl: d.showDesign ? "/designs/demo-card.svg" : null,
+      designUrl: d.showDesign ? "/designs/barista-card.svg" : null,
       status,
       createdAt: new Date(placedAt).toISOString(),
       updatedAt: new Date(now).toISOString(),
