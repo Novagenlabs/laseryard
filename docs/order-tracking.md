@@ -26,7 +26,7 @@ DATABASE_URL="postgres://..." node scripts/setup-orders-db.mjs
 - `orders` — one row per order: `tracking_number` (unique, e.g. `LY-7K2M-QX4H`), `customer_name`, `customer_phone`, `item_description`, `destination`, `design_url` (optional image/SVG of the job, shown on the ticket plate; host it under `public/designs/`), `status`, timestamps.
 - `order_events` — append-only timeline shown to the customer: status + note + timestamp.
 
-Statuses: `received` → `in_production` → `shipped` → `out_for_delivery` → `delivered`, plus `cancelled`.
+Statuses: `received` → `processing` → `in_production` → `quality_check` → `approved` → `shipped` → `delivered`, plus `cancelled`.
 
 ## Orders Console (local app)
 

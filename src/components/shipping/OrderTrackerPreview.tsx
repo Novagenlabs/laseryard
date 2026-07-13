@@ -17,17 +17,21 @@ import {
 
 const FLOW: OrderStatus[] = [
   "received",
+  "processing",
   "in_production",
+  "quality_check",
+  "approved",
   "shipped",
-  "out_for_delivery",
   "delivered",
 ];
 
 const NOTES: Record<OrderStatus, string> = {
   received: "We received your order and design brief. It is in the queue.",
-  in_production: "Design approved. Engraving in progress.",
-  shipped: "Engraving and QC complete. Handed to courier, waybill FZ-88214.",
-  out_for_delivery: "Your package is with the rider and arriving today.",
+  processing: "Design files prepared and queued for the laser.",
+  in_production: "Engraving in progress.",
+  quality_check: "Inspecting every card against the approved design.",
+  approved: "Quality check passed. Packing your order.",
+  shipped: "Handed to courier, waybill FZ-88214.",
   delivered: "Delivered. Enjoy your cards!",
   cancelled: "This order has been cancelled.",
 };

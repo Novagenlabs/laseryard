@@ -113,7 +113,7 @@
 </div>
 
 <script>
-  const STATUSES = ["received","in_production","shipped","out_for_delivery","delivered","cancelled"];
+  const STATUSES = ["received","processing","in_production","quality_check","approved","shipped","delivered","cancelled"];
   const $ = (id) => document.getElementById(id);
   const store = {
     get base() { return localStorage.getItem("ly-api-base") || "https://laseryard.com"; },

@@ -11,7 +11,9 @@ import {
   Check,
   Truck,
   Flame,
-  MapPin,
+  Cog,
+  ScanSearch,
+  BadgeCheck,
   ClipboardCheck,
   XCircle,
 } from "lucide-react";
@@ -25,9 +27,11 @@ const plexMono = IBM_Plex_Mono({
 
 export type OrderStatus =
   | "received"
+  | "processing"
   | "in_production"
+  | "quality_check"
+  | "approved"
   | "shipped"
-  | "out_for_delivery"
   | "delivered"
   | "cancelled";
 
@@ -64,17 +68,21 @@ export type TrackerLook = {
 
 const STEPS: { status: OrderStatus; label: string; icon: typeof Package }[] = [
   { status: "received", label: "Received", icon: ClipboardCheck },
+  { status: "processing", label: "Processing", icon: Cog },
   { status: "in_production", label: "In Production", icon: Flame },
+  { status: "quality_check", label: "Quality Check", icon: ScanSearch },
+  { status: "approved", label: "Approved", icon: BadgeCheck },
   { status: "shipped", label: "Shipped", icon: Truck },
-  { status: "out_for_delivery", label: "Out for Delivery", icon: MapPin },
   { status: "delivered", label: "Delivered", icon: Check },
 ];
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   received: "Order Received",
+  processing: "Processing",
   in_production: "In Production",
+  quality_check: "Quality Check",
+  approved: "Approved",
   shipped: "Shipped",
-  out_for_delivery: "Out for Delivery",
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
@@ -162,6 +170,54 @@ const MATERIAL_COLORS: Record<CardMaterial, [string, string]> = {
   brass: ["#d9c485", "#57431c"], // brass base, dark engraving
 };
 
+// Clear near-edge rows/columns that are mostly one engraved run — border
+// strokes and crop artifacts from exported artwork. Real content (text,
+// logos) never fills a whole row.
+function scrubEdgeLines(maskUrl: string, w: number, h: number): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const id = ctx.getImageData(0, 0, w, h);
+      const d = id.data;
+      const bandY = Math.round(h * 0.08);
+      const bandX = Math.round(w * 0.08);
+      const rowFill = (y: number) => {
+        let n = 0;
+        for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 128) n++;
+        return n / w;
+      };
+      const colFill = (x: number) => {
+        let n = 0;
+        for (let y = 0; y < h; y++) if (d[(y * w + x) * 4 + 3] > 128) n++;
+        return n / h;
+      };
+      const clearRow = (y: number) => {
+        for (let x = 0; x < w; x++) d[(y * w + x) * 4 + 3] = 0;
+      };
+      const clearCol = (x: number) => {
+        for (let y = 0; y < h; y++) d[(y * w + x) * 4 + 3] = 0;
+      };
+      for (let y = 0; y < bandY; y++) {
+        if (rowFill(y) > 0.55) clearRow(y);
+        if (rowFill(h - 1 - y) > 0.55) clearRow(h - 1 - y);
+      }
+      for (let x = 0; x < bandX; x++) {
+        if (colFill(x) > 0.55) clearCol(x);
+        if (colFill(w - 1 - x) > 0.55) clearCol(w - 1 - x);
+      }
+      ctx.putImageData(id, 0, 0);
+      resolve(c.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(maskUrl);
+    img.src = maskUrl;
+  });
+}
+
 function useEngravePreview(
   designUrl: string | null | undefined,
   material: CardMaterial
@@ -205,9 +261,10 @@ function useEngravePreview(
 
         // Full-bleed card artwork: the CARD adopts the artwork's own
         // aspect ratio (clamped to plausible card shapes), then the
-        // design is cover-fit with a 2% overscan so its rectangular
-        // edge and anti-aliased border pixels fall outside the canvas
-        // instead of engraving as lines.
+        // design is cover-fit with a 5% overscan — the bleed crop.
+        // Exported card art routinely carries border strokes and crop
+        // artifacts near its edges; without the crop they threshold
+        // into engraved lines along the card.
         const fullBleed = opaque / total > 0.9;
         const imgAspect = img.width / img.height || 850 / 550;
         const canvasW = 850;
@@ -222,7 +279,7 @@ function useEngravePreview(
           c.height = canvasH;
           const cctx = c.getContext("2d")!;
           const scale =
-            Math.max(canvasW / img.width, canvasH / img.height) * 1.02;
+            Math.max(canvasW / img.width, canvasH / img.height) * 1.05;
           const w = img.width * scale;
           const h = img.height * scale;
           cctx.drawImage(img, (canvasW - w) / 2, (canvasH - h) / 2, w, h);
@@ -234,11 +291,14 @@ function useEngravePreview(
           });
         }
 
-        const mask = processDesign(sourceImg, {
+        let mask = processDesign(sourceImg, {
           invert: alreadyMask || majorityEngraved,
           outputWidth: canvasW,
           outputHeight: canvasH,
         });
+        if (fullBleed) {
+          mask = await scrubEdgeLines(mask, canvasW, canvasH);
+        }
         const [cardColor, markColor] = MATERIAL_COLORS[material];
         // square corners (CSS rounds them) and gentle texture — the
         // studio's row-noise aliases into visible bands at card size

@@ -2,9 +2,11 @@ import { getDb } from "@/lib/db";
 
 export const ORDER_STATUSES = [
   "received",
+  "processing",
   "in_production",
+  "quality_check",
+  "approved",
   "shipped",
-  "out_for_delivery",
   "delivered",
 ] as const;
 
@@ -12,18 +14,22 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number] | "cancelled";
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   received: "Order Received",
+  processing: "Processing",
   in_production: "In Production",
+  quality_check: "Quality Check",
+  approved: "Approved",
   shipped: "Shipped",
-  out_for_delivery: "Out for Delivery",
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
 
 export const DEFAULT_STATUS_NOTES: Record<OrderStatus, string> = {
   received: "We've received your order and it's in the queue.",
+  processing: "We're preparing your design files for production.",
   in_production: "Your order is being engraved and finished.",
+  quality_check: "Your order is going through quality inspection.",
+  approved: "Quality check passed. Your order is ready to ship.",
   shipped: "Your order has been handed to the courier.",
-  out_for_delivery: "Your order is on its way to you today.",
   delivered: "Your order has been delivered.",
   cancelled: "This order has been cancelled.",
 };

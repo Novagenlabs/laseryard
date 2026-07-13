@@ -20,7 +20,7 @@ await sql`
     destination text,
     design_url text,
     status text NOT NULL DEFAULT 'received'
-      CHECK (status IN ('received', 'in_production', 'shipped', 'out_for_delivery', 'delivered', 'cancelled')),
+      CHECK (status IN ('received', 'processing', 'in_production', 'quality_check', 'approved', 'shipped', 'delivered', 'cancelled')),
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
   )
@@ -48,6 +48,16 @@ await sql`
     data text NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now()
   )
+`;
+
+// migrations for earlier installs: widen the status set and retire
+// out_for_delivery (folded into shipped)
+await sql`UPDATE orders SET status = 'shipped' WHERE status = 'out_for_delivery'`;
+await sql`UPDATE order_events SET status = 'shipped' WHERE status = 'out_for_delivery'`;
+await sql`ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check`;
+await sql`
+  ALTER TABLE orders ADD CONSTRAINT orders_status_check
+  CHECK (status IN ('received', 'processing', 'in_production', 'quality_check', 'approved', 'shipped', 'delivered', 'cancelled'))
 `;
 
 // migration for tables created before design_url existed
