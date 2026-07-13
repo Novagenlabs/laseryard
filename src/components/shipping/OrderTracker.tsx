@@ -16,6 +16,7 @@ import {
   XCircle,
 } from "lucide-react";
 import styles from "./OrderTracker.module.css";
+import { processDesign, generate2DPreview } from "@/lib/design-processor";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -137,6 +138,85 @@ export function TrackSearch() {
   );
 }
 
+/* ── Engrave preview ──────────────────────────────────────────────────
+   A laser can't print color: the card shows the design as the machine
+   would cut it. We reuse the design studio's pipeline — threshold the
+   artwork into an engrave mask, then composite it on coated metal.
+   Material comes from the item description: stainless = dark marks on
+   steel; everything else = exposed silver on black anodized. Artwork
+   that is already a white-on-transparent engrave mask (design studio
+   exports) is detected and inverted so it doesn't vanish. */
+
+function isStainless(itemDescription: string): boolean {
+  return (
+    /stainless|steel/i.test(itemDescription) &&
+    !/anodiz|black/i.test(itemDescription)
+  );
+}
+
+function useEngravePreview(
+  designUrl: string | null | undefined,
+  itemDescription: string
+) {
+  const [result, setResult] = useState<{ for: string; url: string } | null>(null);
+
+  useEffect(() => {
+    if (!designUrl) return;
+    let alive = true;
+
+    const img = new Image();
+    img.onload = async () => {
+      try {
+        // Detect designs that are already engrave masks: nearly all
+        // opaque pixels near-white → threshold would erase them.
+        const probe = document.createElement("canvas");
+        probe.width = 128;
+        probe.height = 128;
+        const pctx = probe.getContext("2d")!;
+        pctx.drawImage(img, 0, 0, 128, 128);
+        const pd = pctx.getImageData(0, 0, 128, 128).data;
+        const total = pd.length / 4;
+        let opaque = 0;
+        let white = 0;
+        let dark = 0;
+        for (let i = 0; i < pd.length; i += 4) {
+          if (pd[i + 3] < 10) continue;
+          opaque++;
+          const gray = 0.299 * pd[i] + 0.587 * pd[i + 1] + 0.114 * pd[i + 2];
+          if (gray > 200) white++;
+          if (gray < 128) dark++;
+        }
+        const alreadyMask = opaque > 0 && white / opaque > 0.95;
+        // Engraving covers the design, not most of the card: if the
+        // threshold would cut the majority of the surface, flip it.
+        const majorityEngraved = dark / total > 0.5;
+
+        const mask = processDesign(img, { invert: alreadyMask || majorityEngraved });
+        const steel = isStainless(itemDescription);
+        const url = await generate2DPreview(
+          mask,
+          steel ? "#c9c8c4" : "#1a1a1a",
+          steel ? "#42413e" : "#c0c0c0"
+        );
+        if (alive) setResult({ for: designUrl, url });
+      } catch {
+        // canvas failed (tainted/odd SVG) — fall back to raw artwork
+        if (alive) setResult({ for: designUrl, url: designUrl });
+      }
+    };
+    img.onerror = () => {
+      if (alive) setResult({ for: designUrl, url: designUrl });
+    };
+    img.src = designUrl;
+
+    return () => {
+      alive = false;
+    };
+  }, [designUrl, itemDescription]);
+
+  return result && result.for === designUrl ? result.url : null;
+}
+
 /* ── Details view: driven by the order number in the URL ─────────── */
 
 export function OrderDetails({
@@ -184,6 +264,11 @@ export function OrderDetails({
 
   const order = override ? override.order : fetched?.order;
   const events = override ? override.events : (fetched?.events ?? []);
+  const engravePreview = useEngravePreview(
+    order?.designUrl,
+    order?.itemDescription ?? ""
+  );
+  const steelCard = isStainless(order?.itemDescription ?? "");
 
   const cancelled = order?.status === "cancelled";
   const delivered = order?.status === "delivered";
@@ -266,20 +351,24 @@ export function OrderDetails({
           <div className="p-6 flex flex-col sm:flex-row gap-5 items-start">
             {order.designUrl ? (
               <div className={`${styles.jobCardWrap} w-full sm:w-[360px] shrink-0`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={order.designUrl}
-                  alt=""
-                  aria-hidden
-                  className={styles.jobCardAmbient}
-                />
-                <div className={styles.jobCard}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                {engravePreview && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
-                    src={order.designUrl}
-                    alt={`Design preview for ${order.trackingNumber}`}
-                    className={styles.jobCardFace}
+                    src={engravePreview}
+                    alt=""
+                    aria-hidden
+                    className={styles.jobCardAmbient}
                   />
+                )}
+                <div className={`${styles.jobCard} ${steelCard ? styles.jobCardSteel : ""}`}>
+                  {engravePreview && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={engravePreview}
+                      alt={`Engraving preview for ${order.trackingNumber}`}
+                      className={styles.jobCardFace}
+                    />
+                  )}
                   <div className={styles.jobCardTexture} />
                   <div className={styles.jobCardGloss} />
                   {look?.sheen !== false && <div className={styles.jobCardSheen} />}

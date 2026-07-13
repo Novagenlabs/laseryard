@@ -289,6 +289,20 @@
   pointer-events: none;
 }
 
+/* stainless variant: base matches the steel canvas so corners and the
+   pre-render flash are the same material as the card itself */
+.jobCardSteel {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.3) 1px,
+      rgba(0, 0, 0, 0.04) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #d2d1cd 0%, #bcbbb7 38%, #cccbc7 62%, #b5b4b0 100%);
+}
+
 /* rim: edge thickness + top light / bottom shade */
 .jobCardRim {
   position: absolute;
