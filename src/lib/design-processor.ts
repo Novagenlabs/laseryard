@@ -141,7 +141,8 @@ export function generate2DPreview(
   engraveDataUrl: string,
   cardColor: string = "#1a1a1a",
   metalColor: string = "#c0c0c0",
-  cornerRadius: number = 20
+  cornerRadius: number = 20,
+  textureStrength: number = 1
 ): Promise<string> {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
@@ -156,7 +157,7 @@ export function generate2DPreview(
     ctx.fill();
 
     // Add subtle brushed metal texture to the whole card
-    addBrushedMetalTexture(ctx, 850, 550, 0.03);
+    addBrushedMetalTexture(ctx, 850, 550, 0.03 * textureStrength);
 
     // Load and composite the engrave mask
     const engraveImg = new Image();
@@ -172,7 +173,7 @@ export function generate2DPreview(
       metalCtx.fillRect(0, 0, 850, 550);
 
       // Add prominent brushed metal texture to revealed areas
-      addBrushedMetalTexture(metalCtx, 850, 550, 0.15);
+      addBrushedMetalTexture(metalCtx, 850, 550, 0.15 * textureStrength);
 
       // Use engrave mask to cut out the metal
       metalCtx.globalCompositeOperation = "destination-in";
