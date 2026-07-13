@@ -154,9 +154,17 @@ function isStainless(itemDescription: string): boolean {
   );
 }
 
+export type CardMaterial = "steel" | "anodized" | "brass";
+
+const MATERIAL_COLORS: Record<CardMaterial, [string, string]> = {
+  anodized: ["#1a1a1a", "#c0c0c0"], // black coating, exposed silver
+  steel: ["#c9c8c4", "#42413e"], // steel base, dark laser marks
+  brass: ["#d9c485", "#57431c"], // brass base, dark engraving
+};
+
 function useEngravePreview(
   designUrl: string | null | undefined,
-  itemDescription: string
+  material: CardMaterial
 ) {
   const [result, setResult] = useState<{ for: string; url: string } | null>(null);
 
@@ -192,12 +200,8 @@ function useEngravePreview(
         const majorityEngraved = dark / total > 0.5;
 
         const mask = processDesign(img, { invert: alreadyMask || majorityEngraved });
-        const steel = isStainless(itemDescription);
-        const url = await generate2DPreview(
-          mask,
-          steel ? "#c9c8c4" : "#1a1a1a",
-          steel ? "#42413e" : "#c0c0c0"
-        );
+        const [cardColor, markColor] = MATERIAL_COLORS[material];
+        const url = await generate2DPreview(mask, cardColor, markColor);
         if (alive) setResult({ for: designUrl, url });
       } catch {
         // canvas failed (tainted/odd SVG) — fall back to raw artwork
@@ -212,7 +216,7 @@ function useEngravePreview(
     return () => {
       alive = false;
     };
-  }, [designUrl, itemDescription]);
+  }, [designUrl, material]);
 
   return result && result.for === designUrl ? result.url : null;
 }
@@ -264,11 +268,10 @@ export function OrderDetails({
 
   const order = override ? override.order : fetched?.order;
   const events = override ? override.events : (fetched?.events ?? []);
-  const engravePreview = useEngravePreview(
-    order?.designUrl,
-    order?.itemDescription ?? ""
-  );
-  const steelCard = isStainless(order?.itemDescription ?? "");
+  const material: CardMaterial =
+    look?.plateStyle ??
+    (isStainless(order?.itemDescription ?? "") ? "steel" : "anodized");
+  const engravePreview = useEngravePreview(order?.designUrl, material);
 
   const cancelled = order?.status === "cancelled";
   const delivered = order?.status === "delivered";
@@ -360,7 +363,15 @@ export function OrderDetails({
                     className={styles.jobCardAmbient}
                   />
                 )}
-                <div className={`${styles.jobCard} ${steelCard ? styles.jobCardSteel : ""}`}>
+                <div
+                  className={`${styles.jobCard} ${
+                    material === "steel"
+                      ? styles.jobCardSteel
+                      : material === "brass"
+                        ? styles.jobCardBrass
+                        : ""
+                  }`}
+                >
                   {engravePreview && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img

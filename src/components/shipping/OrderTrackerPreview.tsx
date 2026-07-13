@@ -110,8 +110,8 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
       look: {
         plateStyle: {
           type: "select",
-          default: "steel",
-          options: ["steel", "anodized", "brass"],
+          default: "auto",
+          options: ["auto", "steel", "anodized", "brass"],
         },
         laserColor: { type: "color", default: "#eec335" },
         glow: [1, 0, 2, 0.05],
@@ -130,7 +130,10 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
   );
 
   const look: TrackerLook = {
-    plateStyle: d.look.plateStyle as TrackerLook["plateStyle"],
+    plateStyle:
+      d.look.plateStyle === "auto"
+        ? undefined
+        : (d.look.plateStyle as TrackerLook["plateStyle"]),
     laserColor: d.look.laserColor,
     glow: d.look.glow,
     engraveDepth: d.look.engraveDepth,

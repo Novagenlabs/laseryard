@@ -213,7 +213,7 @@
   height: calc(100% - 6px);
   object-fit: cover;
   filter: blur(26px) saturate(1.5);
-  opacity: 0.5;
+  opacity: calc(0.5 * var(--glow));
   border-radius: 24px;
 }
 
@@ -221,7 +221,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  border-radius: var(--card-r);
   overflow: hidden;
   /* matte black anodized card with brushed texture — the artwork sits on
      this like a real engraved card (same model as the design studio) */
@@ -303,11 +303,24 @@
     linear-gradient(105deg, #d2d1cd 0%, #bcbbb7 38%, #cccbc7 62%, #b5b4b0 100%);
 }
 
+/* brass variant base */
+.jobCardBrass {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.25) 1px,
+      rgba(120, 90, 20, 0.06) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #e4d093 0%, #cdb573 38%, #dcc687 62%, #c4aa66 100%);
+}
+
 /* rim: edge thickness + top light / bottom shade */
 .jobCardRim {
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: var(--card-r);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.18),
     inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
