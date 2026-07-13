@@ -170,54 +170,6 @@ const MATERIAL_COLORS: Record<CardMaterial, [string, string]> = {
   brass: ["#d9c485", "#57431c"], // brass base, dark engraving
 };
 
-// Clear near-edge rows/columns that are mostly one engraved run — border
-// strokes and crop artifacts from exported artwork. Real content (text,
-// logos) never fills a whole row.
-function scrubEdgeLines(maskUrl: string, w: number, h: number): Promise<string> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement("canvas");
-      c.width = w;
-      c.height = h;
-      const ctx = c.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
-      const id = ctx.getImageData(0, 0, w, h);
-      const d = id.data;
-      const bandY = Math.round(h * 0.08);
-      const bandX = Math.round(w * 0.08);
-      const rowFill = (y: number) => {
-        let n = 0;
-        for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 128) n++;
-        return n / w;
-      };
-      const colFill = (x: number) => {
-        let n = 0;
-        for (let y = 0; y < h; y++) if (d[(y * w + x) * 4 + 3] > 128) n++;
-        return n / h;
-      };
-      const clearRow = (y: number) => {
-        for (let x = 0; x < w; x++) d[(y * w + x) * 4 + 3] = 0;
-      };
-      const clearCol = (x: number) => {
-        for (let y = 0; y < h; y++) d[(y * w + x) * 4 + 3] = 0;
-      };
-      for (let y = 0; y < bandY; y++) {
-        if (rowFill(y) > 0.55) clearRow(y);
-        if (rowFill(h - 1 - y) > 0.55) clearRow(h - 1 - y);
-      }
-      for (let x = 0; x < bandX; x++) {
-        if (colFill(x) > 0.55) clearCol(x);
-        if (colFill(w - 1 - x) > 0.55) clearCol(w - 1 - x);
-      }
-      ctx.putImageData(id, 0, 0);
-      resolve(c.toDataURL("image/png"));
-    };
-    img.onerror = () => resolve(maskUrl);
-    img.src = maskUrl;
-  });
-}
-
 function useEngravePreview(
   designUrl: string | null | undefined,
   material: CardMaterial
@@ -278,11 +230,14 @@ function useEngravePreview(
           c.width = canvasW;
           c.height = canvasH;
           const cctx = c.getContext("2d")!;
-          const scale =
-            Math.max(canvasW / img.width, canvasH / img.height) * 1.05;
+          // slim bare-metal margin, whole design shown — never cropped
+          const pad = Math.round(canvasW * 0.03);
+          const contentW = canvasW - pad * 2;
+          const contentH = canvasH - pad * 2;
+          const scale = Math.min(contentW / img.width, contentH / img.height);
           const w = img.width * scale;
           const h = img.height * scale;
-          cctx.drawImage(img, (canvasW - w) / 2, (canvasH - h) / 2, w, h);
+          cctx.drawImage(img, pad + (contentW - w) / 2, pad + (contentH - h) / 2, w, h);
           sourceImg = await new Promise<HTMLImageElement>((res, rej) => {
             const i = new Image();
             i.onload = () => res(i);
@@ -291,14 +246,11 @@ function useEngravePreview(
           });
         }
 
-        let mask = processDesign(sourceImg, {
+        const mask = processDesign(sourceImg, {
           invert: alreadyMask || majorityEngraved,
           outputWidth: canvasW,
           outputHeight: canvasH,
         });
-        if (fullBleed) {
-          mask = await scrubEdgeLines(mask, canvasW, canvasH);
-        }
         const [cardColor, markColor] = MATERIAL_COLORS[material];
         // square corners (CSS rounds them) and gentle texture — the
         // studio's row-noise aliases into visible bands at card size
