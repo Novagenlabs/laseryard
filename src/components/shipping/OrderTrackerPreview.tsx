@@ -82,7 +82,7 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
   const d = useDialKit(
     "Track Page",
     {
-      livePreview: true, // off = the real page (form + DB lookup)
+      livePreview: false, // on = force the demo order + dial state
       state: {
         status: {
           type: "select",
@@ -126,7 +126,7 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
         pulseSpeed: [1.6, 0.5, 4, 0.1],
       },
     },
-    { id: "track-page-v2", persist: true }
+    { id: "track-page-v3", persist: true }
   );
 
   const look: TrackerLook = {
