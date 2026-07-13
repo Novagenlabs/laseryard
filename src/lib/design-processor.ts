@@ -142,38 +142,40 @@ export function generate2DPreview(
   cardColor: string = "#1a1a1a",
   metalColor: string = "#c0c0c0",
   cornerRadius: number = 20,
-  textureStrength: number = 1
+  textureStrength: number = 1,
+  width: number = 850,
+  height: number = 550
 ): Promise<string> {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
-    canvas.width = 850;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d")!;
 
     // Draw card base (dark coating)
     ctx.fillStyle = cardColor;
     ctx.beginPath();
-    ctx.roundRect(0, 0, 850, 550, cornerRadius);
+    ctx.roundRect(0, 0, width, height, cornerRadius);
     ctx.fill();
 
     // Add subtle brushed metal texture to the whole card
-    addBrushedMetalTexture(ctx, 850, 550, 0.03 * textureStrength);
+    addBrushedMetalTexture(ctx, width, height, 0.03 * textureStrength);
 
     // Load and composite the engrave mask
     const engraveImg = new Image();
     engraveImg.onload = () => {
       // Create temp canvas for the metal-revealed areas
       const metalCanvas = document.createElement("canvas");
-      metalCanvas.width = 850;
-      metalCanvas.height = 550;
+      metalCanvas.width = width;
+      metalCanvas.height = height;
       const metalCtx = metalCanvas.getContext("2d")!;
 
       // Draw metal color as base
       metalCtx.fillStyle = metalColor;
-      metalCtx.fillRect(0, 0, 850, 550);
+      metalCtx.fillRect(0, 0, width, height);
 
       // Add prominent brushed metal texture to revealed areas
-      addBrushedMetalTexture(metalCtx, 850, 550, 0.15 * textureStrength);
+      addBrushedMetalTexture(metalCtx, width, height, 0.15 * textureStrength);
 
       // Use engrave mask to cut out the metal
       metalCtx.globalCompositeOperation = "destination-in";

@@ -166,7 +166,11 @@ function useEngravePreview(
   designUrl: string | null | undefined,
   material: CardMaterial
 ) {
-  const [result, setResult] = useState<{ for: string; url: string } | null>(null);
+  const [result, setResult] = useState<{
+    for: string;
+    url: string;
+    aspect: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!designUrl) return;
@@ -199,20 +203,29 @@ function useEngravePreview(
         // threshold would cut the majority of the surface, flip it.
         const majorityEngraved = dark / total > 0.5;
 
-        // Full-bleed card artwork: cover-fit with a 2% overscan so the
-        // design's own rectangular edge (and its anti-aliased border
-        // pixels) fall outside the canvas instead of becoming a thin
-        // engraved line along the card.
+        // Full-bleed card artwork: the CARD adopts the artwork's own
+        // aspect ratio (clamped to plausible card shapes), then the
+        // design is cover-fit with a 2% overscan so its rectangular
+        // edge and anti-aliased border pixels fall outside the canvas
+        // instead of engraving as lines.
+        const fullBleed = opaque / total > 0.9;
+        const imgAspect = img.width / img.height || 850 / 550;
+        const canvasW = 850;
+        const canvasH = fullBleed
+          ? Math.round(850 / Math.min(2.1, Math.max(1.3, imgAspect)))
+          : 550;
+
         let sourceImg = img;
-        if (opaque / total > 0.9) {
+        if (fullBleed) {
           const c = document.createElement("canvas");
-          c.width = 850;
-          c.height = 550;
+          c.width = canvasW;
+          c.height = canvasH;
           const cctx = c.getContext("2d")!;
-          const scale = Math.max(850 / img.width, 550 / img.height) * 1.02;
+          const scale =
+            Math.max(canvasW / img.width, canvasH / img.height) * 1.02;
           const w = img.width * scale;
           const h = img.height * scale;
-          cctx.drawImage(img, (850 - w) / 2, (550 - h) / 2, w, h);
+          cctx.drawImage(img, (canvasW - w) / 2, (canvasH - h) / 2, w, h);
           sourceImg = await new Promise<HTMLImageElement>((res, rej) => {
             const i = new Image();
             i.onload = () => res(i);
@@ -221,19 +234,31 @@ function useEngravePreview(
           });
         }
 
-        const mask = processDesign(sourceImg, { invert: alreadyMask || majorityEngraved });
+        const mask = processDesign(sourceImg, {
+          invert: alreadyMask || majorityEngraved,
+          outputWidth: canvasW,
+          outputHeight: canvasH,
+        });
         const [cardColor, markColor] = MATERIAL_COLORS[material];
         // square corners (CSS rounds them) and gentle texture — the
         // studio's row-noise aliases into visible bands at card size
-        const url = await generate2DPreview(mask, cardColor, markColor, 0, 0.3);
-        if (alive) setResult({ for: designUrl, url });
+        const url = await generate2DPreview(
+          mask,
+          cardColor,
+          markColor,
+          0,
+          0.3,
+          canvasW,
+          canvasH
+        );
+        if (alive) setResult({ for: designUrl, url, aspect: canvasW / canvasH });
       } catch {
         // canvas failed (tainted/odd SVG) — fall back to raw artwork
-        if (alive) setResult({ for: designUrl, url: designUrl });
+        if (alive) setResult({ for: designUrl, url: designUrl, aspect: 850 / 550 });
       }
     };
     img.onerror = () => {
-      if (alive) setResult({ for: designUrl, url: designUrl });
+      if (alive) setResult({ for: designUrl, url: designUrl, aspect: 850 / 550 });
     };
     img.src = designUrl;
 
@@ -242,7 +267,7 @@ function useEngravePreview(
     };
   }, [designUrl, material]);
 
-  return result && result.for === designUrl ? result.url : null;
+  return result && result.for === designUrl ? result : null;
 }
 
 /* ── Details view: driven by the order number in the URL ─────────── */
@@ -377,11 +402,14 @@ export function OrderDetails({
           {showBeamEdge && <div className={styles.beamEdge} />}
           <div className="p-6 flex flex-col sm:flex-row gap-5 items-start">
             {order.designUrl ? (
-              <div className={`${styles.jobCardWrap} w-full sm:w-[360px] shrink-0`}>
+              <div
+                className={`${styles.jobCardWrap} w-full sm:w-[360px] shrink-0`}
+                style={engravePreview ? { aspectRatio: `${engravePreview.aspect}` } : undefined}
+              >
                 {engravePreview && (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
-                    src={engravePreview}
+                    src={engravePreview.url}
                     alt=""
                     aria-hidden
                     className={styles.jobCardAmbient}
@@ -399,7 +427,7 @@ export function OrderDetails({
                   {engravePreview && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
-                      src={engravePreview}
+                      src={engravePreview.url}
                       alt={`Engraving preview for ${order.trackingNumber}`}
                       className={styles.jobCardFace}
                     />
