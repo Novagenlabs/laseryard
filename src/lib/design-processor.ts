@@ -140,7 +140,8 @@ export function processDesign(
 export function generate2DPreview(
   engraveDataUrl: string,
   cardColor: string = "#1a1a1a",
-  metalColor: string = "#c0c0c0"
+  metalColor: string = "#c0c0c0",
+  cornerRadius: number = 20
 ): Promise<string> {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
@@ -150,9 +151,8 @@ export function generate2DPreview(
 
     // Draw card base (dark coating)
     ctx.fillStyle = cardColor;
-    const radius = 20;
     ctx.beginPath();
-    ctx.roundRect(0, 0, 850, 550, radius);
+    ctx.roundRect(0, 0, 850, 550, cornerRadius);
     ctx.fill();
 
     // Add subtle brushed metal texture to the whole card

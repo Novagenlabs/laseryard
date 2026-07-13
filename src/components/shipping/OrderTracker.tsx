@@ -201,7 +201,9 @@ function useEngravePreview(
 
         const mask = processDesign(img, { invert: alreadyMask || majorityEngraved });
         const [cardColor, markColor] = MATERIAL_COLORS[material];
-        const url = await generate2DPreview(mask, cardColor, markColor);
+        // square corners: the CSS card radius does the rounding, so the
+        // composite meets the card edge with no seam
+        const url = await generate2DPreview(mask, cardColor, markColor, 0);
         if (alive) setResult({ for: designUrl, url });
       } catch {
         // canvas failed (tainted/odd SVG) — fall back to raw artwork
