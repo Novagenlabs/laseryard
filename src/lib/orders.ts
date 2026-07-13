@@ -52,6 +52,7 @@ export type Order = {
 };
 
 export type OrderEvent = {
+  id: number;
   status: OrderStatus;
   note: string | null;
   createdAt: string;
@@ -92,6 +93,7 @@ function rowToOrder(row: any): Order {
 
 function rowToEvent(row: any): OrderEvent {
   return {
+    id: Number(row.id),
     status: row.status,
     note: row.note,
     createdAt: row.created_at,
@@ -112,7 +114,7 @@ export async function getOrderWithEvents(
 
   const order = rowToOrder(orders[0]);
   const events = await sql`
-    SELECT status, note, created_at FROM order_events
+    SELECT id, status, note, created_at FROM order_events
     WHERE order_id = ${order.id}
     ORDER BY created_at DESC, id DESC
   `;
@@ -205,6 +207,21 @@ export async function updateOrderDetails(
     RETURNING *
   `;
   return rowToOrder(rows[0]);
+}
+
+// Delete a single timeline event; only if it belongs to the order.
+export async function deleteOrderEvent(
+  trackingNumber: string,
+  eventId: number
+): Promise<boolean> {
+  const sql = getDb();
+  const tn = normalizeTrackingNumber(trackingNumber);
+  const rows = await sql`
+    DELETE FROM order_events WHERE id = ${eventId} AND order_id = (
+      SELECT id FROM orders WHERE tracking_number = ${tn}
+    ) RETURNING id
+  `;
+  return rows.length > 0;
 }
 
 // Delete an order (events cascade via FK). If the artwork lives in our
