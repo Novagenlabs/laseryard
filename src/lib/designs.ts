@@ -10,7 +10,7 @@ export const ALLOWED_DESIGN_TYPES: Record<string, string> = {
   "image/webp": ".webp",
 };
 
-export const MAX_DESIGN_BYTES = 2 * 1024 * 1024; // 2MB
+export const MAX_DESIGN_BYTES = 5 * 1024 * 1024; // 5MB (console compresses before upload)
 
 export type StoredDesign = {
   id: string;

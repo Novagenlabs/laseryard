@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
     if (file.size > MAX_DESIGN_BYTES) {
-      return adminJson({ error: "File too large (max 2MB)" }, 413);
+      return adminJson({ error: "File too large (max 5MB)" }, 413);
     }
 
     const data = Buffer.from(await file.arrayBuffer());

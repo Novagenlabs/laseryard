@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 // the bearer key, not the origin.
 export const ADMIN_CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Authorization, Content-Type",
 } as const;
 

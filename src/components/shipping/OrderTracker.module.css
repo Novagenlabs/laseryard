@@ -201,7 +201,8 @@
 
 .jobCardWrap {
   position: relative;
-  height: 215px;
+  /* real business-card proportions, same as the design studio preview */
+  aspect-ratio: 85 / 55;
 }
 
 /* ambient glow: the artwork itself, blurred, bleeding behind the card */
@@ -212,7 +213,7 @@
   height: calc(100% - 6px);
   object-fit: cover;
   filter: blur(26px) saturate(1.5);
-  opacity: 0.5;
+  opacity: calc(0.5 * var(--glow));
   border-radius: 24px;
 }
 
@@ -220,8 +221,19 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  border-radius: var(--card-r);
   overflow: hidden;
+  /* matte black anodized card with brushed texture — the artwork sits on
+     this like a real engraved card (same model as the design studio) */
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.04) 1px,
+      rgba(0, 0, 0, 0.1) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #2a2927 0%, #1a1917 38%, #262523 62%, #171614 100%);
   box-shadow:
     0 18px 36px -18px rgba(0, 0, 0, 0.5),
     0 6px 14px -8px rgba(0, 0, 0, 0.35);
@@ -232,6 +244,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  /* the composite is exactly card-ratio; cover kills sub-pixel seams */
   object-fit: cover;
 }
 
@@ -275,16 +288,52 @@
   pointer-events: none;
 }
 
+/* stainless variant: base matches the steel canvas so corners and the
+   pre-render flash are the same material as the card itself */
+.jobCardSteel {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.3) 1px,
+      rgba(0, 0, 0, 0.04) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #d2d1cd 0%, #bcbbb7 38%, #cccbc7 62%, #b5b4b0 100%);
+}
+
+/* brass variant base */
+.jobCardBrass {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0.25) 1px,
+      rgba(120, 90, 20, 0.06) 2px,
+      rgba(255, 255, 255, 0) 3px
+    ),
+    linear-gradient(105deg, #e4d093 0%, #cdb573 38%, #dcc687 62%, #c4aa66 100%);
+}
+
 /* rim: edge thickness + top light / bottom shade */
 .jobCardRim {
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: var(--card-r);
   box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.18),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.3);
+    inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.12);
   pointer-events: none;
+}
+
+/* on bright metals even a soft dark ring reads as an outline */
+.jobCardSteel .jobCardRim,
+.jobCardBrass .jobCardRim {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
 }
 
 /* floating status chip when artwork covers the card */

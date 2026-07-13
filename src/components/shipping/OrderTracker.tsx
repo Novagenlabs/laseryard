@@ -11,11 +11,14 @@ import {
   Check,
   Truck,
   Flame,
-  MapPin,
+  Cog,
+  ScanSearch,
+  BadgeCheck,
   ClipboardCheck,
   XCircle,
 } from "lucide-react";
 import styles from "./OrderTracker.module.css";
+import { processDesign, generate2DPreview } from "@/lib/design-processor";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -24,9 +27,11 @@ const plexMono = IBM_Plex_Mono({
 
 export type OrderStatus =
   | "received"
+  | "processing"
   | "in_production"
+  | "quality_check"
+  | "approved"
   | "shipped"
-  | "out_for_delivery"
   | "delivered"
   | "cancelled";
 
@@ -63,17 +68,21 @@ export type TrackerLook = {
 
 const STEPS: { status: OrderStatus; label: string; icon: typeof Package }[] = [
   { status: "received", label: "Received", icon: ClipboardCheck },
+  { status: "processing", label: "Processing", icon: Cog },
   { status: "in_production", label: "In Production", icon: Flame },
+  { status: "quality_check", label: "Quality Check", icon: ScanSearch },
+  { status: "approved", label: "Approved", icon: BadgeCheck },
   { status: "shipped", label: "Shipped", icon: Truck },
-  { status: "out_for_delivery", label: "Out for Delivery", icon: MapPin },
   { status: "delivered", label: "Delivered", icon: Check },
 ];
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   received: "Order Received",
+  processing: "Processing",
   in_production: "In Production",
+  quality_check: "Quality Check",
+  approved: "Approved",
   shipped: "Shipped",
-  out_for_delivery: "Out for Delivery",
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
@@ -137,6 +146,142 @@ export function TrackSearch() {
   );
 }
 
+/* ── Engrave preview ──────────────────────────────────────────────────
+   A laser can't print color: the card shows the design as the machine
+   would cut it. We reuse the design studio's pipeline — threshold the
+   artwork into an engrave mask, then composite it on coated metal.
+   Material comes from the item description: stainless = dark marks on
+   steel; everything else = exposed silver on black anodized. Artwork
+   that is already a white-on-transparent engrave mask (design studio
+   exports) is detected and inverted so it doesn't vanish. */
+
+function isStainless(itemDescription: string): boolean {
+  return (
+    /stainless|steel/i.test(itemDescription) &&
+    !/anodiz|black/i.test(itemDescription)
+  );
+}
+
+export type CardMaterial = "steel" | "anodized" | "brass";
+
+const MATERIAL_COLORS: Record<CardMaterial, [string, string]> = {
+  anodized: ["#1a1a1a", "#c0c0c0"], // black coating, exposed silver
+  steel: ["#c9c8c4", "#42413e"], // steel base, dark laser marks
+  brass: ["#d9c485", "#57431c"], // brass base, dark engraving
+};
+
+function useEngravePreview(
+  designUrl: string | null | undefined,
+  material: CardMaterial
+) {
+  const [result, setResult] = useState<{
+    for: string;
+    url: string;
+    aspect: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!designUrl) return;
+    let alive = true;
+
+    const img = new Image();
+    img.onload = async () => {
+      try {
+        // Detect designs that are already engrave masks: nearly all
+        // opaque pixels near-white → threshold would erase them.
+        const probe = document.createElement("canvas");
+        probe.width = 128;
+        probe.height = 128;
+        const pctx = probe.getContext("2d")!;
+        pctx.drawImage(img, 0, 0, 128, 128);
+        const pd = pctx.getImageData(0, 0, 128, 128).data;
+        const total = pd.length / 4;
+        let opaque = 0;
+        let white = 0;
+        let dark = 0;
+        for (let i = 0; i < pd.length; i += 4) {
+          if (pd[i + 3] < 10) continue;
+          opaque++;
+          const gray = 0.299 * pd[i] + 0.587 * pd[i + 1] + 0.114 * pd[i + 2];
+          if (gray > 200) white++;
+          if (gray < 128) dark++;
+        }
+        const alreadyMask = opaque > 0 && white / opaque > 0.95;
+        // Engraving covers the design, not most of the card: if the
+        // threshold would cut the majority of the surface, flip it.
+        const majorityEngraved = dark / total > 0.5;
+
+        // Full-bleed card artwork: the CARD adopts the artwork's own
+        // aspect ratio (clamped to plausible card shapes), then the
+        // design is cover-fit with a 5% overscan — the bleed crop.
+        // Exported card art routinely carries border strokes and crop
+        // artifacts near its edges; without the crop they threshold
+        // into engraved lines along the card.
+        const fullBleed = opaque / total > 0.9;
+        const imgAspect = img.width / img.height || 850 / 550;
+        const canvasW = 850;
+        const canvasH = fullBleed
+          ? Math.round(850 / Math.min(2.1, Math.max(1.3, imgAspect)))
+          : 550;
+
+        let sourceImg = img;
+        if (fullBleed) {
+          const c = document.createElement("canvas");
+          c.width = canvasW;
+          c.height = canvasH;
+          const cctx = c.getContext("2d")!;
+          // slim bare-metal margin, whole design shown — never cropped
+          const pad = Math.round(canvasW * 0.03);
+          const contentW = canvasW - pad * 2;
+          const contentH = canvasH - pad * 2;
+          const scale = Math.min(contentW / img.width, contentH / img.height);
+          const w = img.width * scale;
+          const h = img.height * scale;
+          cctx.drawImage(img, pad + (contentW - w) / 2, pad + (contentH - h) / 2, w, h);
+          sourceImg = await new Promise<HTMLImageElement>((res, rej) => {
+            const i = new Image();
+            i.onload = () => res(i);
+            i.onerror = () => rej(new Error("recanvas failed"));
+            i.src = c.toDataURL("image/png");
+          });
+        }
+
+        const mask = processDesign(sourceImg, {
+          invert: alreadyMask || majorityEngraved,
+          outputWidth: canvasW,
+          outputHeight: canvasH,
+        });
+        const [cardColor, markColor] = MATERIAL_COLORS[material];
+        // square corners (CSS rounds them) and gentle texture — the
+        // studio's row-noise aliases into visible bands at card size
+        const url = await generate2DPreview(
+          mask,
+          cardColor,
+          markColor,
+          0,
+          0.3,
+          canvasW,
+          canvasH
+        );
+        if (alive) setResult({ for: designUrl, url, aspect: canvasW / canvasH });
+      } catch {
+        // canvas failed (tainted/odd SVG) — fall back to raw artwork
+        if (alive) setResult({ for: designUrl, url: designUrl, aspect: 850 / 550 });
+      }
+    };
+    img.onerror = () => {
+      if (alive) setResult({ for: designUrl, url: designUrl, aspect: 850 / 550 });
+    };
+    img.src = designUrl;
+
+    return () => {
+      alive = false;
+    };
+  }, [designUrl, material]);
+
+  return result && result.for === designUrl ? result : null;
+}
+
 /* ── Details view: driven by the order number in the URL ─────────── */
 
 export function OrderDetails({
@@ -184,6 +329,10 @@ export function OrderDetails({
 
   const order = override ? override.order : fetched?.order;
   const events = override ? override.events : (fetched?.events ?? []);
+  const material: CardMaterial =
+    look?.plateStyle ??
+    (isStainless(order?.itemDescription ?? "") ? "steel" : "anodized");
+  const engravePreview = useEngravePreview(order?.designUrl, material);
 
   const cancelled = order?.status === "cancelled";
   const delivered = order?.status === "delivered";
@@ -265,21 +414,36 @@ export function OrderDetails({
           {showBeamEdge && <div className={styles.beamEdge} />}
           <div className="p-6 flex flex-col sm:flex-row gap-5 items-start">
             {order.designUrl ? (
-              <div className={`${styles.jobCardWrap} w-full sm:w-[360px] shrink-0`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={order.designUrl}
-                  alt=""
-                  aria-hidden
-                  className={styles.jobCardAmbient}
-                />
-                <div className={styles.jobCard}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div
+                className={`${styles.jobCardWrap} w-full sm:w-[360px] shrink-0`}
+                style={engravePreview ? { aspectRatio: `${engravePreview.aspect}` } : undefined}
+              >
+                {engravePreview && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
-                    src={order.designUrl}
-                    alt={`Design preview for ${order.trackingNumber}`}
-                    className={styles.jobCardFace}
+                    src={engravePreview.url}
+                    alt=""
+                    aria-hidden
+                    className={styles.jobCardAmbient}
                   />
+                )}
+                <div
+                  className={`${styles.jobCard} ${
+                    material === "steel"
+                      ? styles.jobCardSteel
+                      : material === "brass"
+                        ? styles.jobCardBrass
+                        : ""
+                  }`}
+                >
+                  {engravePreview && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={engravePreview.url}
+                      alt={`Engraving preview for ${order.trackingNumber}`}
+                      className={styles.jobCardFace}
+                    />
+                  )}
                   <div className={styles.jobCardTexture} />
                   <div className={styles.jobCardGloss} />
                   {look?.sheen !== false && <div className={styles.jobCardSheen} />}
