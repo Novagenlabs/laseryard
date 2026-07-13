@@ -199,7 +199,29 @@ function useEngravePreview(
         // threshold would cut the majority of the surface, flip it.
         const majorityEngraved = dark / total > 0.5;
 
-        const mask = processDesign(img, { invert: alreadyMask || majorityEngraved });
+        // Full-bleed card artwork: cover-fit with a 2% overscan so the
+        // design's own rectangular edge (and its anti-aliased border
+        // pixels) fall outside the canvas instead of becoming a thin
+        // engraved line along the card.
+        let sourceImg = img;
+        if (opaque / total > 0.9) {
+          const c = document.createElement("canvas");
+          c.width = 850;
+          c.height = 550;
+          const cctx = c.getContext("2d")!;
+          const scale = Math.max(850 / img.width, 550 / img.height) * 1.02;
+          const w = img.width * scale;
+          const h = img.height * scale;
+          cctx.drawImage(img, (850 - w) / 2, (550 - h) / 2, w, h);
+          sourceImg = await new Promise<HTMLImageElement>((res, rej) => {
+            const i = new Image();
+            i.onload = () => res(i);
+            i.onerror = () => rej(new Error("recanvas failed"));
+            i.src = c.toDataURL("image/png");
+          });
+        }
+
+        const mask = processDesign(sourceImg, { invert: alreadyMask || majorityEngraved });
         const [cardColor, markColor] = MATERIAL_COLORS[material];
         // square corners (CSS rounds them) and gentle texture — the
         // studio's row-noise aliases into visible bands at card size
