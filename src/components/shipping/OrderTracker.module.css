@@ -388,6 +388,52 @@
     0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
+/* vertical variants for the mobile stepper */
+.trackDoneV {
+  background: linear-gradient(180deg, #2b2a27, #454339);
+  box-shadow:
+    0 0 calc(6px * var(--glow)) 0 color-mix(in oklab, var(--laser) 55%, transparent),
+    1px 0 0 rgba(255, 255, 255, 0.7);
+}
+
+.trackTodoV {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.16) 0 5px,
+    transparent 5px 10px
+  );
+}
+
+.sparkV {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 25%, var(--laser) 60%, transparent 75%);
+  filter: drop-shadow(0 0 calc(6px * var(--glow)) var(--laser));
+  animation: sparkRunV var(--spark-s) linear infinite;
+}
+
+@keyframes sparkRunV {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 7px);
+    opacity: 0;
+  }
+}
+
 /* raw (upcoming) segment: faint guide line */
 .trackTodo {
   background: repeating-linear-gradient(
@@ -533,6 +579,7 @@
 @media (prefers-reduced-motion: reduce) {
   .plate::after,
   .spark,
+  .sparkV,
   .beamEdge,
   .nodeActive {
     animation: none;
