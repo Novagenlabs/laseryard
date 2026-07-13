@@ -515,7 +515,59 @@ export function OrderDetails({
         {/* Laser Stepper */}
         {!cancelled && (
           <div className={`${styles.reveal} ${styles.revealDelay1} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
-            <div className="flex items-start">
+            {/* vertical timeline on phones */}
+            <div className="flex flex-col sm:hidden">
+              {STEPS.map((step, i) => {
+                const done = i <= currentStep;
+                const active = i === currentStep && !delivered;
+                const segDone = i + 1 <= currentStep;
+                const segFeedsActive = i + 1 === currentStep && !delivered;
+                const Icon = step.icon;
+                return (
+                  <div key={step.status} className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          active
+                            ? styles.nodeActive
+                            : done
+                              ? delivered && i === STEPS.length - 1
+                                ? styles.nodeFinal
+                                : "bg-foreground text-background"
+                              : "bg-card border border-border text-foreground/40"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      {i < STEPS.length - 1 && (
+                        <div className="relative w-[3px] flex-1 min-h-7 my-1 rounded-full">
+                          <div
+                            className={`h-full w-full rounded-full ${
+                              segDone ? styles.trackDoneV : styles.trackTodoV
+                            }`}
+                          />
+                          {segFeedsActive && <span className={styles.sparkV} />}
+                        </div>
+                      )}
+                    </div>
+                    <p
+                      className={`pt-1.5 ${i < STEPS.length - 1 ? "pb-5" : ""} text-sm ${
+                        active
+                          ? "font-semibold"
+                          : done
+                            ? "text-foreground/70"
+                            : "text-muted-foreground/60"
+                      }`}
+                    >
+                      {step.label}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* horizontal stepper on larger screens */}
+            <div className="hidden sm:flex items-start">
               {STEPS.map((step, i) => {
                 const done = i <= currentStep;
                 const active = i === currentStep && !delivered;
