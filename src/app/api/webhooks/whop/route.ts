@@ -3,6 +3,7 @@ import { whop } from "@/lib/whop";
 import {
   ensureOrderForCheckoutRef,
   notifyTeamOfPaidOrder,
+  sendOrderConfirmationEmail,
   CheckoutMetadata,
 } from "@/lib/agent-orders";
 
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
         );
         if (created) {
           await notifyTeamOfPaidOrder(order, metadata);
+          await sendOrderConfirmationEmail(order, metadata);
           console.log(
             `Order ${order.trackingNumber} created from payment ${payment.id}`
           );

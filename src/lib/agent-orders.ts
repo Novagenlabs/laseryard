@@ -71,6 +71,62 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NOTIFICATION_TO = "hello@laseryard.com";
 const FROM_ADDRESS = "Laseryard Orders <orders@updates.laseryard.com>";
 
+async function sendEmail(payload: {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  scheduled_at?: string;
+  idempotencyKey?: string;
+}): Promise<void> {
+  if (!RESEND_API_KEY) {
+    console.error("RESEND_API_KEY not set; skipping email:", payload.subject);
+    return;
+  }
+  const { idempotencyKey, ...body } = payload;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      console.error("Resend error:", payload.subject, await res.text());
+    }
+  } catch (e) {
+    console.error("Email send failed:", payload.subject, e);
+  }
+}
+
+export async function sendOrderConfirmationEmail(
+  order: Order,
+  metadata: CheckoutMetadata
+): Promise<void> {
+  if (!metadata.email) return;
+  const trackUrl = `https://laseryard.com/track?order=${order.trackingNumber}`;
+  await sendEmail({
+    from: FROM_ADDRESS,
+    to: metadata.email,
+    subject: `Order ${order.trackingNumber} confirmed — your metal cards are in the queue`,
+    idempotencyKey: `order-confirm-${order.trackingNumber}`,
+    html: `
+      <div style="font-family:sans-serif;font-size:15px;color:#222;max-width:520px;">
+        <h2 style="font-weight:800;">Your order is confirmed</h2>
+        <p>Thanks${order.customerName && order.customerName !== "Yara customer" ? `, ${order.customerName.split(" ")[0]}` : ""}! We've received your payment for:</p>
+        <p style="font-weight:600;">${order.itemDescription}</p>
+        <p>Track your order anytime:<br/>
+          <a href="${trackUrl}" style="color:#0a67ff;">${trackUrl}</a></p>
+        <p>To speed up the design, reply to this email or send your logo and card details (name, title, phone, website) to hello@laseryard.com.</p>
+        <p style="margin-top:24px;font-size:12px;color:#999;">Laseryard — laseryard.com</p>
+      </div>
+    `,
+  });
+}
+
 export async function notifyTeamOfPaidOrder(
   order: Order,
   metadata: CheckoutMetadata,

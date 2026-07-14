@@ -5,6 +5,7 @@ import {
   trackingNumberForRef,
   ensureOrderForCheckoutRef,
   notifyTeamOfPaidOrder,
+  sendOrderConfirmationEmail,
   CheckoutMetadata,
 } from "@/lib/agent-orders";
 import { getOrderWithEvents } from "@/lib/orders";
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
     const { order, created } = await ensureOrderForCheckoutRef(ref, matched);
     if (created) {
       await notifyTeamOfPaidOrder(order, matched);
+      await sendOrderConfirmationEmail(order, matched);
     }
 
     const trackUrl = `https://laseryard.com/track?order=${order.trackingNumber}`;
