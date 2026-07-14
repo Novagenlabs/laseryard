@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     const amount = PRICES[tier][thickness as Thickness][quantity];
+    const checkoutRef = crypto.randomUUID();
 
     const config = await whop.checkoutConfigurations.create({
       plan: {
@@ -118,6 +119,7 @@ export async function POST(request: NextRequest) {
       },
       metadata: {
         source: "yara-agent",
+        checkout_ref: checkoutRef,
         country,
         pricing_tier: tier,
         thickness,
@@ -131,6 +133,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       checkout_url: config.purchase_url,
+      order_reference: checkoutRef,
       price_usd: amount,
       summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (design and ${
         tier === "west_africa" ? "delivery" : "shipping"
