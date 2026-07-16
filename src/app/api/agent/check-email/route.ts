@@ -26,11 +26,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const senderEmail =
+      typeof body?.sender_email === "string" ? body.sender_email : null;
     const memory = await getCustomerMemory(whatsappUserId).catch(() => null);
     const emails = await getRecentEmailsForCustomer(
       whatsappUserId,
       5,
-      memory?.email
+      memory?.email,
+      senderEmail
     );
     if (!emails.length) {
       return NextResponse.json({

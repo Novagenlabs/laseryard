@@ -79,20 +79,33 @@ export async function recordInboundEmail(input: {
 export async function getRecentEmailsForCustomer(
   whatsappUserId: string,
   limit = 5,
-  knownEmail?: string | null
+  knownEmail?: string | null,
+  claimedEmail?: string | null
 ): Promise<CustomerEmail[]> {
   await ensureTable();
   const sql = getDb();
   const email = knownEmail?.trim().toLowerCase() || null;
-  // Match by WhatsApp identity OR by the email address we know this
-  // customer by — covers emails that arrived before the identities were
-  // linked (e.g. they emailed before memory stored their address).
+  const claimed = claimedEmail?.trim().toLowerCase() || null;
+  // Match by WhatsApp identity, by the address memory knows them by, or by
+  // an address they just claimed in conversation — customers routinely send
+  // from a different address than the one they first mentioned.
   const rows = await sql`
     SELECT * FROM customer_emails
     WHERE whatsapp_user_id = ${whatsappUserId}
        OR (${email}::text IS NOT NULL AND lower(from_address) = ${email})
+       OR (${claimed}::text IS NOT NULL AND lower(from_address) = ${claimed})
     ORDER BY received_at DESC LIMIT ${limit}
   `;
+
+  // Claimed address matched an unlinked email: link it to this customer
+  // permanently so future lookups don't depend on them repeating it.
+  if (claimed && rows.some((r: any) => r.from_address === claimed && !r.whatsapp_user_id)) {
+    await sql`
+      UPDATE customer_emails SET whatsapp_user_id = ${whatsappUserId}
+      WHERE lower(from_address) = ${claimed} AND whatsapp_user_id IS NULL
+    `;
+  }
+
   return rows.map(rowToEmail);
 }
 
