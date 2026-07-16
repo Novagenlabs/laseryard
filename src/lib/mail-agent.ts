@@ -99,7 +99,10 @@ function envelopeAddresses(envelope: any): string[] {
     .filter(Boolean);
 }
 
-export async function pollAgentInbox(): Promise<PollResult> {
+export async function pollAgentInbox(options?: {
+  /** Re-scan this many UIDs before the watermark (stranded-mail recovery). */
+  rewindBy?: number;
+}): Promise<PollResult> {
   if (!MAIL_USER || !MAIL_PASSWORD) {
     throw new Error("MAIL_AGENT_USER / MAIL_AGENT_PASSWORD not set");
   }
@@ -130,6 +133,9 @@ export async function pollAgentInbox(): Promise<PollResult> {
       return result;
     }
     lastUid = state.lastUid;
+    if (options?.rewindBy && options.rewindBy > 0) {
+      lastUid = Math.max(0, lastUid - Math.min(options.rewindBy, 100));
+    }
     if (maxUid <= lastUid) return result;
 
     let processedUpTo = lastUid;

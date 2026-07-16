@@ -14,7 +14,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await pollAgentInbox();
+    const rewindBy = parseInt(
+      request.nextUrl.searchParams.get("rewind") || "0",
+      10
+    );
+    const result = await pollAgentInbox({ rewindBy });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     console.error("Inbox poll failed:", e);
