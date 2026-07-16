@@ -90,9 +90,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { order, created } = await ensureOrderForCheckoutRef(ref, matched);
+    let emailSent = false;
     if (created) {
       await notifyTeamOfPaidOrder(order, matched);
-      await sendOrderConfirmationEmail(order, matched);
+      emailSent = await sendOrderConfirmationEmail(order, matched);
     }
 
     const trackUrl = `https://laseryard.com/track?order=${order.trackingNumber}`;
@@ -100,7 +101,8 @@ export async function POST(request: NextRequest) {
       paid: true,
       tracking_number: order.trackingNumber,
       track_url: trackUrl,
-      summary: `Payment confirmed. Order ${order.trackingNumber} is in the queue. Send the customer this tracking link: ${trackUrl}`,
+      email_sent: emailSent,
+      summary: `Payment confirmed. Order ${order.trackingNumber} is in the queue. Send the customer this tracking link: ${trackUrl}${emailSent ? ` We also emailed their confirmation — tell them to check their spam folder if they don't see it.` : ""}`,
     });
   } catch (e) {
     console.error("Agent payment confirmation error:", e);

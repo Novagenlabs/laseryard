@@ -105,8 +105,8 @@ async function sendEmail(payload: {
 export async function sendOrderConfirmationEmail(
   order: Order,
   metadata: CheckoutMetadata
-): Promise<void> {
-  if (!metadata.email) return;
+): Promise<boolean> {
+  if (!metadata.email) return false;
   const trackUrl = `https://laseryard.com/track?order=${order.trackingNumber}`;
   await sendEmail({
     from: FROM_ADDRESS,
@@ -125,6 +125,7 @@ export async function sendOrderConfirmationEmail(
       </div>
     `,
   });
+  return true;
 }
 
 export async function notifyTeamOfPaidOrder(

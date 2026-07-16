@@ -4,6 +4,10 @@ import {
   getCustomerMemory,
   formatCustomerContext,
 } from "@/lib/customer-memory";
+import {
+  getRecentEmailsForCustomer,
+  formatEmailsContext,
+} from "@/lib/customer-emails";
 
 /**
  * ElevenLabs conversation-initiation webhook: called when a conversation
@@ -25,7 +29,15 @@ export async function POST(request: NextRequest) {
     const callerId = body?.caller_id;
     if (callerId && typeof callerId === "string") {
       const memory = await getCustomerMemory(callerId);
-      customerContext = formatCustomerContext(memory);
+      const emails = await getRecentEmailsForCustomer(callerId).catch(
+        () => []
+      );
+      customerContext = [
+        formatCustomerContext(memory),
+        formatEmailsContext(emails),
+      ]
+        .filter(Boolean)
+        .join("\n\n");
     }
   } catch (e) {
     console.error("Initiation webhook error (returning empty context):", e);

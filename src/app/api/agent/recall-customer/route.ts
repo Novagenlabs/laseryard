@@ -4,6 +4,10 @@ import {
   getCustomerMemory,
   formatCustomerContext,
 } from "@/lib/customer-memory";
+import {
+  getRecentEmailsForCustomer,
+  formatEmailsContext,
+} from "@/lib/customer-emails";
 
 /**
  * Customer recall for the Yara ElevenLabs agent (tool fallback for the
@@ -27,7 +31,12 @@ export async function POST(request: NextRequest) {
     }
 
     const memory = await getCustomerMemory(whatsappUserId);
-    const context = formatCustomerContext(memory);
+    const emails = await getRecentEmailsForCustomer(whatsappUserId).catch(
+      () => []
+    );
+    const context = [formatCustomerContext(memory), formatEmailsContext(emails)]
+      .filter(Boolean)
+      .join("\n\n");
 
     return NextResponse.json({
       found: context.length > 0,
