@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { upsertCustomerMemory } from "@/lib/customer-memory";
+import {
+  renderBrandedEmail,
+  resolveEmailRecipient,
+} from "@/lib/email-template";
 
 /**
  * ElevenLabs post-call webhook: sends a follow-up email after conversations
@@ -108,6 +112,26 @@ export async function POST(request: NextRequest) {
       Date.now() + FOLLOW_UP_DELAY_MIN * 60 * 1000
     ).toISOString();
 
+    const { html, text } = renderBrandedEmail({
+      preheader: "See your design on an actual metal card in seconds.",
+      heading: `Good chatting with you${firstName ? `, ${firstName}` : ""}`,
+      paragraphsHtml: [
+        `Thanks for stopping by today. No rush at all — your cards will be ready whenever you are.`,
+        `If you want to see your design on an actual metal card before deciding, try our Design Studio: upload a logo and preview it in seconds.`,
+        `Any questions, just reply to this email or message us on WhatsApp.`,
+      ],
+      text: `Hey${firstName ? ` ${firstName}` : ""}, good chatting with you today.
+
+If you want to see your design on an actual metal card before deciding, try our Design Studio — upload a logo and preview it in seconds: https://laseryard.com/unforgettable
+
+Any questions, just reply to this email or message us on WhatsApp.`,
+      cta: {
+        label: "Preview your card",
+        url: "https://laseryard.com/unforgettable",
+      },
+    });
+
+    const { to, subjectPrefix } = resolveEmailRecipient(email);
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -118,18 +142,11 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         from: FROM_ADDRESS,
-        to: email,
-        subject: "Your metal cards, whenever you're ready",
+        to,
+        subject: `${subjectPrefix}Your metal cards, whenever you're ready`,
         scheduled_at: scheduledAt,
-        html: `
-          <div style="font-family:sans-serif;font-size:15px;color:#222;max-width:520px;">
-            <p>Hey${firstName ? ` ${firstName}` : ""}, good chatting with you today.</p>
-            <p>If you want to see your design on an actual metal card before deciding, try our Design Studio — upload a logo and preview it in seconds:<br/>
-              <a href="https://laseryard.com/unforgettable" style="color:#0a67ff;">laseryard.com/unforgettable</a></p>
-            <p>Any questions, just reply to this email or message us on WhatsApp.</p>
-            <p style="margin-top:24px;font-size:12px;color:#999;">Yara — Laseryard, laseryard.com</p>
-          </div>
-        `,
+        html,
+        text,
       }),
     });
     if (!res.ok) {

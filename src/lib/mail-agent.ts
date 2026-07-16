@@ -4,6 +4,10 @@ import nodemailer from "nodemailer";
 import MailComposer from "nodemailer/lib/mail-composer";
 import { getDb } from "@/lib/db";
 import { recordInboundEmail } from "@/lib/customer-emails";
+import {
+  renderBrandedEmail,
+  resolveEmailRecipient,
+} from "@/lib/email-template";
 
 /**
  * The agent's mail identity: sales@laseryard.com — an alias that delivers
@@ -191,19 +195,28 @@ async function sendAck(
   opts: { to: string; subject: string; inReplyTo?: string }
 ): Promise<void> {
   if (!MAIL_USER || !MAIL_PASSWORD) return;
+
+  const { html, text } = renderBrandedEmail({
+    preheader: "Your design files arrived — the design team is on it.",
+    heading: "Got your files 🙌",
+    paragraphsHtml: [
+      `Thanks — your design files came through and the design team is on it.`,
+      `If you haven't placed your order yet, just reply here or message us on WhatsApp and we'll get you a checkout link.`,
+    ],
+    text: `Got your files — thanks! The design team is on it.
+
+If you haven't placed your order yet, just reply here or message us on WhatsApp and we'll get you a checkout link.`,
+  });
+
+  const { to, subjectPrefix } = resolveEmailRecipient(opts.to);
   const mail = {
     from: `Laseryard <${MAIL_ALIAS}>`,
-    to: opts.to,
-    subject: opts.subject ? `Re: ${opts.subject}` : "Got your design files",
+    to,
+    subject: `${subjectPrefix}${opts.subject ? `Re: ${opts.subject}` : "Got your design files"}`,
     inReplyTo: opts.inReplyTo,
     references: opts.inReplyTo,
-    html: `
-      <div style="font-family:sans-serif;font-size:15px;color:#222;max-width:520px;">
-        <p>Got your files — thanks! The design team is on it.</p>
-        <p>If you haven't placed your order yet, just reply here or message us on WhatsApp and we'll get you a checkout link.</p>
-        <p style="margin-top:24px;font-size:12px;color:#999;">Laseryard — laseryard.com</p>
-      </div>
-    `,
+    html,
+    text,
   };
 
   const raw = await new MailComposer(mail).compile().build();
@@ -215,7 +228,7 @@ async function sendAck(
     auth: { user: MAIL_USER, pass: MAIL_PASSWORD },
   });
   await transporter.sendMail({
-    envelope: { from: MAIL_USER, to: [opts.to] },
+    envelope: { from: MAIL_USER, to: [to] },
     raw,
   });
 

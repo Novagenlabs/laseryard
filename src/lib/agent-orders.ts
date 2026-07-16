@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
 import { createOrder, getOrderWithEvents, Order } from "@/lib/orders";
+import {
+  renderBrandedEmail,
+  resolveEmailRecipient,
+} from "@/lib/email-template";
 
 /**
  * Order creation from verified Whop payments (v2 confirmation signal).
@@ -76,6 +80,7 @@ async function sendEmail(payload: {
   to: string;
   subject: string;
   html: string;
+  text?: string;
   scheduled_at?: string;
   idempotencyKey?: string;
 }): Promise<void> {
@@ -108,22 +113,37 @@ export async function sendOrderConfirmationEmail(
 ): Promise<boolean> {
   if (!metadata.email) return false;
   const trackUrl = `https://laseryard.com/track?order=${order.trackingNumber}`;
+  const firstName =
+    order.customerName && order.customerName !== "Yara customer"
+      ? order.customerName.split(" ")[0]
+      : null;
+
+  const { html, text } = renderBrandedEmail({
+    preheader: `Order ${order.trackingNumber} is confirmed and in the production queue.`,
+    heading: "Your order is confirmed 🎉",
+    paragraphsHtml: [
+      `Thanks${firstName ? `, ${firstName}` : ""}! We've received your payment for:`,
+      `<strong>${order.itemDescription}</strong>`,
+      `Your order number is <strong>${order.trackingNumber}</strong> — keep it handy. You can follow every step of production with the button below.`,
+      `To speed up the design, send your logo and card details (name, title, phone, website) to <a href="mailto:sales@laseryard.com" style="color:#b58900;">sales@laseryard.com</a>.`,
+    ],
+    text: `Thanks${firstName ? `, ${firstName}` : ""}! We've received your payment for: ${order.itemDescription}
+
+Your order number is ${order.trackingNumber}.
+Track your order: ${trackUrl}
+
+To speed up the design, send your logo and card details (name, title, phone, website) to sales@laseryard.com.`,
+    cta: { label: "Track your order", url: trackUrl },
+  });
+
+  const { to, subjectPrefix } = resolveEmailRecipient(metadata.email);
   await sendEmail({
     from: FROM_ADDRESS,
-    to: metadata.email,
-    subject: `Order ${order.trackingNumber} confirmed — your metal cards are in the queue`,
+    to,
+    subject: `${subjectPrefix}Order ${order.trackingNumber} confirmed — your metal cards are in the queue`,
     idempotencyKey: `order-confirm-${order.trackingNumber}`,
-    html: `
-      <div style="font-family:sans-serif;font-size:15px;color:#222;max-width:520px;">
-        <h2 style="font-weight:800;">Your order is confirmed</h2>
-        <p>Thanks${order.customerName && order.customerName !== "Yara customer" ? `, ${order.customerName.split(" ")[0]}` : ""}! We've received your payment for:</p>
-        <p style="font-weight:600;">${order.itemDescription}</p>
-        <p>Track your order anytime:<br/>
-          <a href="${trackUrl}" style="color:#0a67ff;">${trackUrl}</a></p>
-        <p>To speed up the design, send your logo and card details (name, title, phone, website) to sales@laseryard.com.</p>
-        <p style="margin-top:24px;font-size:12px;color:#999;">Laseryard — laseryard.com</p>
-      </div>
-    `,
+    html,
+    text,
   });
   return true;
 }
