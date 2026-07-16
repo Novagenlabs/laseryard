@@ -120,7 +120,7 @@ export async function sendOrderConfirmationEmail(
         <p style="font-weight:600;">${order.itemDescription}</p>
         <p>Track your order anytime:<br/>
           <a href="${trackUrl}" style="color:#0a67ff;">${trackUrl}</a></p>
-        <p>To speed up the design, reply to this email or send your logo and card details (name, title, phone, website) to hello@laseryard.com.</p>
+        <p>To speed up the design, send your logo and card details (name, title, phone, website) to sales@laseryard.com.</p>
         <p style="margin-top:24px;font-size:12px;color:#999;">Laseryard — laseryard.com</p>
       </div>
     `,

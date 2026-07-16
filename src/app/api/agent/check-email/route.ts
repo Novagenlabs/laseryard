@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         found: false,
         summary:
-          "No email from this client has arrived yet. If they say they sent it, ask them to double-check the address (hello@laseryard.com) and mention it can take a minute or two to come through.",
+          "No email from this client has arrived yet. If they say they sent it, ask them to double-check the address (sales@laseryard.com) and mention it can take a couple of minutes to come through.",
       });
     }
 

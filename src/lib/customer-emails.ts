@@ -101,5 +101,5 @@ export function formatEmailsContext(emails: CustomerEmail[]): string {
     });
     return `- [${when}] "${e.subject || "(no subject)"}"${e.hasAttachments ? " (with attachments)" : ""}`;
   });
-  return `Emails this client sent to hello@laseryard.com (newest first):\n${lines.join("\n")}`;
+  return `Emails this client sent us (newest first):\n${lines.join("\n")}`;
 }
