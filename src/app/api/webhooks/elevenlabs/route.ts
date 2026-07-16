@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { upsertCustomerMemory } from "@/lib/customer-memory";
 
 /**
  * ElevenLabs post-call webhook: sends a follow-up email after conversations
@@ -66,6 +67,28 @@ export async function POST(request: NextRequest) {
     const email = collected(results, "customer_email");
     const name = collected(results, "customer_name");
     const purchased = collected(results, "purchased");
+
+    // Memory write path: store the conversation summary keyed by the
+    // customer's WhatsApp ID, independent of whether a follow-up goes out.
+    try {
+      const whatsappUserId =
+        event.data?.metadata?.whatsapp?.whatsapp_user_id ||
+        event.data?.conversation_initiation_client_data?.dynamic_variables?.[
+          "system__caller_id"
+        ];
+      const summary = event.data?.analysis?.transcript_summary;
+      if (whatsappUserId && typeof whatsappUserId === "string") {
+        await upsertCustomerMemory({
+          whatsappUserId,
+          customerName: typeof name === "string" ? name : undefined,
+          email: typeof email === "string" ? email : undefined,
+          conversationId,
+          summary: typeof summary === "string" ? summary : undefined,
+        });
+      }
+    } catch (e) {
+      console.error("Customer memory write failed:", e);
+    }
 
     if (typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json({ received: true, followup: "no_email" });
