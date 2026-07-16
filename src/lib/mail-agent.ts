@@ -7,6 +7,7 @@ import { recordInboundEmail } from "@/lib/customer-emails";
 import {
   renderBrandedEmail,
   resolveEmailRecipient,
+  ccFor,
 } from "@/lib/email-template";
 
 /**
@@ -209,9 +210,11 @@ If you haven't placed your order yet, just reply here or message us on WhatsApp 
   });
 
   const { to, subjectPrefix } = resolveEmailRecipient(opts.to);
+  const cc = ccFor(to);
   const mail = {
     from: `Laseryard <${MAIL_ALIAS}>`,
     to,
+    cc,
     subject: `${subjectPrefix}${opts.subject ? `Re: ${opts.subject}` : "Got your design files"}`,
     inReplyTo: opts.inReplyTo,
     references: opts.inReplyTo,
@@ -228,7 +231,7 @@ If you haven't placed your order yet, just reply here or message us on WhatsApp 
     auth: { user: MAIL_USER, pass: MAIL_PASSWORD },
   });
   await transporter.sendMail({
-    envelope: { from: MAIL_USER, to: [to] },
+    envelope: { from: MAIL_USER, to: [to, ...(cc || [])] },
     raw,
   });
 

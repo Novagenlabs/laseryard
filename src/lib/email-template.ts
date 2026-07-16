@@ -18,6 +18,14 @@ const BG = "#f5f4f0";
 export const EMAIL_LIVE = process.env.AGENT_EMAIL_MODE === "live";
 const TEST_INBOX = "hello@laseryard.com";
 
+/**
+ * CC the team on every customer email the agent sends — unless the email
+ * is already going to the team inbox (test mode, notifications).
+ */
+export function ccFor(to: string): string[] | undefined {
+  return to.trim().toLowerCase() === TEST_INBOX ? undefined : [TEST_INBOX];
+}
+
 export function resolveEmailRecipient(intended: string): {
   to: string;
   subjectPrefix: string;

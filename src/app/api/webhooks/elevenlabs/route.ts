@@ -4,6 +4,7 @@ import { upsertCustomerMemory } from "@/lib/customer-memory";
 import {
   renderBrandedEmail,
   resolveEmailRecipient,
+  ccFor,
 } from "@/lib/email-template";
 
 /**
@@ -143,6 +144,7 @@ Any questions, just reply to this email or message us on WhatsApp.`,
       body: JSON.stringify({
         from: FROM_ADDRESS,
         to,
+        cc: ccFor(to),
         subject: `${subjectPrefix}Your metal cards, whenever you're ready`,
         scheduled_at: scheduledAt,
         html,

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { deleteOrder, getOrderWithEvents, isValidStatus, updateOrderDetails, updateOrderStatus, ORDER_STATUSES } from "@/lib/orders";
 import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
+import { notifyOrderStatusChange } from "@/lib/order-notifications";
 
 export function OPTIONS() {
   return adminPreflight();
@@ -74,6 +75,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         return adminJson({ error: "Order not found" }, 404);
       }
     }
+    let notified = false;
     if (status !== undefined) {
       order = await updateOrderStatus(
         trackingNumber,
@@ -83,9 +85,16 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       if (!order) {
         return adminJson({ error: "Order not found" }, 404);
       }
+      notified = await notifyOrderStatusChange(
+        order,
+        typeof note === "string" ? note : undefined
+      ).catch((e) => {
+        console.error("Status notification error:", e);
+        return false;
+      });
     }
 
-    return adminJson({ order });
+    return adminJson({ order, notified });
   } catch (e) {
     console.error("Order status update error:", e);
     return adminJson({ error: "Failed to update order" }, 500);

@@ -3,7 +3,9 @@ import { createOrder, getOrderWithEvents, Order } from "@/lib/orders";
 import {
   renderBrandedEmail,
   resolveEmailRecipient,
+  ccFor,
 } from "@/lib/email-template";
+import { setOrderCustomerEmail } from "@/lib/order-notifications";
 
 /**
  * Order creation from verified Whop payments (v2 confirmation signal).
@@ -61,6 +63,11 @@ export async function ensureOrderForCheckoutRef(
       destination: metadata.country || undefined,
       note: "Payment confirmed. Your order is in the queue.",
     });
+    if (metadata.email) {
+      await setOrderCustomerEmail(trackingNumber, metadata.email).catch((e) =>
+        console.error("Could not store order customer email:", e)
+      );
+    }
     return { order, created: true };
   } catch (e) {
     // Unique-violation race: the webhook and the agent tool both tried to
@@ -97,7 +104,7 @@ async function sendEmail(payload: {
         "Content-Type": "application/json",
         ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, cc: ccFor(payload.to) }),
     });
     if (!res.ok) {
       console.error("Resend error:", payload.subject, await res.text());
