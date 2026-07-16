@@ -29,9 +29,11 @@ export async function POST(request: NextRequest) {
     const callerId = body?.caller_id;
     if (callerId && typeof callerId === "string") {
       const memory = await getCustomerMemory(callerId);
-      const emails = await getRecentEmailsForCustomer(callerId).catch(
-        () => []
-      );
+      const emails = await getRecentEmailsForCustomer(
+        callerId,
+        5,
+        memory?.email
+      ).catch(() => []);
       customerContext = [
         formatCustomerContext(memory),
         formatEmailsContext(emails),

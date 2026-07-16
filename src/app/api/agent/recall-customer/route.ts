@@ -31,9 +31,11 @@ export async function POST(request: NextRequest) {
     }
 
     const memory = await getCustomerMemory(whatsappUserId);
-    const emails = await getRecentEmailsForCustomer(whatsappUserId).catch(
-      () => []
-    );
+    const emails = await getRecentEmailsForCustomer(
+      whatsappUserId,
+      5,
+      memory?.email
+    ).catch(() => []);
     const context = [formatCustomerContext(memory), formatEmailsContext(emails)]
       .filter(Boolean)
       .join("\n\n");

@@ -4,6 +4,7 @@ import {
   getRecentEmailsForCustomer,
   formatEmailsContext,
 } from "@/lib/customer-emails";
+import { getCustomerMemory } from "@/lib/customer-memory";
 
 /**
  * Email-activity check for the Yara ElevenLabs agent: "did this client's
@@ -25,7 +26,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emails = await getRecentEmailsForCustomer(whatsappUserId);
+    const memory = await getCustomerMemory(whatsappUserId).catch(() => null);
+    const emails = await getRecentEmailsForCustomer(
+      whatsappUserId,
+      5,
+      memory?.email
+    );
     if (!emails.length) {
       return NextResponse.json({
         found: false,

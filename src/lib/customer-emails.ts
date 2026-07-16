@@ -78,13 +78,19 @@ export async function recordInboundEmail(input: {
 
 export async function getRecentEmailsForCustomer(
   whatsappUserId: string,
-  limit = 5
+  limit = 5,
+  knownEmail?: string | null
 ): Promise<CustomerEmail[]> {
   await ensureTable();
   const sql = getDb();
+  const email = knownEmail?.trim().toLowerCase() || null;
+  // Match by WhatsApp identity OR by the email address we know this
+  // customer by — covers emails that arrived before the identities were
+  // linked (e.g. they emailed before memory stored their address).
   const rows = await sql`
     SELECT * FROM customer_emails
     WHERE whatsapp_user_id = ${whatsappUserId}
+       OR (${email}::text IS NOT NULL AND lower(from_address) = ${email})
     ORDER BY received_at DESC LIMIT ${limit}
   `;
   return rows.map(rowToEmail);
