@@ -161,13 +161,13 @@ function HeroDesktop() {
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="mt-10 flex items-center gap-4"
+              className="mt-10 flex items-center gap-6"
             >
               <a
                 href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
+                className="group inline-flex items-center justify-center gap-2 w-[277px] px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
               >
                 Get a Quote
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
