@@ -18,10 +18,14 @@ const footerLinks = {
     { label: "Wood Engraving", href: "/products/wood-engraving" },
     { label: "Custom Engraving", href: "/custom-engraving" },
   ],
-  regions: COUNTRIES.map((c) => ({
-    label: c.name,
-    href: `/${c.slug}`,
-  })),
+  // The regions shown under "We Serve" — a subset of COUNTRIES; the
+  // remaining country pages stay live for SEO, just unlisted here.
+  regions: ["africa", "united-kingdom", "united-states", "uae", "eu"].flatMap(
+    (slug) => {
+      const c = COUNTRIES.find((x) => x.slug === slug);
+      return c ? [{ label: c.name, href: `/${c.slug}` }] : [];
+    }
+  ),
 };
 
 export function Footer() {
