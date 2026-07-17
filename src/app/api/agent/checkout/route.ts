@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { whop, WHOP_COMPANY_ID, WHOP_PRODUCT_ID } from "@/lib/whop";
 import { isAuthorizedAgentRequest } from "@/lib/agent-auth";
+import {
+  renderBrandedEmail,
+  resolveEmailRecipient,
+  ccFor,
+} from "@/lib/email-template";
 
 /**
  * Checkout link generator for the Yara ElevenLabs agent.
@@ -131,9 +136,47 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Email the checkout link too when we know their address — better
+    // conversion than a link buried in chat history.
+    let emailSent = false;
+    if (email && typeof email === "string" && email.includes("@") && process.env.RESEND_API_KEY) {
+      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, design and ${tier === "west_africa" ? "delivery" : "shipping"} included`;
+      const { html, text } = renderBrandedEmail({
+        preheader: "Your secure checkout link is inside.",
+        heading: "Complete your order",
+        paragraphsHtml: [
+          `Here's everything ready to go:`,
+          `<strong>${summaryLine}</strong>`,
+          `Pay securely with the button below. Once your order is placed, the design team gets started right away.`,
+        ],
+        text: `Here's everything ready to go:\n\n${summaryLine}\n\nPay securely: ${config.purchase_url}\n\nOnce your order is placed, the design team gets started right away.`,
+        cta: { label: "Pay securely", url: config.purchase_url ?? "" },
+      });
+      const { to, subjectPrefix } = resolveEmailRecipient(email);
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": `checkout-link-${checkoutRef}`,
+        },
+        body: JSON.stringify({
+          from: "Laseryard Orders <orders@updates.laseryard.com>",
+          to,
+          cc: ccFor(to),
+          subject: `${subjectPrefix}Your Laseryard checkout link`,
+          html,
+          text,
+        }),
+      })
+        .then((r) => { emailSent = r.ok; })
+        .catch((e) => console.error("Checkout link email failed:", e));
+    }
+
     return NextResponse.json({
       checkout_url: config.purchase_url,
       order_reference: checkoutRef,
+      email_sent: emailSent,
       price_usd: amount,
       summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (design and ${
         tier === "west_africa" ? "delivery" : "shipping"
