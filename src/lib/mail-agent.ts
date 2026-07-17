@@ -114,6 +114,13 @@ export async function pollAgentInbox(options?: {
     secure: true,
     auth: { user: MAIL_USER, pass: MAIL_PASSWORD },
     logger: false,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+  });
+  // imapflow emits late socket errors outside our try/catch; without a
+  // handler they become uncaughtException and can take the process down.
+  client.on("error", (e: Error) => {
+    console.error("IMAP connection error:", e.message);
   });
 
   await client.connect();
