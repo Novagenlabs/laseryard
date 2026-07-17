@@ -26,6 +26,9 @@ import {
  */
 
 const MAIL_HOST = process.env.MAIL_AGENT_HOST || "mail.privateemail.com";
+// 993 = implicit TLS (default). Set MAIL_AGENT_IMAP_PORT=143 for STARTTLS —
+// useful when a network filter interferes with one port but not the other.
+const IMAP_PORT = parseInt(process.env.MAIL_AGENT_IMAP_PORT || "993", 10);
 const MAIL_USER = process.env.MAIL_AGENT_USER;
 const MAIL_PASSWORD = process.env.MAIL_AGENT_PASSWORD;
 const MAIL_ALIAS = (
@@ -110,8 +113,8 @@ export async function pollAgentInbox(options?: {
   const result: PollResult = { scanned: 0, processed: 0, matched: 0, acked: 0 };
   const client = new ImapFlow({
     host: MAIL_HOST,
-    port: 993,
-    secure: true,
+    port: IMAP_PORT,
+    secure: IMAP_PORT === 993,
     auth: { user: MAIL_USER, pass: MAIL_PASSWORD },
     logger: false,
     connectionTimeout: 15000,
