@@ -164,8 +164,8 @@ export default async function BlogPostPage({ params }: Props) {
                 Ready to order your metal business cards?
               </h3>
               <p className="text-muted-foreground text-sm mb-6 max-w-md mx-auto">
-                Message us on WhatsApp for a quote, or try the Design Studio to
-                preview your card in 3D.
+                Message us on WhatsApp for a quote, or order your cards online
+                in minutes.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <WhatsAppCTA
@@ -174,10 +174,10 @@ export default async function BlogPostPage({ params }: Props) {
                   trackingLabel={`blog-${post.slug}`}
                 />
                 <Link
-                  href="/unforgettable/design-studio"
+                  href="/products/metal-business-cards"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-sm font-medium hover:border-foreground/30 transition-colors group"
                 >
-                  Design Studio
+                  Order Your Cards
                   <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>

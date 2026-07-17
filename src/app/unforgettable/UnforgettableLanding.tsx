@@ -39,13 +39,6 @@ export function UnforgettableLanding() {
                     Order Your Cards
                     <ArrowRight className="w-4 h-4" />
                   </Link>
-                  <Link
-                    href="/unforgettable/design-studio"
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-border text-foreground font-medium text-base hover:bg-foreground/5 transition-colors group"
-                  >
-                    Try the Design Studio
-                    <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
                 </div>
                 <p className="text-[11px] text-muted-foreground/50 mt-4 text-center lg:text-left tracking-wide">
                   Free design consultation · 10-14 day production · Min. 30 cards
@@ -179,46 +172,6 @@ export function UnforgettableLanding() {
               </div>
             </ScrollReveal>
           ))}
-        </div>
-      </section>
-
-      {/* ──── Design Studio ──── */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <ScrollReveal>
-            <div className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-center">
-              <div className="lg:col-span-3">
-                <p className="text-muted-foreground/50 text-[11px] tracking-[0.35em] uppercase font-medium mb-4">
-                  Design Studio
-                </p>
-                <h2 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
-                  See it before you commit
-                </h2>
-                <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-8 max-w-lg">
-                  Upload your logo and see exactly how it looks laser-engraved
-                  on metal. Adjust detail levels, rotate the card in 3D,
-                  generate studio photos. No account needed.
-                </p>
-                <Link
-                  href="/unforgettable/design-studio"
-                  className="inline-flex items-center gap-2.5 text-foreground hover:text-foreground/70 font-medium text-sm transition-colors group"
-                >
-                  Open the Design Studio
-                  <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-
-              <div className="lg:col-span-2">
-                <Image
-                  src="/images/products/card_front_transparent_background.png"
-                  alt="Matte black laser-engraved metal business card"
-                  width={800}
-                  height={500}
-                  className="w-full"
-                />
-              </div>
-            </div>
-          </ScrollReveal>
         </div>
       </section>
 

@@ -128,7 +128,7 @@ export function renderBrandedEmail(input: BrandedEmail): {
                 &nbsp;·&nbsp;
                 <a href="${SITE}/track" style="color:${GOLD};text-decoration:none;">Track your order</a>
                 &nbsp;·&nbsp;
-                <a href="${SITE}/unforgettable" style="color:${GOLD};text-decoration:none;">Design Studio</a>
+                <a href="${SITE}/products/metal-business-cards" style="color:${GOLD};text-decoration:none;">Order cards</a>
               </p>
             </td>
           </tr>

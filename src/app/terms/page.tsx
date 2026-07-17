@@ -147,7 +147,7 @@ export default function TermsPage() {
               <h2>Website use</h2>
               <p>
                 You can browse the website, place orders, and use the tools we
-                provide (like the design studio and shipping calculator). Do
+                provide (like the shipping calculator). Do
                 not scrape the site, overload it with automated requests, or
                 use it for anything illegal.
               </p>

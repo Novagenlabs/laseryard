@@ -110,7 +110,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         heading: "Preview before you commit",
-        body: "Use our free Design Studio at laseryard.com/unforgettable/design-studio to upload your logo and see how it looks on a metal card in 3D. No account needed. You can rotate the card, zoom in on the engraving, and decide if the design works before placing an order.",
+        body: "Every order includes a digital proof before anything is engraved. We send it within 1-3 business days, and you can request unlimited revisions until the design is exactly right. Nothing goes into production until you approve.",
       },
     ],
   },

@@ -185,10 +185,10 @@ export default async function LocationPage({ params }: Props) {
                 trackingLabel={`location-${country.slug}`}
               />
               <Link
-                href="/unforgettable/design-studio"
+                href="/products/metal-business-cards"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border text-foreground font-medium text-sm hover:border-foreground/30 transition-colors group"
               >
-                Try the Design Studio
+                Order Your Cards
                 <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
@@ -323,7 +323,7 @@ export default async function LocationPage({ params }: Props) {
               {
                 step: "01",
                 title: "Send Your Design",
-                desc: "Upload your logo in the Design Studio or message us on WhatsApp with your details.",
+                desc: "Message us on WhatsApp with your logo and details, or upload your design when you order.",
               },
               {
                 step: "02",

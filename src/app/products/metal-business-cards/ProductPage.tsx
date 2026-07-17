@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -15,20 +15,21 @@ import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { cn } from "@/lib/utils";
 import { FAQAccordion } from "@/components/sections/FAQAccordion";
 import { CTABanner } from "@/components/sections/CTABanner";
-import { ShippingEstimator } from "@/components/shipping/ShippingEstimator";
+import {
+  ShippingEstimator,
+  type DeliverySelection,
+} from "@/components/shipping/ShippingEstimator";
 import { WhopCheckout } from "@/components/payments/WhopCheckout";
+import {
+  CARD_PRICING,
+  CARD_QUANTITIES,
+  type CardQuantity,
+  type CardThickness,
+} from "@/lib/constants";
 
-type Thickness = "0.4mm" | "0.8mm";
-
-const thicknessOptions = {
-  "0.4mm": {
-    label: "Standard",
-    description: "Solid & durable, similar to a premium credit card",
-  },
-  "0.8mm": {
-    label: "Premium",
-    description: "Heavy & rigid with a substantial executive feel",
-  },
+const thicknessDescriptions: Record<CardThickness, string> = {
+  "0.4mm": "Solid & durable, similar to a premium credit card",
+  "0.8mm": "Heavy & rigid with a substantial executive feel",
 };
 
 const specs = [
@@ -82,12 +83,28 @@ const galleryImages = [
   },
 ];
 
+const formatUsd = (amount: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+
 export function ProductPage() {
   const [selectedThickness, setSelectedThickness] =
-    useState<Thickness>("0.4mm");
+    useState<CardThickness>("0.4mm");
+  const [selectedQuantity, setSelectedQuantity] = useState<CardQuantity>(30);
   const [activeImage, setActiveImage] = useState(0);
+  const [delivery, setDelivery] = useState<DeliverySelection | null>(null);
 
-  const option = thicknessOptions[selectedThickness];
+  const handleDeliveryChange = useCallback(
+    (d: DeliverySelection | null) => setDelivery(d),
+    []
+  );
+
+  const pricing = CARD_PRICING[selectedThickness];
+  const cardsSubtotal = pricing.prices[selectedQuantity];
+  const total = cardsSubtotal + (delivery?.usd ?? 0);
 
   return (
     <>
@@ -113,15 +130,6 @@ export function ProductPage() {
                     alt={galleryImages[activeImage].alt}
                     className="w-full"
                   />
-
-                  {/* Design Studio hint */}
-                  <Link
-                    href="/unforgettable/design-studio"
-                    className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-foreground/90 text-xs text-background font-medium hover:bg-foreground transition-colors flex items-center gap-1.5 group"
-                  >
-                    Preview your design in 3D
-                    <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
                 </div>
 
                 {/* Thumbnails */}
@@ -168,9 +176,9 @@ export function ProductPage() {
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {(
-                      Object.entries(thicknessOptions) as [
-                        Thickness,
-                        (typeof thicknessOptions)["0.4mm"]
+                      Object.entries(CARD_PRICING) as [
+                        CardThickness,
+                        (typeof CARD_PRICING)[CardThickness]
                       ][]
                     ).map(([key, opt]) => (
                       <button
@@ -190,7 +198,14 @@ export function ProductPage() {
                           </p>
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">
-                          {opt.description}
+                          {thicknessDescriptions[key]}
+                        </p>
+                        <p className="text-sm font-semibold mt-2">
+                          From {formatUsd(opt.prices[30])}
+                          <span className="text-muted-foreground font-normal">
+                            {" "}
+                            / 30 cards
+                          </span>
                         </p>
 
                         {selectedThickness === key && (
@@ -203,37 +218,109 @@ export function ProductPage() {
                   </div>
                 </div>
 
-                {/* Key Info */}
+                {/* Quantity Selector */}
+                <div>
+                  <label className="text-sm font-medium mb-3 block">
+                    Card Quantity
+                  </label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {CARD_QUANTITIES.map((qty) => (
+                      <button
+                        key={qty}
+                        onClick={() => setSelectedQuantity(qty)}
+                        className={cn(
+                          "relative p-3 rounded-xl border-2 text-center transition-all",
+                          selectedQuantity === qty
+                            ? "border-foreground bg-foreground/5"
+                            : "border-border hover:border-foreground/30"
+                        )}
+                      >
+                        <p className="font-semibold">{qty}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatUsd(pricing.prices[qty])}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Need a different quantity, material, or finish?{" "}
+                    <a
+                      href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I'd like a custom quote for metal business cards.")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-foreground transition-colors"
+                    >
+                      Get a custom quote
+                    </a>
+                    .
+                  </p>
+                </div>
+
+                {/* Delivery */}
+                <ShippingEstimator onDeliveryChange={handleDeliveryChange} />
+
+                {/* Order Summary */}
                 <div className="p-6 rounded-xl bg-card border border-border space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Minimum Order</span>
-                    <span className="font-semibold">30 cards</span>
+                    <span className="text-muted-foreground">
+                      {selectedQuantity} cards · {pricing.label} (
+                      {selectedThickness})
+                    </span>
+                    <span className="font-semibold">
+                      {formatUsd(cardsSubtotal)}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Production Time</span>
-                    <span className="font-semibold">10-14 business days</span>
+                    <span className="text-muted-foreground">
+                      {delivery
+                        ? `Delivery to ${delivery.destination}`
+                        : "Delivery"}
+                    </span>
+                    <span className="font-semibold">
+                      {delivery ? formatUsd(delivery.usd) : "—"}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Selected Thickness</span>
-                    <span className="font-semibold">{selectedThickness} ({option.label})</span>
+                  <div className="flex justify-between items-center pt-4 border-t border-border">
+                    <span className="font-semibold">Total</span>
+                    <span className="font-semibold text-lg">
+                      {delivery ? formatUsd(total) : formatUsd(cardsSubtotal)}
+                    </span>
                   </div>
-                  <div className="pt-4 border-t border-border">
+                  {!delivery && (
                     <p className="text-sm text-muted-foreground">
-                      Pricing depends on design complexity, quantity, and finish. Message us for a quote.
+                      Select your delivery destination above to see the full
+                      total and check out.
                     </p>
-                  </div>
+                  )}
                 </div>
 
                 {/* CTA */}
                 <div className="space-y-3">
-                  <WhopCheckout
-                    amount={200}
-                    currency="usd"
-                    metadata={{ thickness: selectedThickness, quantity: "30" }}
-                    buttonText={`Order Now - $200`}
-                  />
+                  {delivery ? (
+                    <WhopCheckout
+                      amount={total}
+                      currency="usd"
+                      metadata={{
+                        thickness: selectedThickness,
+                        tier: pricing.label,
+                        quantity: String(selectedQuantity),
+                        cardsSubtotalUsd: String(cardsSubtotal),
+                        deliveryDestination: delivery.destination,
+                        deliveryUsd: String(delivery.usd),
+                        totalUsd: String(total),
+                      }}
+                      buttonText={`Order Now - ${formatUsd(total)}`}
+                    />
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-medium text-base opacity-50 cursor-not-allowed"
+                    >
+                      Select delivery destination to order
+                    </button>
+                  )}
                   <a
-                    href={`https://wa.me/22893184418?text=${encodeURIComponent(`Hi! I'm interested in ordering metal business cards (${selectedThickness} thickness). Can you help me with pricing and the design process?`)}`}
+                    href={`https://wa.me/22893184418?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (${pricing.label}, ${selectedThickness}). Can you help me with pricing and the design process?`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
@@ -241,17 +328,7 @@ export function ProductPage() {
                     Need a custom quote? Chat on WhatsApp
                     <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </a>
-                  <Link
-                    href="/unforgettable/design-studio"
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
-                  >
-                    Try the Design Studio
-                    <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
                 </div>
-
-                {/* Shipping Estimate */}
-                <ShippingEstimator />
               </div>
             </ScrollReveal>
           </div>
@@ -276,32 +353,6 @@ export function ProductPage() {
               </ScrollReveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Design Studio CTA */}
-      <section className="py-16 border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <ScrollReveal>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 py-8 border-t border-border/50">
-              <div>
-                <h2 className="font-[family-name:var(--font-montserrat)] text-xl sm:text-2xl font-bold tracking-tight mb-2">
-                  See your card before you order
-                </h2>
-                <p className="text-muted-foreground text-sm max-w-lg">
-                  Upload your logo and preview it laser-engraved on metal in 3D.
-                  No account needed.
-                </p>
-              </div>
-              <Link
-                href="/unforgettable/design-studio"
-                className="inline-flex items-center gap-2.5 text-foreground hover:text-foreground/70 font-medium text-sm transition-colors group flex-shrink-0"
-              >
-                Open the Design Studio
-                <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </ScrollReveal>
         </div>
       </section>
 

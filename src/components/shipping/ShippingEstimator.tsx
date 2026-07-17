@@ -20,7 +20,17 @@ type ExportCost = {
 
 const NIGERIA_VALUE = "__nigeria__";
 
-export function ShippingEstimator() {
+export type DeliverySelection = {
+  destination: string;
+  usd: number;
+};
+
+interface ShippingEstimatorProps {
+  /** Called whenever the estimated delivery cost changes; null while nothing is selected. */
+  onDeliveryChange?: (delivery: DeliverySelection | null) => void;
+}
+
+export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps = {}) {
   const [states, setStates] = useState<FezState[]>([]);
   const [exportLocations, setExportLocations] = useState<ExportLocation[]>([]);
 
@@ -136,6 +146,36 @@ export function ShippingEstimator() {
         setNgnToUsd(1 / 1600);
       });
   }, []);
+
+  // Report the selected delivery cost (in USD, rounded up) to the parent
+  useEffect(() => {
+    if (!onDeliveryChange) return;
+
+    if (ngnToUsd && domesticCost && !loading) {
+      onDeliveryChange({
+        destination: `${domesticCost.state}, Nigeria`,
+        usd: Math.ceil(domesticCost.totalCost * ngnToUsd),
+      });
+    } else if (ngnToUsd && exportCost && !loading) {
+      const location = exportLocations.find(
+        (l) => String(l.id) === selectedCountry
+      );
+      onDeliveryChange({
+        destination: location?.name || "International",
+        usd: Math.ceil(exportCost.price * ngnToUsd),
+      });
+    } else {
+      onDeliveryChange(null);
+    }
+  }, [
+    onDeliveryChange,
+    domesticCost,
+    exportCost,
+    ngnToUsd,
+    loading,
+    exportLocations,
+    selectedCountry,
+  ]);
 
   const formatUsd = (ngnAmount: number) => {
     if (!ngnToUsd) return "...";
