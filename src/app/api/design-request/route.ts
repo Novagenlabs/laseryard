@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
             <p style="color:#444;line-height:1.6;">
               If you'd like a faster response, message us directly on WhatsApp:
             </p>
-            <a href="https://wa.me/22893184418" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;text-decoration:none;border-radius:999px;font-size:14px;font-weight:500;margin:8px 0 24px;">
+            <a href="https://wa.me/14159039078" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;text-decoration:none;border-radius:999px;font-size:14px;font-weight:500;margin:8px 0 24px;">
               Chat on WhatsApp
             </a>
             <p style="font-size:12px;color:#999;border-top:1px solid #eee;padding-top:16px;margin-top:24px;">
