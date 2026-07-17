@@ -44,6 +44,14 @@ export const CARD_PRICING: Record<
   },
 };
 
+// Limited-time marketing campaign: free delivery if the visitor orders within
+// `windowHours` of their first visit (per-visitor countdown, localStorage).
+// Flip `enabled` to start/stop the campaign.
+export const FREE_SHIPPING_CAMPAIGN = {
+  enabled: true,
+  windowHours: 48,
+};
+
 export const NAV_LINKS = [
   { href: "/products/metal-business-cards", label: "Metal Cards" },
   { href: "/shop", label: "More Products" },

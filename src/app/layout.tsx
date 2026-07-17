@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins, Montserrat } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { Pixels } from "@/components/analytics/Pixels";
 import { ChatAssistant } from "@/components/chat/ChatAssistant";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { JsonLd } from "@/components/JsonLd";
@@ -112,7 +114,9 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${montserrat.variable} font-sans antialiased`}
       >
+        <Pixels />
         <ThemeProvider>
+          <AnnouncementBar />
           <Header />
           <main className="min-h-[100dvh]">{children}</main>
           <Footer />
