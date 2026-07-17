@@ -86,7 +86,7 @@
     <div id="listStatus" class="muted" style="font-size:13px;">Set your connection, then Load.</div>
     <div style="overflow-x:auto;">
       <table id="convTable" class="hidden">
-        <thead><tr><th>When</th><th>Status</th><th>Msgs</th><th>Summary</th><th></th></tr></thead>
+        <thead><tr><th>When</th><th>Customer</th><th>Status</th><th>Msgs</th><th>Preview</th><th></th></tr></thead>
         <tbody id="convBody"></tbody>
       </table>
     </div>
@@ -167,7 +167,7 @@ function statusPill(s){ const c = s==="done"?"done":s==="in-progress"?"progress"
 
 async function loadConversations(){
   const el=document.getElementById("listStatus");
-  el.textContent="Loading…";
+  el.textContent="Loading… (fetching phone + analysis for each, ~a few seconds)";
   try{
     const ps=document.getElementById("pageSize").value;
     const d=await api(`/api/admin/conversations?page_size=${ps}`);
@@ -175,7 +175,20 @@ async function loadConversations(){
     (d.conversations||[]).forEach(c=>{
       const tr=document.createElement("tr"); tr.className="clickable";
       tr.onclick=()=>openDetail(c.conversation_id);
-      tr.innerHTML=`<td>${fmtTime(c.start_time_unix_secs)}</td><td>${statusPill(c.status)}</td><td>${c.message_count??"—"}</td><td class="muted" style="max-width:420px;">${(c.transcript_summary||"").slice(0,90)||"—"}</td><td><button class="small">View →</button></td>`;
+      const phone = c.whatsapp_user_id ? "+"+c.whatsapp_user_id : "";
+      const cust = (c.customer_name?`<b>${escapeHtml(c.customer_name)}</b><br/>`:"") +
+        (phone?`<span class="mono muted" style="font-size:11px;">${phone}</span>`:'<span class="muted">—</span>');
+      const flags=[];
+      if(c.wants_human) flags.push('<span class="pill human">⚠ human</span>');
+      if(c.purchased===true) flags.push('<span class="pill done">paid</span>');
+      if(c.sentiment && /neg/i.test(c.sentiment)) flags.push('<span class="pill grey">'+c.sentiment+'</span>');
+      const preview = (c.title?`<b>${escapeHtml(c.title)}</b> — `:"") + escapeHtml((c.transcript_summary||"").slice(0,110)) || "—";
+      tr.innerHTML=`<td style="white-space:nowrap;">${fmtTime(c.start_time_unix_secs)}</td>`+
+        `<td>${cust}</td>`+
+        `<td style="white-space:nowrap;">${statusPill(c.status)} ${flags.join(" ")}</td>`+
+        `<td>${c.message_count??"—"}</td>`+
+        `<td class="muted" style="max-width:360px;">${preview||"—"}</td>`+
+        `<td><button class="small">View →</button></td>`;
       body.appendChild(tr);
     });
     document.getElementById("convTable").classList.remove("hidden");
