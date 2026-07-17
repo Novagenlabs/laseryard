@@ -139,7 +139,7 @@ function HeroDesktop() {
             <motion.h1
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="font-[family-name:var(--font-montserrat)] text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.06] text-foreground"
+              className="font-[family-name:var(--font-montserrat)] text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.06] text-foreground"
             >
               Metal Business Cards.{" "}
               <span className="block">Designed Custom.</span>
