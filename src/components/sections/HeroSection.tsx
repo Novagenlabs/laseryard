@@ -6,6 +6,7 @@ import { ArrowRight, Star } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import Link from "next/link";
 import Avatar from "boring-avatars";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
 
 const AVATAR_NAMES = ["Adaeze O.", "Marcus T.", "Chioma N.", "Jamal B.", "Sophia K."];
 
@@ -61,7 +62,7 @@ function HeroMobile() {
         {/* CTA */}
         <motion.div {...fadeSlide(0.2)} className="mt-6 flex flex-col items-center gap-3">
           <a
-            href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
@@ -138,7 +139,7 @@ function HeroDesktop() {
             <motion.h1
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="font-[family-name:var(--font-montserrat)] text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.06] text-foreground"
+              className="font-[family-name:var(--font-montserrat)] text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.06] text-foreground"
             >
               Metal Business Cards.{" "}
               <span className="block">Designed Custom.</span>
@@ -164,7 +165,7 @@ function HeroDesktop() {
               className="mt-10 flex items-center gap-6"
             >
               <a
-                href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center justify-center gap-2 w-[277px] px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"

@@ -23,6 +23,7 @@ import { WhopCheckout } from "@/components/payments/WhopCheckout";
 import {
   CARD_PRICING,
   CARD_QUANTITIES,
+  WHATSAPP_NUMBER,
   type CardQuantity,
   type CardThickness,
 } from "@/lib/constants";
@@ -251,7 +252,7 @@ export function ProductPage() {
                   <p className="text-xs text-muted-foreground mt-2">
                     Need a different quantity, material, or finish?{" "}
                     <a
-                      href={`https://wa.me/22893184418?text=${encodeURIComponent("Hi! I'd like a custom quote for metal business cards.")}`}
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'd like a custom quote for metal business cards.")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline hover:text-foreground transition-colors"
@@ -341,7 +342,7 @@ export function ProductPage() {
                     </button>
                   )}
                   <a
-                    href={`https://wa.me/22893184418?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (${pricing.label}, ${selectedThickness}). Can you help me with pricing and the design process?`)}`}
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (${pricing.label}, ${selectedThickness}). Can you help me with pricing and the design process?`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
