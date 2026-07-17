@@ -282,6 +282,13 @@ export const FAQ_ITEMS = [
 
 export const COUNTRIES = [
   {
+    slug: "africa",
+    name: "Africa",
+    cities: ["Lagos", "Accra", "Abuja", "Nairobi", "Johannesburg"],
+    currency: "USD",
+    phone: "+234",
+  },
+  {
     slug: "nigeria",
     name: "Nigeria",
     cities: ["Lagos", "Abuja", "Port Harcourt", "Kano"],

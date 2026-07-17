@@ -54,6 +54,11 @@ const SHIPPING_INFO: Record<
   string,
   { time: string; method: string; note: string }
 > = {
+  africa: {
+    time: "24-48 hours in Lagos, 3-7 business days across the continent",
+    method: "Local dispatch in Nigeria, tracked courier elsewhere",
+    note: "Shipped from our Lagos studio — same-day rush available in Lagos",
+  },
   nigeria: {
     time: "24-48 hours in Lagos, 3-5 business days nationwide",
     method: "Local courier and dispatch riders",
@@ -87,6 +92,12 @@ const SHIPPING_INFO: Record<
 };
 
 const PAYMENT_INFO: Record<string, string[]> = {
+  africa: [
+    "Bank transfer (NGN or USD)",
+    "Mobile money (MTN MoMo, Airtel Money)",
+    "Card payments",
+    "Pay on delivery (Lagos only)",
+  ],
   nigeria: [
     "Bank transfer (NGN)",
     "Mobile money",
