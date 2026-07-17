@@ -114,21 +114,21 @@ export async function POST(request: NextRequest) {
     ).toISOString();
 
     const { html, text } = renderBrandedEmail({
-      preheader: "See your design on an actual metal card in seconds.",
+      preheader: "Order your metal business cards in minutes.",
       heading: `Good chatting with you${firstName ? `, ${firstName}` : ""}`,
       paragraphsHtml: [
         `Thanks for stopping by today. No rush at all — your cards will be ready whenever you are.`,
-        `If you want to see your design on an actual metal card before deciding, try our Design Studio: upload a logo and preview it in seconds.`,
+        `When you're ready, ordering takes just a few minutes: pick your thickness and quantity, and we'll send a digital proof before anything is engraved.`,
         `Any questions, just reply to this email or message us on WhatsApp.`,
       ],
       text: `Hey${firstName ? ` ${firstName}` : ""}, good chatting with you today.
 
-If you want to see your design on an actual metal card before deciding, try our Design Studio — upload a logo and preview it in seconds: https://laseryard.com/unforgettable
+When you're ready, ordering takes just a few minutes — pick your thickness and quantity, and we'll send a digital proof before anything is engraved: https://laseryard.com/products/metal-business-cards
 
 Any questions, just reply to this email or message us on WhatsApp.`,
       cta: {
-        label: "Preview your card",
-        url: "https://laseryard.com/unforgettable",
+        label: "Order your cards",
+        url: "https://laseryard.com/products/metal-business-cards",
       },
     });
 

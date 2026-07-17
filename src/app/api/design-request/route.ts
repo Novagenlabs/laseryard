@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NOTIFICATION_TO = "hello@laseryard.com";
-const FROM_ADDRESS = "Design Studio <design-team@updates.laseryard.com>";
+const FROM_ADDRESS = "Laser Yard Design Team <design-team@updates.laseryard.com>";
 
 export async function POST(req: NextRequest) {
   const { name, email, phone, hasLogo } = await req.json();
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
             <tr><td style="padding:8px 16px 8px 0;color:#666;">Phone</td><td style="padding:8px 0;font-weight:600;">${escapeHtml(phone)}</td></tr>
             <tr><td style="padding:8px 16px 8px 0;color:#666;">Logo</td><td style="padding:8px 0;font-weight:600;">${hasLogo ? "Yes (uploaded)" : "No"}</td></tr>
           </table>
-          <p style="margin-top:24px;font-size:12px;color:#999;">From Design Studio on laseryard.com</p>
+          <p style="margin-top:24px;font-size:12px;color:#999;">From a design request on laseryard.com</p>
         `,
       }),
     });

@@ -18,9 +18,6 @@ Laser-engraved wooden boards and coasters for restaurants, corporate gifting, an
 ### Custom Engraving
 Bring your own items for laser engraving. Supported materials: metal (stainless steel, aluminum, brass, copper), wood (hardwood, plywood, bamboo, MDF), acrylic (clear, colored, frosted), leather (genuine, faux), glass (bottles, awards, drinkware), and fabric (denim, canvas, patches).
 
-### Design Studio
-Free online tool to upload your logo and preview how it will look laser-engraved on a metal business card. Interactive 3D preview, no account needed.
-
 ## Key Information
 
 - **Headquarters**: Lagos, Nigeria
@@ -42,7 +39,6 @@ Free online tool to upload your logo and preview how it will look laser-engraved
 - Wood Boards & Coasters: https://laseryard.com/products/wood-engraving
 - Shop All Products: https://laseryard.com/shop
 - Custom Engraving: https://laseryard.com/custom-engraving
-- Design Studio: https://laseryard.com/unforgettable/design-studio
 - How It Works: https://laseryard.com/process
 - FAQ: https://laseryard.com/faq
 - About Us: https://laseryard.com/about

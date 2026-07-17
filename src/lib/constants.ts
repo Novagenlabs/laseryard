@@ -22,6 +22,28 @@ export const WHATSAPP_MESSAGES = {
     "Hi! I'm interested in your laser engraving services.",
 };
 
+// Metal business card pricing.
+// Quantities outside this table (or other materials/finishes) get a custom quote on WhatsApp.
+export const CARD_QUANTITIES = [30, 50, 100, 200] as const;
+export type CardQuantity = (typeof CARD_QUANTITIES)[number];
+export type CardThickness = "0.4mm" | "0.8mm";
+
+// Total price in USD per thickness and quantity.
+// Base: $200 (0.4mm) / $450 (0.8mm) per 30 cards; ~5% off per card at 50, ~10% at 100, ~15% at 200.
+export const CARD_PRICING: Record<
+  CardThickness,
+  { label: string; prices: Record<CardQuantity, number> }
+> = {
+  "0.4mm": {
+    label: "Standard",
+    prices: { 30: 200, 50: 315, 100: 600, 200: 1135 },
+  },
+  "0.8mm": {
+    label: "Premium",
+    prices: { 30: 450, 50: 715, 100: 1350, 200: 2550 },
+  },
+};
+
 export const NAV_LINKS = [
   { href: "/products/metal-business-cards", label: "Metal Cards" },
   { href: "/shop", label: "More Products" },
@@ -234,7 +256,7 @@ export const FAQ_ITEMS = [
   {
     question: "How do I design my metal business cards?",
     answer:
-      "You have two options: upload your own design (PDF or high-resolution PNG) in the Design Studio and preview it on a 3D metal card, or let our design team handle it for you. Just share your logo and details, and we'll create a production-ready layout.",
+      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it for you. Just share your logo and details, and we'll create a production-ready layout.",
   },
   {
     question: "How long does it take to get my cards?",

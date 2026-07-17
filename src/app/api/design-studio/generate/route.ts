@@ -64,7 +64,18 @@ function extractImageUrl(message: Record<string, unknown>): string | null {
   return null;
 }
 
+// The Design Studio is disabled for now; keep the endpoint but reject requests
+// so stray callers can't burn OpenRouter credits.
+const DESIGN_STUDIO_ENABLED = false;
+
 export async function POST(request: NextRequest) {
+  if (!DESIGN_STUDIO_ENABLED) {
+    return NextResponse.json(
+      { error: "The Design Studio is currently unavailable" },
+      { status: 410 }
+    );
+  }
+
   if (!OPENROUTER_API_KEY) {
     return NextResponse.json(
       { error: "Image generation is not configured" },
