@@ -245,9 +245,6 @@ export function ProductPage() {
                         )}
                       >
                         <p className="font-semibold">{qty}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatUsd(pricing.prices[qty])}
-                        </p>
                       </button>
                     ))}
                   </div>
