@@ -32,7 +32,7 @@ export function Header() {
             ? "bg-background/80 backdrop-blur-xl border-b border-border"
             : "bg-transparent"
         )}
-        style={{ top: 0 }}
+        style={{ top: "var(--announcement-height, 0px)" }}
       >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">

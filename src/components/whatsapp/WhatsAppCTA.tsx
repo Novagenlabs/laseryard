@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { MessageCircle } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 interface WhatsAppCTAProps {
   message?: string;
@@ -23,13 +24,7 @@ export function WhatsAppCTA({
   trackingLabel = "general",
 }: WhatsAppCTAProps) {
   const handleClick = () => {
-    // Analytics tracking
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "whatsapp_click", {
-        event_category: "CTA",
-        event_label: trackingLabel,
-      });
-    }
+    trackWhatsAppClick(trackingLabel);
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
       message

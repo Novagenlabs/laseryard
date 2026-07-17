@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -26,6 +26,8 @@ import {
   type CardQuantity,
   type CardThickness,
 } from "@/lib/constants";
+import { useFreeShipping } from "@/hooks/useFreeShipping";
+import { trackViewProduct } from "@/lib/analytics";
 
 const thicknessDescriptions: Record<CardThickness, string> = {
   "0.4mm": "Solid & durable, similar to a premium credit card",
@@ -97,14 +99,21 @@ export function ProductPage() {
   const [activeImage, setActiveImage] = useState(0);
   const [delivery, setDelivery] = useState<DeliverySelection | null>(null);
 
+  const { active: freeShipping } = useFreeShipping();
+
   const handleDeliveryChange = useCallback(
     (d: DeliverySelection | null) => setDelivery(d),
     []
   );
 
+  useEffect(() => {
+    trackViewProduct("Metal Business Cards", CARD_PRICING["0.4mm"].prices[30]);
+  }, []);
+
   const pricing = CARD_PRICING[selectedThickness];
   const cardsSubtotal = pricing.prices[selectedQuantity];
-  const total = cardsSubtotal + (delivery?.usd ?? 0);
+  const deliveryCharged = delivery && !freeShipping ? delivery.usd : 0;
+  const total = cardsSubtotal + deliveryCharged;
 
   return (
     <>
@@ -236,9 +245,6 @@ export function ProductPage() {
                         )}
                       >
                         <p className="font-semibold">{qty}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatUsd(pricing.prices[qty])}
-                        </p>
                       </button>
                     ))}
                   </div>
@@ -277,7 +283,20 @@ export function ProductPage() {
                         : "Delivery"}
                     </span>
                     <span className="font-semibold">
-                      {delivery ? formatUsd(delivery.usd) : "—"}
+                      {delivery ? (
+                        freeShipping ? (
+                          <>
+                            <span className="line-through text-muted-foreground font-normal mr-2">
+                              {formatUsd(delivery.usd)}
+                            </span>
+                            <span className="text-gold">FREE</span>
+                          </>
+                        ) : (
+                          formatUsd(delivery.usd)
+                        )
+                      ) : (
+                        "—"
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-border">
@@ -306,7 +325,9 @@ export function ProductPage() {
                         quantity: String(selectedQuantity),
                         cardsSubtotalUsd: String(cardsSubtotal),
                         deliveryDestination: delivery.destination,
-                        deliveryUsd: String(delivery.usd),
+                        deliveryUsd: String(deliveryCharged),
+                        standardDeliveryUsd: String(delivery.usd),
+                        freeShippingPromo: String(freeShipping),
                         totalUsd: String(total),
                       }}
                       buttonText={`Order Now - ${formatUsd(total)}`}

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Zap } from "lucide-react";
+import { X, Zap, Truck } from "lucide-react";
+import { useFreeShipping, formatCountdown } from "@/hooks/useFreeShipping";
 
 export function AnnouncementBar() {
   const [isVisible, setIsVisible] = useState(true);
+  const { active, remainingMs } = useFreeShipping();
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -19,26 +21,50 @@ export function AnnouncementBar() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] h-9 bg-gold/10 border-b border-gold/20 flex items-center justify-center px-4">
-      {/* Desktop */}
-      <div className="hidden sm:flex items-center gap-4 text-sm">
-        <span className="inline-flex items-center gap-1.5 text-foreground">
-          <Zap className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
-          5-7 Day Turnaround
-        </span>
-        <span className="text-muted-foreground">|</span>
-        <span className="text-foreground">Free Design Consultation</span>
-      </div>
+    <div className="fixed top-0 left-0 right-0 z-[60] h-9 bg-background/95 backdrop-blur-md border-b border-gold/30 flex items-center justify-center px-4">
+      {active ? (
+        <>
+          {/* Campaign: free shipping countdown */}
+          <div className="hidden sm:flex items-center gap-2 text-sm">
+            <Truck className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
+            <span className="text-foreground font-medium">
+              Free shipping if you order in the next
+            </span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {formatCountdown(remainingMs)}
+            </span>
+          </div>
+          <div className="flex sm:hidden items-center gap-1.5 text-xs">
+            <Truck className="w-3 h-3 text-gold" aria-hidden="true" />
+            <span className="text-foreground font-medium">Free shipping ends in</span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {formatCountdown(remainingMs)}
+            </span>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Desktop */}
+          <div className="hidden sm:flex items-center gap-4 text-sm">
+            <span className="inline-flex items-center gap-1.5 text-foreground">
+              <Zap className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
+              5-7 Day Turnaround
+            </span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-foreground">Free Design Consultation</span>
+          </div>
 
-      {/* Mobile */}
-      <div className="flex sm:hidden items-center gap-3 text-xs">
-        <span className="inline-flex items-center gap-1 text-foreground">
-          <Zap className="w-3 h-3 text-gold" aria-hidden="true" />
-          5-7 Day Turnaround
-        </span>
-        <span className="text-muted-foreground">|</span>
-        <span className="text-foreground">Free Consultation</span>
-      </div>
+          {/* Mobile */}
+          <div className="flex sm:hidden items-center gap-3 text-xs">
+            <span className="inline-flex items-center gap-1 text-foreground">
+              <Zap className="w-3 h-3 text-gold" aria-hidden="true" />
+              5-7 Day Turnaround
+            </span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-foreground">Free Consultation</span>
+          </div>
+        </>
+      )}
 
       {/* Dismiss */}
       <button

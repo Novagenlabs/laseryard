@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { WhopCheckoutEmbed } from "@whop/checkout/react";
 import { Loader2, X, Check } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { trackBeginCheckout, trackPurchase } from "@/lib/analytics";
 
 interface WhopCheckoutProps {
   amount: number;
@@ -29,6 +30,7 @@ export function WhopCheckout({
   const startCheckout = useCallback(async () => {
     setLoading(true);
     setError("");
+    trackBeginCheckout(amount);
 
     try {
       const res = await fetch("/api/checkout", {
@@ -97,6 +99,7 @@ export function WhopCheckout({
             sessionId={sessionId}
             returnUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/pay/success`}
             onComplete={(id) => {
+              trackPurchase(amount, id);
               setPaymentId(id);
               setCompleted(true);
               setSessionId(null);
