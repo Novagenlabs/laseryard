@@ -20,6 +20,10 @@ type ExportCost = {
 
 const NIGERIA_VALUE = "__nigeria__";
 
+// Flat delivery fee (USD) charged when the live Fez quote can't be fetched,
+// so a shipping-API outage never blocks checkout.
+const FLAT_DELIVERY_FALLBACK_USD = 65;
+
 export type DeliverySelection = {
   destination: string;
   usd: number;
@@ -43,6 +47,9 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState("");
+  // True when the live quote couldn't be fetched for the current selection —
+  // we then charge the flat fallback fee instead of blocking checkout.
+  const [costFailed, setCostFailed] = useState(false);
 
   const isNigeria = selectedCountry === NIGERIA_VALUE;
 
@@ -78,6 +85,7 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
     setDomesticCost(null);
     setExportCost(null);
     setError("");
+    setCostFailed(false);
   }, [selectedCountry]);
 
   // Fetch domestic cost when state selected
@@ -89,6 +97,7 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
 
     setLoading(true);
     setError("");
+    setCostFailed(false);
 
     fetch("/api/shipping/cost", {
       method: "POST",
@@ -97,10 +106,10 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
     })
       .then((r) => r.json())
       .then((data) => {
-        if (data.error) setError(data.error);
+        if (data.error) setCostFailed(true);
         else setDomesticCost(data);
       })
-      .catch(() => setError("Could not fetch delivery cost"))
+      .catch(() => setCostFailed(true))
       .finally(() => setLoading(false));
   }, [isNigeria, selectedState]);
 
@@ -116,6 +125,7 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
 
     setLoading(true);
     setError("");
+    setCostFailed(false);
 
     // weightId 19 = 0.5kg, covers a standard 30-card order with packaging
     fetch("/api/shipping/export-cost", {
@@ -125,10 +135,10 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
     })
       .then((r) => r.json())
       .then((data) => {
-        if (data.error) setError(data.error);
+        if (data.error) setCostFailed(true);
         else setExportCost(data);
       })
-      .catch(() => setError("Could not fetch delivery cost"))
+      .catch(() => setCostFailed(true))
       .finally(() => setLoading(false));
   }, [isNigeria, selectedCountry]);
 
@@ -164,6 +174,18 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
         destination: location?.name || "International",
         usd: Math.ceil(exportCost.price * ngnToUsd),
       });
+    } else if (costFailed && !loading) {
+      // Live quote failed but the customer picked a destination — charge the
+      // flat fallback fee so checkout isn't blocked by a shipping-API outage.
+      const location = exportLocations.find(
+        (l) => String(l.id) === selectedCountry
+      );
+      const destination = isNigeria
+        ? selectedState
+          ? `${selectedState}, Nigeria`
+          : "Nigeria"
+        : location?.name || "your location";
+      onDeliveryChange({ destination, usd: FLAT_DELIVERY_FALLBACK_USD });
     } else {
       onDeliveryChange(null);
     }
@@ -173,6 +195,9 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
     exportCost,
     ngnToUsd,
     loading,
+    costFailed,
+    isNigeria,
+    selectedState,
     exportLocations,
     selectedCountry,
   ]);
@@ -242,6 +267,20 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
       )}
 
       {error && <p className="text-sm text-red-500 mt-3">{error}</p>}
+
+      {/* Fallback flat fee when the live quote is unavailable */}
+      {costFailed && !loading && (
+        <div className="mt-3 space-y-2">
+          <div className="flex justify-between text-sm font-semibold">
+            <span>Flat Delivery Fee</span>
+            <span>${FLAT_DELIVERY_FALLBACK_USD.toFixed(2)}</span>
+          </div>
+          <p className="text-xs text-muted-foreground pt-1">
+            We couldn&apos;t reach our courier for a live rate, so a flat
+            delivery fee applies. Final amount confirmed at checkout.
+          </p>
+        </div>
+      )}
 
       {/* Domestic cost result */}
       {domesticCost && !loading && (
