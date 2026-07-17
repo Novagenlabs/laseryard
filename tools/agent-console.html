@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laser Yard · Agent Console</title>
+<!--
+  Standalone local console for reviewing Yara's WhatsApp conversations and
+  re-engaging customers who dropped off. Open directly in a browser
+  (`open tools/agent-console.html`). NOT served by the website — it talks to
+  the admin API over CORS with your ORDERS_ADMIN_KEY. Settings persist in
+  this browser only. Requires ELEVENLABS_API_KEY set on the server.
+-->
+<style>
+  :root {
+    --ink:#17181d; --muted:#6f7076; --border:rgba(0,0,0,0.1);
+    --gold:#eec335; --bg:#fdfdfd; --card:#fff; --red:#dc2626; --green:#16a34a;
+    --amber:#d97706; --blue:#2563eb;
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:"Poppins",system-ui,sans-serif; background:var(--bg); color:var(--ink); padding:40px 20px; }
+  .mono { font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace; }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { font-size:24px; font-weight:800; letter-spacing:-0.02em; }
+  h2 { font-size:15px; font-weight:700; margin-bottom:10px; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+  .eyebrow { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:22px; }
+  input, select, textarea { width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:10px; font:inherit; font-size:14px; background:var(--bg); }
+  input:focus, select:focus, textarea:focus { outline:2px solid rgba(238,195,53,0.7); }
+  label { display:block; font-size:12px; color:var(--muted); margin:0 0 4px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:640px){ .grid2{ grid-template-columns:1fr; } }
+  button { font:inherit; font-size:14px; font-weight:600; cursor:pointer; border-radius:10px; padding:9px 16px; border:1px solid var(--border); background:var(--card); color:var(--ink); }
+  button.primary { background:var(--gold); border-color:var(--gold); }
+  button.small { padding:5px 11px; font-size:12px; }
+  button:disabled { opacity:0.5; cursor:not-allowed; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); padding:6px 8px; border-bottom:1px solid var(--border); }
+  td { padding:8px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr.clickable:hover { background:rgba(238,195,53,0.08); cursor:pointer; }
+  .pill { display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:999px; }
+  .pill.done { background:#e8f5ee; color:var(--green); }
+  .pill.progress { background:#eef2ff; color:var(--blue); }
+  .pill.human { background:#fef3c7; color:var(--amber); }
+  .pill.grey { background:#f1f1f2; color:var(--muted); }
+  .muted { color:var(--muted); }
+  .transcript { max-height:300px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--bg); font-size:13px; }
+  .msg { margin-bottom:8px; }
+  .msg .who { font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; }
+  .msg.user .who { color:var(--blue); }
+  .msg.agent .who { color:var(--amber); }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:12px 20px; border-radius:12px; font-size:14px; opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:50; }
+  .toast.show { opacity:1; }
+  .hidden { display:none; }
+  a.link { color:var(--blue); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row">
+    <div>
+      <div class="eyebrow">Laser Yard</div>
+      <h1>Agent Console</h1>
+    </div>
+    <button class="small" onclick="toggleSettings()">⚙ Settings</button>
+  </div>
+
+  <div class="card" id="settings">
+    <h2>Connection</h2>
+    <div class="grid2">
+      <div><label>API base</label><input id="apiBase" placeholder="https://laseryard.com" /></div>
+      <div><label>Admin key (ORDERS_ADMIN_KEY)</label><input id="apiKey" type="password" placeholder="paste key" /></div>
+    </div>
+    <div style="margin-top:12px;"><button class="primary" onclick="saveSettings()">Save</button></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="margin-bottom:14px;">
+      <h2 style="margin:0;">Recent conversations</h2>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <select id="pageSize" style="width:auto;"><option>20</option><option selected>30</option><option>50</option><option>100</option></select>
+        <button class="primary small" onclick="loadConversations()">Load</button>
+      </div>
+    </div>
+    <div id="listStatus" class="muted" style="font-size:13px;">Set your connection, then Load.</div>
+    <div style="overflow-x:auto;">
+      <table id="convTable" class="hidden">
+        <thead><tr><th>When</th><th>Status</th><th>Msgs</th><th>Summary</th><th></th></tr></thead>
+        <tbody id="convBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card hidden" id="detailCard">
+    <div class="row" style="margin-bottom:8px;">
+      <h2 style="margin:0;">Conversation</h2>
+      <button class="small" onclick="closeDetail()">✕ Close</button>
+    </div>
+    <div id="detailMeta" style="font-size:13px; margin-bottom:12px;"></div>
+    <div id="detailTranscript" class="transcript" style="margin-bottom:16px;"></div>
+
+    <h2>Re-message this customer</h2>
+    <div id="reengageBox">
+      <div class="grid2">
+        <div>
+          <label>Template</label>
+          <select id="tplSelect" onchange="renderTplFields()"></select>
+        </div>
+        <div id="waIdWrap">
+          <label>WhatsApp ID</label>
+          <input id="waId" readonly />
+        </div>
+      </div>
+      <div id="tplFields" style="margin-top:10px;"></div>
+      <div style="margin-top:14px;">
+        <button class="primary" id="sendBtn" onclick="sendReengage()">Send message</button>
+        <span class="muted" style="font-size:12px; margin-left:10px;">Sends a WhatsApp template. If they reply, Yara takes over.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TEMPLATES = {
+  laseryard_followup: { label:"Follow-up", body:[
+    {key:"name", label:"First name", ph:"Jordan"},
+    {key:"subject", label:"About their request", ph:"the 30 metal business cards you asked about"}
+  ], button:null },
+  checkout_reminder: { label:"Checkout reminder", body:[
+    {key:"name", label:"First name", ph:"Jordan"},
+    {key:"product", label:"Product", ph:"30 metal business cards"}
+  ], button:{key:"suffix", label:"Checkout URL suffix (after whop.com/checkout/)", ph:"plan_xxx/?session=ch_yyy"} },
+  checkout_link: { label:"Checkout link (body)", body:[
+    {key:"name", label:"First name", ph:"Jordan"},
+    {key:"product", label:"Product", ph:"30 metal business cards"},
+    {key:"url", label:"Full checkout URL", ph:"https://whop.com/checkout/..."}
+  ], button:null },
+};
+
+const store = {
+  get base(){ return localStorage.getItem("ly-agent-base") || "https://laseryard.com"; },
+  set base(v){ localStorage.setItem("ly-agent-base", v); },
+  get key(){ return localStorage.getItem("ly-agent-key") || ""; },
+  set key(v){ localStorage.setItem("ly-agent-key", v); },
+};
+let currentWaId = null;
+
+function toast(msg, ok=true){ const t=document.getElementById("toast"); t.textContent=msg; t.style.background = ok?"#17181d":"#dc2626"; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 3200); }
+function toggleSettings(){ document.getElementById("settings").classList.toggle("hidden"); }
+function saveSettings(){ store.base=document.getElementById("apiBase").value.trim(); store.key=document.getElementById("apiKey").value.trim(); toast("Saved"); document.getElementById("settings").classList.add("hidden"); }
+
+async function api(path, opts={}){
+  const res = await fetch(store.base.replace(/\/$/,"") + path, {
+    ...opts,
+    headers: { "Authorization":"Bearer "+store.key, "Content-Type":"application/json", ...(opts.headers||{}) },
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || ("HTTP "+res.status));
+  return data;
+}
+
+function fmtTime(unix){ if(!unix) return "—"; const d=new Date(unix*1000); return d.toLocaleString(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
+function statusPill(s){ const c = s==="done"?"done":s==="in-progress"?"progress":"grey"; return `<span class="pill ${c}">${s||"?"}</span>`; }
+
+async function loadConversations(){
+  const el=document.getElementById("listStatus");
+  el.textContent="Loading…";
+  try{
+    const ps=document.getElementById("pageSize").value;
+    const d=await api(`/api/admin/conversations?page_size=${ps}`);
+    const body=document.getElementById("convBody"); body.innerHTML="";
+    (d.conversations||[]).forEach(c=>{
+      const tr=document.createElement("tr"); tr.className="clickable";
+      tr.onclick=()=>openDetail(c.conversation_id);
+      tr.innerHTML=`<td>${fmtTime(c.start_time_unix_secs)}</td><td>${statusPill(c.status)}</td><td>${c.message_count??"—"}</td><td class="muted" style="max-width:420px;">${(c.transcript_summary||"").slice(0,90)||"—"}</td><td><button class="small">View →</button></td>`;
+      body.appendChild(tr);
+    });
+    document.getElementById("convTable").classList.remove("hidden");
+    el.textContent = `${(d.conversations||[]).length} conversations`;
+  }catch(e){ el.textContent="Error: "+e.message; toast(e.message,false); }
+}
+
+async function openDetail(id){
+  try{
+    const d=await api(`/api/admin/conversations/${id}`);
+    currentWaId=d.whatsapp_user_id;
+    const badges=[];
+    if(d.wants_human) badges.push('<span class="pill human">⚠ asked for a human</span>');
+    if(d.purchased===true) badges.push('<span class="pill done">purchased</span>');
+    else if(d.purchased===false) badges.push('<span class="pill grey">no purchase</span>');
+    document.getElementById("detailMeta").innerHTML=`
+      ${statusPill(d.status)} ${badges.join(" ")}<br/>
+      <div style="margin-top:8px;">
+        <b>${d.customer_name||"Unknown"}</b> ${d.customer_email?`· ${d.customer_email}`:""}<br/>
+        <span class="muted mono">WhatsApp: ${d.whatsapp_user_id||"—"} · ${d.message_count} msgs · ${d.channel}</span>
+      </div>
+      ${d.summary?`<div style="margin-top:8px;" class="muted">${d.summary}</div>`:""}`;
+    document.getElementById("detailTranscript").innerHTML=(d.transcript||[]).map(t=>`<div class="msg ${t.role}"><span class="who">${t.role==="user"?"Customer":"Yara"}</span><div>${escapeHtml(t.message)}</div></div>`).join("") || '<span class="muted">No transcript.</span>';
+    document.getElementById("waId").value=d.whatsapp_user_id||"";
+    if(!d.whatsapp_user_id){ document.getElementById("reengageBox").innerHTML='<span class="muted">No WhatsApp ID on this conversation — can\'t re-message.</span>'; }
+    document.getElementById("detailCard").classList.remove("hidden");
+    document.getElementById("detailCard").scrollIntoView({behavior:"smooth"});
+  }catch(e){ toast(e.message,false); }
+}
+function closeDetail(){ document.getElementById("detailCard").classList.add("hidden"); }
+
+function initTemplates(){
+  const sel=document.getElementById("tplSelect"); sel.innerHTML="";
+  Object.entries(TEMPLATES).forEach(([k,v])=>{ const o=document.createElement("option"); o.value=k; o.textContent=v.label; sel.appendChild(o); });
+  renderTplFields();
+}
+function renderTplFields(){
+  const tpl=TEMPLATES[document.getElementById("tplSelect").value];
+  const box=document.getElementById("tplFields");
+  const fields=[...tpl.body, ...(tpl.button?[tpl.button]:[])];
+  box.innerHTML=fields.map(f=>`<div style="margin-bottom:8px;"><label>${f.label}</label><input data-key="${f.key}" placeholder="${f.ph}" /></div>`).join("");
+}
+async function sendReengage(){
+  if(!currentWaId){ toast("No WhatsApp ID",false); return; }
+  const name=document.getElementById("tplSelect").value;
+  const tpl=TEMPLATES[name];
+  const inputs=[...document.querySelectorAll("#tplFields input")];
+  const vals={}; inputs.forEach(i=>vals[i.dataset.key]=i.value.trim());
+  const body_params=tpl.body.map(f=>vals[f.key]||"");
+  if(body_params.some(v=>!v)){ toast("Fill all fields",false); return; }
+  const payload={ whatsapp_user_id:currentWaId, template_name:name, body_params };
+  if(tpl.button){ if(!vals[tpl.button.key]){ toast("Fill the button field",false); return; } payload.button_param=vals[tpl.button.key]; }
+  const btn=document.getElementById("sendBtn"); btn.disabled=true; btn.textContent="Sending…";
+  try{
+    const d=await api("/api/admin/reengage",{method:"POST",body:JSON.stringify(payload)});
+    toast("Sent ✓ "+(d.conversation_id||""));
+  }catch(e){ toast("Failed: "+e.message,false); }
+  finally{ btn.disabled=false; btn.textContent="Send message"; }
+}
+function escapeHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// init
+document.getElementById("apiBase").value=store.base;
+document.getElementById("apiKey").value=store.key;
+if(store.key) document.getElementById("settings").classList.add("hidden");
+initTemplates();
+</script>
+</body>
+</html>
