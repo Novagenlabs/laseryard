@@ -24,6 +24,8 @@ import {
 const THICKNESSES: CardThickness[] = ["0.4mm", "0.8mm"];
 // We currently do not ship to Germany.
 const BLOCKED_COUNTRIES = ["germany"];
+// Flat shipping fee added to every agent order (agent total = website price + $50).
+const FLAT_SHIPPING_USD = 50;
 
 export async function POST(request: NextRequest) {
   if (!isAuthorizedAgentRequest(request)) {
@@ -78,7 +80,9 @@ export async function POST(request: NextRequest) {
     }
 
     const amount =
-      CARD_PRICING[thickness as CardThickness].prices[quantity as CardQuantity];
+      CARD_PRICING[thickness as CardThickness].prices[
+        quantity as CardQuantity
+      ] + FLAT_SHIPPING_USD;
     const checkoutRef = crypto.randomUUID();
 
     const config = await whop.checkoutConfigurations.create({
