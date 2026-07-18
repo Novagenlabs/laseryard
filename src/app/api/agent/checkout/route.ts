@@ -6,59 +6,24 @@ import {
   resolveEmailRecipient,
   ccFor,
 } from "@/lib/email-template";
+import {
+  CARD_PRICING,
+  CARD_QUANTITIES,
+  CardThickness,
+  CardQuantity,
+} from "@/lib/constants";
 
 /**
  * Checkout link generator for the Yara ElevenLabs agent.
  *
- * Called as a webhook tool from the agent mid-conversation. The agent passes
- * the customer's country and order details; the pricing tier and price are
- * ALWAYS computed server-side from the same matrix as yara-system-prompt-v2.md,
- * so the agent can never quote or charge an arbitrary amount or pick the
- * wrong tier.
+ * Prices come straight from CARD_PRICING — the exact same table the website
+ * uses — so every customer is charged the same, computed server-side. The
+ * agent can never quote or charge an arbitrary amount.
  */
 
-type Tier = "international" | "west_africa";
-type Thickness = "0.4mm" | "0.8mm";
-
-const PRICES: Record<Tier, Record<Thickness, Record<number, number>>> = {
-  international: {
-    "0.4mm": { 30: 300, 100: 500 },
-    "0.8mm": { 30: 450, 100: 750 },
-  },
-  west_africa: {
-    "0.4mm": { 30: 250, 100: 450 },
-    "0.8mm": { 30: 400, 100: 700 },
-  },
-};
-
-const WEST_AFRICA_COUNTRIES = [
-  "nigeria",
-  "ghana",
-  "togo",
-  "benin",
-  "ivory coast",
-  "cote d'ivoire",
-  "côte d'ivoire",
-  "senegal",
-  "burkina faso",
-  "niger",
-  "gambia",
-  "sierra leone",
-  "liberia",
-];
-
-// Per yara-system-prompt-v2.md: we currently do not ship to Germany.
+const THICKNESSES: CardThickness[] = ["0.4mm", "0.8mm"];
+// We currently do not ship to Germany.
 const BLOCKED_COUNTRIES = ["germany"];
-
-const THICKNESSES: Thickness[] = ["0.4mm", "0.8mm"];
-const QUANTITIES = [30, 100];
-
-function tierForCountry(country: string): Tier | "blocked" {
-  const normalized = country.trim().toLowerCase();
-  if (BLOCKED_COUNTRIES.includes(normalized)) return "blocked";
-  if (WEST_AFRICA_COUNTRIES.includes(normalized)) return "west_africa";
-  return "international";
-}
 
 export async function POST(request: NextRequest) {
   if (!isAuthorizedAgentRequest(request)) {
@@ -79,7 +44,10 @@ export async function POST(request: NextRequest) {
 
     if (!country || typeof country !== "string") {
       return NextResponse.json(
-        { error: "country is required. Ask the customer where they are based." },
+        {
+          error:
+            "country is required. Ask the customer where they're based (needed to confirm we can ship there).",
+        },
         { status: 400 }
       );
     }
@@ -89,19 +57,17 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (!QUANTITIES.includes(quantity)) {
+    if (!(CARD_QUANTITIES as readonly number[]).includes(quantity)) {
       return NextResponse.json(
         {
-          error: `quantity must be one of: ${QUANTITIES.join(
+          error: `quantity must be one of: ${CARD_QUANTITIES.join(
             ", "
-          )}. For custom quantities, tell the customer to email hello@laseryard.com for a custom quote.`,
+          )}. For other quantities, tell the customer to email hello@laseryard.com for a custom quote.`,
         },
         { status: 400 }
       );
     }
-
-    const tier = tierForCountry(country);
-    if (tier === "blocked") {
+    if (BLOCKED_COUNTRIES.includes(country.trim().toLowerCase())) {
       return NextResponse.json(
         {
           error:
@@ -111,7 +77,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const amount = PRICES[tier][thickness as Thickness][quantity];
+    const amount =
+      CARD_PRICING[thickness as CardThickness].prices[quantity as CardQuantity];
     const checkoutRef = crypto.randomUUID();
 
     const config = await whop.checkoutConfigurations.create({
@@ -126,7 +93,6 @@ export async function POST(request: NextRequest) {
         source: "yara-agent",
         checkout_ref: checkoutRef,
         country,
-        pricing_tier: tier,
         thickness,
         quantity: String(quantity),
         customer_name: customer_name || "",
@@ -139,8 +105,13 @@ export async function POST(request: NextRequest) {
     // Email the checkout link too when we know their address — better
     // conversion than a link buried in chat history.
     let emailSent = false;
-    if (email && typeof email === "string" && email.includes("@") && process.env.RESEND_API_KEY) {
-      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, design and ${tier === "west_africa" ? "delivery" : "shipping"} included`;
+    if (
+      email &&
+      typeof email === "string" &&
+      email.includes("@") &&
+      process.env.RESEND_API_KEY
+    ) {
+      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, design and shipping included`;
       const { html, text } = renderBrandedEmail({
         preheader: "Your secure checkout link is inside.",
         heading: "Complete your order",
@@ -169,7 +140,9 @@ export async function POST(request: NextRequest) {
           text,
         }),
       })
-        .then((r) => { emailSent = r.ok; })
+        .then((r) => {
+          emailSent = r.ok;
+        })
         .catch((e) => console.error("Checkout link email failed:", e));
     }
 
@@ -178,9 +151,7 @@ export async function POST(request: NextRequest) {
       order_reference: checkoutRef,
       email_sent: emailSent,
       price_usd: amount,
-      summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (design and ${
-        tier === "west_africa" ? "delivery" : "shipping"
-      } included)`,
+      summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (design and shipping included)`,
     });
   } catch (e) {
     console.error("Agent checkout creation error:", e);
