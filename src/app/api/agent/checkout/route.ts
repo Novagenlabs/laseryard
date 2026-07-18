@@ -7,7 +7,6 @@ import {
   ccFor,
 } from "@/lib/email-template";
 import {
-  CARD_PRICING,
   CARD_QUANTITIES,
   CardThickness,
   CardQuantity,
@@ -16,16 +15,20 @@ import {
 /**
  * Checkout link generator for the Yara ElevenLabs agent.
  *
- * Prices come straight from CARD_PRICING — the exact same table the website
- * uses — so every customer is charged the same, computed server-side. The
- * agent can never quote or charge an arbitrary amount.
+ * Prices are the agent's all-in, delivered totals (design + shipping
+ * included) — the same for every customer, computed server-side, so the
+ * agent can never quote or charge an arbitrary amount. These are the
+ * agent-channel prices and may differ from the website's card-only prices.
  */
+
+const AGENT_PRICES: Record<CardThickness, Record<number, number>> = {
+  "0.4mm": { 30: 250, 50: 365, 100: 650, 200: 1185 },
+  "0.8mm": { 30: 450, 50: 715, 100: 1350, 200: 2550 },
+};
 
 const THICKNESSES: CardThickness[] = ["0.4mm", "0.8mm"];
 // We currently do not ship to Germany.
 const BLOCKED_COUNTRIES = ["germany"];
-// Flat shipping fee added to every agent order (agent total = website price + $50).
-const FLAT_SHIPPING_USD = 50;
 
 export async function POST(request: NextRequest) {
   if (!isAuthorizedAgentRequest(request)) {
@@ -80,9 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     const amount =
-      CARD_PRICING[thickness as CardThickness].prices[
-        quantity as CardQuantity
-      ] + FLAT_SHIPPING_USD;
+      AGENT_PRICES[thickness as CardThickness][quantity as CardQuantity];
     const checkoutRef = crypto.randomUUID();
 
     const config = await whop.checkoutConfigurations.create({
