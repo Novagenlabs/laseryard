@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import type { Carrier } from "@/lib/carrier-tracking";
 
 export const ORDER_STATUSES = [
   "received",
@@ -47,6 +48,10 @@ export type Order = {
   destination: string | null;
   designUrl: string | null;
   status: OrderStatus;
+  // Courier waybill, set once the parcel is handed over. Distinct from
+  // trackingNumber, which is our own LY-XXXX-XXXX reference.
+  carrier: Carrier | null;
+  carrierTrackingNumber: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -85,6 +90,8 @@ function rowToOrder(row: any): Order {
     destination: row.destination,
     designUrl: row.design_url,
     status: row.status,
+    carrier: row.carrier ?? null,
+    carrierTrackingNumber: row.carrier_tracking_number ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -167,6 +174,8 @@ export async function updateOrderDetails(
     itemDescription?: string;
     destination?: string;
     designUrl?: string;
+    carrier?: string;
+    carrierTrackingNumber?: string;
   }
 ): Promise<Order | null> {
   const sql = getDb();
@@ -191,6 +200,14 @@ export async function updateOrderDetails(
         : fields.destination || null,
     designUrl:
       fields.designUrl === undefined ? cur.designUrl : fields.designUrl || null,
+    carrier:
+      fields.carrier === undefined
+        ? cur.carrier
+        : ((fields.carrier || null) as Carrier | null),
+    carrierTrackingNumber:
+      fields.carrierTrackingNumber === undefined
+        ? cur.carrierTrackingNumber
+        : fields.carrierTrackingNumber.trim().toUpperCase() || null,
   };
 
   const rows = await sql`
@@ -200,6 +217,8 @@ export async function updateOrderDetails(
       item_description = ${merged.itemDescription},
       destination = ${merged.destination},
       design_url = ${merged.designUrl},
+      carrier = ${merged.carrier},
+      carrier_tracking_number = ${merged.carrierTrackingNumber},
       updated_at = now()
     WHERE tracking_number = ${tn}
     RETURNING *

@@ -65,4 +65,21 @@ await sql`
   ALTER TABLE orders ADD COLUMN IF NOT EXISTS design_url text
 `;
 
-console.log("orders + order_events + designs tables ready");
+// Courier waybill for shipped orders. Distinct from tracking_number,
+// which is our own LY-XXXX-XXXX reference: this is the number the
+// carrier issued, used to pull live transit events from their API.
+await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS carrier text`;
+await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS carrier_tracking_number text`;
+
+// Cached carrier tracking payload, so a page view doesn't hit DHL's
+// rate-limited API (250 calls/day on the free tier).
+await sql`
+  CREATE TABLE IF NOT EXISTS carrier_tracking_cache (
+    tracking_number text PRIMARY KEY,
+    carrier text NOT NULL,
+    payload jsonb NOT NULL,
+    fetched_at timestamptz NOT NULL DEFAULT now()
+  )
+`;
+
+console.log("orders + order_events + designs + carrier_tracking_cache tables ready");

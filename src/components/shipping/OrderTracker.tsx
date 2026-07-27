@@ -16,6 +16,10 @@ import {
   BadgeCheck,
   ClipboardCheck,
   XCircle,
+  MapPin,
+  Clock,
+  ExternalLink,
+  Copy,
 } from "lucide-react";
 import styles from "./OrderTracker.module.css";
 import { processDesign, generate2DPreview } from "@/lib/design-processor";
@@ -42,8 +46,36 @@ export type OrderInfo = {
   destination: string | null;
   designUrl: string | null;
   status: OrderStatus;
+  // Courier waybill — only set once the parcel is handed over.
+  carrier?: string | null;
+  carrierTrackingNumber?: string | null;
+  carrierUrl?: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type CarrierEvent = {
+  timestamp: string;
+  description: string;
+  location: string | null;
+};
+
+export type CarrierTracking = {
+  carrier: string;
+  trackingNumber: string;
+  status: string | null;
+  statusDetail: string | null;
+  estimatedDelivery: string | null;
+  delivered: boolean;
+  events: CarrierEvent[];
+  carrierUrl: string;
+  fetchedAt: string;
+};
+
+const CARRIER_LABELS: Record<string, string> = {
+  dhl: "DHL",
+  fez: "Fez Delivery",
+  other: "Courier",
 };
 
 export type OrderEvent = {
@@ -143,6 +175,41 @@ export function TrackSearch() {
         </button>
       </form>
     </div>
+  );
+}
+
+/* ── Copy-to-clipboard for the waybill ───────────────────────────── */
+
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1800);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        navigator.clipboard
+          ?.writeText(value)
+          .then(() => setCopied(true))
+          .catch(() => {});
+      }}
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+    >
+      {copied ? (
+        <>
+          <Check className="w-3 h-3" /> Copied
+        </>
+      ) : (
+        <>
+          <Copy className="w-3 h-3" /> Copy
+        </>
+      )}
+    </button>
   );
 }
 
@@ -291,12 +358,17 @@ export function OrderDetails({
 }: {
   trackingNumber: string;
   // Dev preview: render this order/timeline instead of fetching
-  override?: { order: OrderInfo; events: OrderEvent[] } | null;
+  override?: {
+    order: OrderInfo;
+    events: OrderEvent[];
+    carrierTracking?: CarrierTracking | null;
+  } | null;
   look?: TrackerLook;
 }) {
   const [fetched, setFetched] = useState<{
     order: OrderInfo;
     events: OrderEvent[];
+    carrierTracking?: CarrierTracking | null;
   } | null>(null);
   const [error, setError] = useState("");
 
@@ -315,7 +387,11 @@ export function OrderDetails({
         if (!res.ok || data.error) {
           setError(data.error || "Could not look up that order number.");
         } else {
-          setFetched({ order: data.order, events: data.events || [] });
+          setFetched({
+            order: data.order,
+            events: data.events || [],
+            carrierTracking: data.carrierTracking ?? null,
+          });
         }
       })
       .catch(() => {
@@ -329,6 +405,8 @@ export function OrderDetails({
 
   const order = override ? override.order : fetched?.order;
   const events = override ? override.events : (fetched?.events ?? []);
+  const carrierTracking =
+    (override ? override.carrierTracking : fetched?.carrierTracking) ?? null;
   const material: CardMaterial =
     look?.plateStyle ??
     (isStainless(order?.itemDescription ?? "") ? "steel" : "anodized");
@@ -336,6 +414,11 @@ export function OrderDetails({
 
   const cancelled = order?.status === "cancelled";
   const delivered = order?.status === "delivered";
+  // Tracking only makes sense once the parcel has left us.
+  const shipped = order?.status === "shipped" || delivered;
+  const carrierName = order?.carrier
+    ? (CARRIER_LABELS[order.carrier] ?? "the courier")
+    : "the courier";
   const currentStep = order
     ? STEPS.findIndex((s) => s.status === order.status)
     : -1;
@@ -615,6 +698,174 @@ export function OrderDetails({
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Shipment tracking — appears once the order ships. The waybill
+            is often issued before the courier's first scan, so each
+            piece degrades on its own: no number yet → "available
+            shortly"; number but no carrier feed → show the number and
+            fall back to our timeline. */}
+        {shipped && (
+          <div
+            className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}
+          >
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-5">
+              <p
+                className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}
+              >
+                Shipment
+              </p>
+              {order.carrier && (
+                <span
+                  className={`${plexMono.className} text-[10px] uppercase tracking-[0.15em] text-muted-foreground`}
+                >
+                  via {carrierName}
+                </span>
+              )}
+            </div>
+
+            {order.carrierTrackingNumber ? (
+              <>
+                <div className="flex flex-col gap-1.5">
+                  <p
+                    className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}
+                  >
+                    Tracking Number
+                  </p>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span
+                      className={`${plexMono.className} text-lg font-semibold tracking-wider break-all`}
+                    >
+                      {order.carrierTrackingNumber}
+                    </span>
+                    <CopyButton value={order.carrierTrackingNumber} />
+                  </div>
+                </div>
+
+                {/* Live carrier status */}
+                {carrierTracking && (
+                  <div className="mt-5 pt-5 border-t border-border flex flex-col gap-3">
+                    {carrierTracking.status && (
+                      <div className="flex items-start gap-2.5">
+                        <Truck className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            {carrierTracking.status}
+                          </p>
+                          {carrierTracking.statusDetail &&
+                            carrierTracking.statusDetail !==
+                              carrierTracking.status && (
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {carrierTracking.statusDetail}
+                              </p>
+                            )}
+                        </div>
+                      </div>
+                    )}
+                    {carrierTracking.estimatedDelivery &&
+                      !carrierTracking.delivered && (
+                        <div className="flex items-center gap-2.5">
+                          <Clock className="w-4 h-4 shrink-0 text-muted-foreground" />
+                          <p className="text-sm">
+                            <span className="text-muted-foreground">
+                              Estimated delivery:{" "}
+                            </span>
+                            {formatDate(carrierTracking.estimatedDelivery)}
+                          </p>
+                        </div>
+                      )}
+                  </div>
+                )}
+
+                {/* Carrier transit events, shown inline — no trip to dhl.com */}
+                {carrierTracking && carrierTracking.events.length > 0 && (
+                  <div className="mt-5 pt-5 border-t border-border">
+                    <p
+                      className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-5`}
+                    >
+                      Transit History
+                    </p>
+                    <div className="space-y-0">
+                      {carrierTracking.events.map((entry, i) => (
+                        <div key={i} className="flex gap-4">
+                          <div className="flex flex-col items-center">
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                i === 0
+                                  ? `bg-foreground text-background ${styles.logLatestDot}`
+                                  : "bg-foreground/10 text-foreground/60"
+                              }`}
+                            >
+                              <MapPin className="w-4 h-4" />
+                            </div>
+                            {i < carrierTracking.events.length - 1 && (
+                              <div className={styles.rail} />
+                            )}
+                          </div>
+                          <div
+                            className={
+                              i === carrierTracking.events.length - 1
+                                ? "pb-0"
+                                : "pb-6"
+                            }
+                          >
+                            <p className="font-medium text-sm">
+                              {entry.description}
+                            </p>
+                            {entry.location && (
+                              <p className="text-muted-foreground text-xs mt-1">
+                                {entry.location}
+                              </p>
+                            )}
+                            <p
+                              className={`${plexMono.className} text-muted-foreground/70 text-[11px] mt-1`}
+                            >
+                              {formatDate(entry.timestamp)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Waybill exists but the courier hasn't scanned it yet */}
+                {!carrierTracking && (
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Your parcel is with {carrierName}. Live transit updates
+                    appear here as soon as they scan it — usually within a few
+                    hours of pickup.
+                  </p>
+                )}
+
+                {order.carrierUrl && (
+                  <a
+                    href={order.carrierUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    View on {carrierName}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </>
+            ) : (
+              /* Shipped, but we haven't recorded the waybill yet */
+              <div className="flex items-start gap-2.5">
+                <Clock className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">
+                    Your tracking number will be available shortly
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Your order is on its way. We&apos;ll post the courier&apos;s
+                    tracking number here as soon as it&apos;s issued.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

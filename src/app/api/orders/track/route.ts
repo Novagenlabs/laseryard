@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrderWithEvents } from "@/lib/orders";
+import { getCarrierTracking, carrierTrackingUrl } from "@/lib/carrier-tracking";
 
 // Rate limit: max lookups per IP per hour
 const RATE_LIMIT = 30;
@@ -61,6 +62,22 @@ export async function POST(request: NextRequest) {
     }
 
     const { order, events } = result;
+
+    // Pull live transit events from the courier so the customer never
+    // has to leave our site. Cached and fail-soft: if the carrier has no
+    // record yet (label created but unscanned) or the API is down, the
+    // page falls back to our own timeline.
+    let carrierTracking = null;
+    if (order.carrier && order.carrierTrackingNumber) {
+      carrierTracking = await getCarrierTracking(
+        order.carrier,
+        order.carrierTrackingNumber
+      ).catch((e) => {
+        console.error("Carrier tracking lookup failed:", e);
+        return null;
+      });
+    }
+
     // Public shape — never expose the customer's phone number
     return NextResponse.json({
       order: {
@@ -70,10 +87,17 @@ export async function POST(request: NextRequest) {
         destination: order.destination,
         designUrl: order.designUrl,
         status: order.status,
+        carrier: order.carrier,
+        carrierTrackingNumber: order.carrierTrackingNumber,
+        carrierUrl:
+          order.carrier && order.carrierTrackingNumber
+            ? carrierTrackingUrl(order.carrier, order.carrierTrackingNumber)
+            : null,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
       },
       events,
+      carrierTracking,
     });
   } catch (e) {
     console.error("Order tracking error:", e);

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { deleteOrder, getOrderWithEvents, isValidStatus, updateOrderDetails, updateOrderStatus, ORDER_STATUSES } from "@/lib/orders";
 import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
 import { notifyOrderStatusChange } from "@/lib/order-notifications";
+import { isValidCarrier, CARRIERS } from "@/lib/carrier-tracking";
 
 export function OPTIONS() {
   return adminPreflight();
@@ -31,11 +32,17 @@ export async function GET(request: NextRequest, context: RouteContext) {
 // Admin: update an order. Two kinds of change, combinable in one call:
 //  - status (+ optional note) — appends a customer-visible timeline event
 //  - detail fields (customerName, customerPhone, itemDescription,
-//    destination, designUrl) — silent edits, no timeline event
+//    destination, designUrl, carrier, carrierTrackingNumber) — silent
+//    edits, no timeline event
+//
 // curl -X PATCH https://laseryard.com/api/orders/LY-XXXX-XXXX \
 //   -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
 //   -H "Content-Type: application/json" \
-//   -d '{"status":"shipped","note":"Handed to Fez, waybill 12345"}'
+//   -d '{"status":"shipped","note":"Handed to the courier"}'
+//
+// Add the courier waybill once the parcel ships; the order page then
+// pulls live transit events from the carrier instead of linking out:
+//   -d '{"status":"shipped","carrier":"dhl","carrierTrackingNumber":"1234567890"}'
 export async function PATCH(request: NextRequest, context: RouteContext) {
   if (!isAdminRequest(request)) {
     return adminJson({ error: "Unauthorized" }, 401);
@@ -44,10 +51,27 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const { trackingNumber } = await context.params;
     const body = await request.json();
-    const { status, note, customerName, customerPhone, itemDescription, destination, designUrl } =
-      body ?? {};
+    const {
+      status,
+      note,
+      customerName,
+      customerPhone,
+      itemDescription,
+      destination,
+      designUrl,
+      carrier,
+      carrierTrackingNumber,
+    } = body ?? {};
 
-    const detailFields = { customerName, customerPhone, itemDescription, destination, designUrl };
+    const detailFields = {
+      customerName,
+      customerPhone,
+      itemDescription,
+      destination,
+      designUrl,
+      carrier,
+      carrierTrackingNumber,
+    };
     const hasDetails = Object.values(detailFields).some((v) => v !== undefined);
 
     if (status === undefined && !hasDetails) {
@@ -66,6 +90,13 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
     if (customerName === "" || itemDescription === "") {
       return adminJson({ error: "customerName and itemDescription cannot be empty" }, 400);
+    }
+    // "" clears the carrier; any other value must name one we support.
+    if (carrier !== undefined && carrier !== "" && !isValidCarrier(carrier)) {
+      return adminJson(
+        { error: `carrier must be one of: ${CARRIERS.join(", ")}` },
+        400
+      );
     }
 
     let order = null;

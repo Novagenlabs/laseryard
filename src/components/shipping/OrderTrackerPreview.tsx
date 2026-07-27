@@ -9,6 +9,7 @@ import {
   type OrderInfo,
   type OrderStatus,
   type TrackerLook,
+  type CarrierTracking,
 } from "./OrderTracker";
 
 // Dev-only: DialKit panel to flip the /track page through every order state
@@ -45,7 +46,12 @@ function buildPreview(d: {
   destination: string;
   placedDaysAgo: number;
   showDesign: boolean;
-}): { order: OrderInfo; events: OrderEvent[] } {
+  tracking: string;
+}): {
+  order: OrderInfo;
+  events: OrderEvent[];
+  carrierTracking?: CarrierTracking | null;
+} {
   const status = d.status as OrderStatus;
   const now = Date.now();
   const placedAt = now - d.placedDaysAgo * 24 * HOUR;
@@ -67,6 +73,40 @@ function buildPreview(d: {
     }))
     .reverse();
 
+  // Waybill states: none (pending), issued but unscanned, or live feed.
+  const hasWaybill = d.tracking !== "none";
+  const waybill = "1234567890";
+  const carrierTracking: CarrierTracking | null =
+    d.tracking === "live"
+      ? {
+          carrier: "dhl",
+          trackingNumber: waybill,
+          status: "In transit",
+          statusDetail: "Processed at DHL facility",
+          estimatedDelivery: new Date(now + 2 * 24 * HOUR).toISOString(),
+          delivered: false,
+          events: [
+            {
+              timestamp: new Date(now - 3 * HOUR).toISOString(),
+              description: "Processed at DHL facility",
+              location: "East Midlands - UK",
+            },
+            {
+              timestamp: new Date(now - 14 * HOUR).toISOString(),
+              description: "Departed facility",
+              location: "Lagos - Nigeria",
+            },
+            {
+              timestamp: new Date(now - 26 * HOUR).toISOString(),
+              description: "Shipment picked up",
+              location: "Lagos - Nigeria",
+            },
+          ],
+          carrierUrl: `https://www.dhl.com/en/express/tracking.html?AWB=${waybill}&brand=DHL`,
+          fetchedAt: new Date(now).toISOString(),
+        }
+      : null;
+
   return {
     order: {
       trackingNumber: "LY-DEMO-CARD",
@@ -75,10 +115,16 @@ function buildPreview(d: {
       destination: d.destination || null,
       designUrl: d.showDesign ? "/designs/barista-card.svg" : null,
       status,
+      carrier: hasWaybill ? "dhl" : null,
+      carrierTrackingNumber: hasWaybill ? waybill : null,
+      carrierUrl: hasWaybill
+        ? `https://www.dhl.com/en/express/tracking.html?AWB=${waybill}&brand=DHL`
+        : null,
       createdAt: new Date(placedAt).toISOString(),
       updatedAt: new Date(now).toISOString(),
     },
     events,
+    carrierTracking,
   };
 }
 
@@ -107,6 +153,11 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
           type: "text",
           default: "Lekki, Lagos",
           placeholder: "Destination",
+        },
+        tracking: {
+          type: "select",
+          default: "live",
+          options: ["none", "issued", "live"],
         },
         placedDaysAgo: [4, 0, 30, 1],
         showDesign: true,
