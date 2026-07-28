@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrderWithEvents } from "@/lib/orders";
+import { carrierTrackingUrl } from "@/lib/carriers";
 
 // Rate limit: max lookups per IP per hour
 const RATE_LIMIT = 30;
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { order, events } = result;
+
     // Public shape — never expose the customer's phone number
     return NextResponse.json({
       order: {
@@ -70,6 +72,12 @@ export async function POST(request: NextRequest) {
         destination: order.destination,
         designUrl: order.designUrl,
         status: order.status,
+        carrier: order.carrier,
+        waybillNumber: order.waybillNumber,
+        shipmentStatus: order.shipmentStatus,
+        shipmentDetail: order.shipmentDetail,
+        estimatedDelivery: order.estimatedDelivery,
+        carrierUrl: carrierTrackingUrl(order.carrier, order.waybillNumber),
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
       },

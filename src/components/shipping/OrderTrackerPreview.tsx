@@ -45,6 +45,7 @@ function buildPreview(d: {
   destination: string;
   placedDaysAgo: number;
   showDesign: boolean;
+  tracking: string;
 }): { order: OrderInfo; events: OrderEvent[] } {
   const status = d.status as OrderStatus;
   const now = Date.now();
@@ -67,6 +68,10 @@ function buildPreview(d: {
     }))
     .reverse();
 
+  // Waybill states: none (not issued yet) or recorded.
+  const hasWaybill = d.tracking !== "none";
+  const waybill = "7614 8829 03";
+
   return {
     order: {
       trackingNumber: "LY-DEMO-CARD",
@@ -75,6 +80,14 @@ function buildPreview(d: {
       destination: d.destination || null,
       designUrl: d.showDesign ? "/designs/barista-card.svg" : null,
       status,
+      carrier: "dhl",
+      waybillNumber: hasWaybill ? waybill : null,
+      shipmentStatus: "On the way",
+      shipmentDetail: "Departed our Lagos studio, bound for London",
+      estimatedDelivery: "2026-07-29",
+      carrierUrl: hasWaybill
+        ? `https://www.dhl.com/en/express/tracking.html?AWB=${waybill.replace(/\s+/g, "")}&brand=DHL`
+        : null,
       createdAt: new Date(placedAt).toISOString(),
       updatedAt: new Date(now).toISOString(),
     },
@@ -107,6 +120,11 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
           type: "text",
           default: "Lekki, Lagos",
           placeholder: "Destination",
+        },
+        tracking: {
+          type: "select",
+          default: "issued",
+          options: ["none", "issued"],
         },
         placedDaysAgo: [4, 0, 30, 1],
         showDesign: true,
