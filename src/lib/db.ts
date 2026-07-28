@@ -20,11 +20,20 @@ function isLocalPostgres(url: string): boolean {
 }
 
 function localDb(url: string): Sql {
-  // Required lazily and only off the Neon path, so `pg` never needs to be
-  // present in a production install.
-  /* eslint-disable @typescript-eslint/no-require-imports */
-  const { Pool } = require("pg") as typeof import("pg");
-  /* eslint-enable @typescript-eslint/no-require-imports */
+  // `pg` is a devDependency and is absent from a production install, which
+  // with output:"standalone" means it is also absent from the deployed
+  // bundle. The specifier is built at runtime so no bundler can follow it
+  // and try to include (or fail on) a module that isn't there. This branch
+  // is only ever reached for a localhost DATABASE_URL.
+  const req = eval("require") as NodeRequire;
+  const { Pool } = req(["pg"].join("")) as {
+    Pool: new (c: { connectionString: string }) => {
+      query: (
+        text: string,
+        values: unknown[]
+      ) => Promise<{ rows: Record<string, unknown>[] }>;
+    };
+  };
   const pool = new Pool({ connectionString: url });
 
   // neon() is called as a tagged template: sql`SELECT ... ${value}`. Rebuild
