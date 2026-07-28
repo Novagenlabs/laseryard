@@ -246,6 +246,23 @@
       meta.textContent = [o.customerName, o.destination, o.customerPhone].filter(Boolean).join(" · ");
       info.append(tnRow, item, meta);
 
+      // Flag shipped orders still missing a waybill — that's the one the
+      // customer is waiting on, and the page tells them it's coming.
+      const isShipped = o.status === "shipped" || o.status === "delivered";
+      if (isShipped) {
+        const ship = document.createElement("div");
+        ship.className = "meta mono";
+        ship.style.marginTop = "2px";
+        if (o.waybillNumber) {
+          ship.textContent =
+            "waybill " + o.waybillNumber + (o.carrier ? " · " + o.carrier.toUpperCase() : "");
+        } else {
+          ship.textContent = "no waybill yet";
+          ship.style.color = "var(--red)";
+        }
+        info.append(ship);
+      }
+
       const sel = document.createElement("select");
       sel.className = "mono";
       for (const s of STATUSES) {
@@ -320,13 +337,53 @@
     eFile.accept = ".svg,.png,.jpg,.jpeg,.webp";
     eItem.style.gridColumn = "1 / -1";
     eFile.style.gridColumn = "1 / -1";
+
+    // Shipment block — what the customer sees on the order page once the
+    // parcel is handed over. We maintain all of it by hand.
+    const shipHead = document.createElement("div");
+    shipHead.className = "mono";
+    shipHead.textContent = "SHIPMENT";
+    shipHead.style.cssText =
+      "grid-column:1 / -1;font-size:10px;letter-spacing:.18em;color:var(--muted);padding-top:10px;margin-top:4px;border-top:1px solid var(--border);";
+
+    const eCarrier = document.createElement("select");
+    eCarrier.className = "mono";
+    for (const [value, label] of [
+      ["", "No courier yet"],
+      ["dhl", "DHL"],
+      ["fedex", "FedEx"],
+      ["ups", "UPS"],
+      ["fez", "Fez Delivery"],
+      ["other", "Other courier"],
+    ]) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      if (value === (o.carrier || "")) opt.selected = true;
+      eCarrier.append(opt);
+    }
+
+    const eWaybill = mk("Waybill number (blank = 'available shortly')", o.waybillNumber);
+    eWaybill.className = "mono";
+    const eShipStatus = mk("Shipment status, e.g. On the way", o.shipmentStatus);
+    const eShipDetail = mk("Detail, e.g. Departed our Lagos studio, bound for London", o.shipmentDetail);
+    eShipDetail.style.gridColumn = "1 / -1";
+    const eEta = document.createElement("input");
+    eEta.type = "date";
+    eEta.title = "Estimated delivery";
+    eEta.value = o.estimatedDelivery || "";
+
     const save = document.createElement("button");
     save.className = "primary";
     save.type = "submit";
     save.textContent = "Save changes";
     save.style.gridColumn = "1 / -1";
     save.style.justifySelf = "start";
-    form.append(eName, ePhone, eItem, eDest, eDesign, eFile, save);
+    form.append(
+      eName, ePhone, eItem, eDest, eDesign, eFile,
+      shipHead, eCarrier, eWaybill, eShipStatus, eEta, eShipDetail,
+      save
+    );
     form.onsubmit = async (e) => {
       e.preventDefault();
       showError("");
@@ -346,6 +403,11 @@
             itemDescription: eItem.value.trim(),
             destination: eDest.value.trim(),
             designUrl,
+            carrier: eCarrier.value,
+            waybillNumber: eWaybill.value.trim(),
+            shipmentStatus: eShipStatus.value.trim(),
+            shipmentDetail: eShipDetail.value.trim(),
+            estimatedDelivery: eEta.value,
           }),
         });
         await load();
