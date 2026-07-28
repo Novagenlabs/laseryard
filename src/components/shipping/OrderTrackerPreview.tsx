@@ -9,7 +9,6 @@ import {
   type OrderInfo,
   type OrderStatus,
   type TrackerLook,
-  type CarrierTracking,
 } from "./OrderTracker";
 
 // Dev-only: DialKit panel to flip the /track page through every order state
@@ -47,11 +46,7 @@ function buildPreview(d: {
   placedDaysAgo: number;
   showDesign: boolean;
   tracking: string;
-}): {
-  order: OrderInfo;
-  events: OrderEvent[];
-  carrierTracking?: CarrierTracking | null;
-} {
+}): { order: OrderInfo; events: OrderEvent[] } {
   const status = d.status as OrderStatus;
   const now = Date.now();
   const placedAt = now - d.placedDaysAgo * 24 * HOUR;
@@ -73,39 +68,9 @@ function buildPreview(d: {
     }))
     .reverse();
 
-  // Waybill states: none (pending), issued but unscanned, or live feed.
+  // Waybill states: none (not issued yet) or recorded.
   const hasWaybill = d.tracking !== "none";
-  const waybill = "1234567890";
-  const carrierTracking: CarrierTracking | null =
-    d.tracking === "live"
-      ? {
-          carrier: "dhl",
-          trackingNumber: waybill,
-          status: "In transit",
-          statusDetail: "Processed at DHL facility",
-          estimatedDelivery: new Date(now + 2 * 24 * HOUR).toISOString(),
-          delivered: false,
-          events: [
-            {
-              timestamp: new Date(now - 3 * HOUR).toISOString(),
-              description: "Processed at DHL facility",
-              location: "East Midlands - UK",
-            },
-            {
-              timestamp: new Date(now - 14 * HOUR).toISOString(),
-              description: "Departed facility",
-              location: "Lagos - Nigeria",
-            },
-            {
-              timestamp: new Date(now - 26 * HOUR).toISOString(),
-              description: "Shipment picked up",
-              location: "Lagos - Nigeria",
-            },
-          ],
-          carrierUrl: `https://www.dhl.com/en/express/tracking.html?AWB=${waybill}&brand=DHL`,
-          fetchedAt: new Date(now).toISOString(),
-        }
-      : null;
+  const waybill = "7614 8829 03";
 
   return {
     order: {
@@ -115,16 +80,18 @@ function buildPreview(d: {
       destination: d.destination || null,
       designUrl: d.showDesign ? "/designs/barista-card.svg" : null,
       status,
-      carrier: hasWaybill ? "dhl" : null,
-      carrierTrackingNumber: hasWaybill ? waybill : null,
+      carrier: "dhl",
+      waybillNumber: hasWaybill ? waybill : null,
+      shipmentStatus: "On the way",
+      shipmentDetail: "Departed our Lagos studio, bound for London",
+      estimatedDelivery: "2026-07-29",
       carrierUrl: hasWaybill
-        ? `https://www.dhl.com/en/express/tracking.html?AWB=${waybill}&brand=DHL`
+        ? `https://www.dhl.com/en/express/tracking.html?AWB=${waybill.replace(/\s+/g, "")}&brand=DHL`
         : null,
       createdAt: new Date(placedAt).toISOString(),
       updatedAt: new Date(now).toISOString(),
     },
     events,
-    carrierTracking,
   };
 }
 
@@ -156,8 +123,8 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
         },
         tracking: {
           type: "select",
-          default: "live",
-          options: ["none", "issued", "live"],
+          default: "issued",
+          options: ["none", "issued"],
         },
         placedDaysAgo: [4, 0, 30, 1],
         showDesign: true,

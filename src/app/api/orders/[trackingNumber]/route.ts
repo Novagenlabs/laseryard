@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { deleteOrder, getOrderWithEvents, isValidStatus, updateOrderDetails, updateOrderStatus, ORDER_STATUSES } from "@/lib/orders";
 import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
 import { notifyOrderStatusChange } from "@/lib/order-notifications";
-import { isValidCarrier, CARRIERS } from "@/lib/carrier-tracking";
+import { isValidCarrier, CARRIERS } from "@/lib/carriers";
 
 export function OPTIONS() {
   return adminPreflight();
@@ -32,17 +32,21 @@ export async function GET(request: NextRequest, context: RouteContext) {
 // Admin: update an order. Two kinds of change, combinable in one call:
 //  - status (+ optional note) — appends a customer-visible timeline event
 //  - detail fields (customerName, customerPhone, itemDescription,
-//    destination, designUrl, carrier, carrierTrackingNumber) — silent
-//    edits, no timeline event
+//    destination, designUrl, carrier, waybillNumber, shipmentStatus,
+//    shipmentDetail, estimatedDelivery) — silent edits, no timeline event
 //
 // curl -X PATCH https://laseryard.com/api/orders/LY-XXXX-XXXX \
 //   -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
 //   -H "Content-Type: application/json" \
 //   -d '{"status":"shipped","note":"Handed to the courier"}'
 //
-// Add the courier waybill once the parcel ships; the order page then
-// pulls live transit events from the carrier instead of linking out:
-//   -d '{"status":"shipped","carrier":"dhl","carrierTrackingNumber":"1234567890"}'
+// Record the shipment once the parcel is handed over. We maintain these
+// by hand — there is no carrier API — so one call sets everything the
+// order page shows:
+//   -d '{"status":"shipped","carrier":"dhl","waybillNumber":"7614882903",
+//        "shipmentStatus":"On the way",
+//        "shipmentDetail":"Departed our Lagos studio, bound for London",
+//        "estimatedDelivery":"2026-07-29"}'
 export async function PATCH(request: NextRequest, context: RouteContext) {
   if (!isAdminRequest(request)) {
     return adminJson({ error: "Unauthorized" }, 401);
@@ -60,7 +64,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       destination,
       designUrl,
       carrier,
-      carrierTrackingNumber,
+      waybillNumber,
+      shipmentStatus,
+      shipmentDetail,
+      estimatedDelivery,
     } = body ?? {};
 
     const detailFields = {
@@ -70,7 +77,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       destination,
       designUrl,
       carrier,
-      carrierTrackingNumber,
+      waybillNumber,
+      shipmentStatus,
+      shipmentDetail,
+      estimatedDelivery,
     };
     const hasDetails = Object.values(detailFields).some((v) => v !== undefined);
 
@@ -95,6 +105,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     if (carrier !== undefined && carrier !== "" && !isValidCarrier(carrier)) {
       return adminJson(
         { error: `carrier must be one of: ${CARRIERS.join(", ")}` },
+        400
+      );
+    }
+    // Stored as a date column — reject anything Postgres would choke on.
+    if (
+      estimatedDelivery !== undefined &&
+      estimatedDelivery !== "" &&
+      !/^\d{4}-\d{2}-\d{2}$/.test(estimatedDelivery)
+    ) {
+      return adminJson(
+        { error: "estimatedDelivery must be an ISO date (YYYY-MM-DD)" },
         400
       );
     }

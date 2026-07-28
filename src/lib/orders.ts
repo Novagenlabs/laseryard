@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/db";
-import type { Carrier } from "@/lib/carrier-tracking";
+import type { Carrier } from "@/lib/carriers";
 
 export const ORDER_STATUSES = [
   "received",
@@ -48,10 +48,14 @@ export type Order = {
   destination: string | null;
   designUrl: string | null;
   status: OrderStatus;
-  // Courier waybill, set once the parcel is handed over. Distinct from
-  // trackingNumber, which is our own LY-XXXX-XXXX reference.
+  // Shipment details, all maintained by us — no carrier API involved.
+  // The waybill is the courier's number, distinct from trackingNumber
+  // (our own LY-XXXX-XXXX reference).
   carrier: Carrier | null;
-  carrierTrackingNumber: string | null;
+  waybillNumber: string | null;
+  shipmentStatus: string | null;
+  shipmentDetail: string | null;
+  estimatedDelivery: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -91,7 +95,12 @@ function rowToOrder(row: any): Order {
     designUrl: row.design_url,
     status: row.status,
     carrier: row.carrier ?? null,
-    carrierTrackingNumber: row.carrier_tracking_number ?? null,
+    waybillNumber: row.waybill_number ?? null,
+    shipmentStatus: row.shipment_status ?? null,
+    shipmentDetail: row.shipment_detail ?? null,
+    estimatedDelivery: row.estimated_delivery
+      ? new Date(row.estimated_delivery).toISOString().slice(0, 10)
+      : null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -175,7 +184,10 @@ export async function updateOrderDetails(
     destination?: string;
     designUrl?: string;
     carrier?: string;
-    carrierTrackingNumber?: string;
+    waybillNumber?: string;
+    shipmentStatus?: string;
+    shipmentDetail?: string;
+    estimatedDelivery?: string;
   }
 ): Promise<Order | null> {
   const sql = getDb();
@@ -204,10 +216,22 @@ export async function updateOrderDetails(
       fields.carrier === undefined
         ? cur.carrier
         : ((fields.carrier || null) as Carrier | null),
-    carrierTrackingNumber:
-      fields.carrierTrackingNumber === undefined
-        ? cur.carrierTrackingNumber
-        : fields.carrierTrackingNumber.trim().toUpperCase() || null,
+    waybillNumber:
+      fields.waybillNumber === undefined
+        ? cur.waybillNumber
+        : fields.waybillNumber.trim().toUpperCase() || null,
+    shipmentStatus:
+      fields.shipmentStatus === undefined
+        ? cur.shipmentStatus
+        : fields.shipmentStatus.trim() || null,
+    shipmentDetail:
+      fields.shipmentDetail === undefined
+        ? cur.shipmentDetail
+        : fields.shipmentDetail.trim() || null,
+    estimatedDelivery:
+      fields.estimatedDelivery === undefined
+        ? cur.estimatedDelivery
+        : fields.estimatedDelivery.trim() || null,
   };
 
   const rows = await sql`
@@ -218,7 +242,10 @@ export async function updateOrderDetails(
       destination = ${merged.destination},
       design_url = ${merged.designUrl},
       carrier = ${merged.carrier},
-      carrier_tracking_number = ${merged.carrierTrackingNumber},
+      waybill_number = ${merged.waybillNumber},
+      shipment_status = ${merged.shipmentStatus},
+      shipment_detail = ${merged.shipmentDetail},
+      estimated_delivery = ${merged.estimatedDelivery},
       updated_at = now()
     WHERE tracking_number = ${tn}
     RETURNING *
