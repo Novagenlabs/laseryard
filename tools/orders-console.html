@@ -307,6 +307,9 @@
       editBtn.onclick = () => {
         const open = div.querySelector(".editForm");
         if (open) { open.remove(); return; }
+        // Only one form at a time. Two stacked forms look nearly identical,
+        // and submitting the event one silently drops every shipment field.
+        div.querySelector(".eventForm")?.remove();
         div.append(buildEditForm(o));
       };
 
@@ -346,11 +349,11 @@
   function buildEventForm(o) {
     const form = document.createElement("form");
     form.className = "eventForm";
-    form.style.cssText = "flex-basis:100%;display:grid;grid-template-columns:1fr auto;gap:8px;padding-top:10px;border-top:1px solid var(--border);margin-top:6px;";
+    form.style.cssText = "flex-basis:100%;display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border:1px solid var(--border);border-left:3px solid var(--gold,#EEC335);border-radius:6px;margin-top:6px;";
 
     const hint = document.createElement("div");
     hint.className = "mono";
-    hint.textContent = "ADD TIMELINE EVENT — appears on the customer's tracking page";
+    hint.textContent = "ADD TIMELINE EVENT — note only, does not change the waybill";
     hint.style.cssText = "grid-column:1 / -1;font-size:10px;letter-spacing:.16em;color:var(--muted);";
 
     const note = document.createElement("input");
