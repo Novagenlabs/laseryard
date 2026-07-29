@@ -75,12 +75,22 @@ await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipment_detail text`;
 await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS estimated_delivery date`;
 
 // Earlier installs of this feature used carrier_tracking_number and cached
-// DHL API payloads. Carry the waybills over, then drop the dead cache.
-await sql`
-  UPDATE orders SET waybill_number = carrier_tracking_number
-  WHERE waybill_number IS NULL AND carrier_tracking_number IS NOT NULL
+// DHL API payloads. Carry those waybills over, then drop the dead cache.
+// Guarded: on a database that never had that column the UPDATE would throw
+// and abort the whole migration, leaving the new columns uncommitted.
+const [{ exists: hadOldColumn }] = await sql`
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'orders' AND column_name = 'carrier_tracking_number'
+  ) AS exists
 `;
-await sql`ALTER TABLE orders DROP COLUMN IF EXISTS carrier_tracking_number`;
+if (hadOldColumn) {
+  await sql`
+    UPDATE orders SET waybill_number = carrier_tracking_number
+    WHERE waybill_number IS NULL AND carrier_tracking_number IS NOT NULL
+  `;
+  await sql`ALTER TABLE orders DROP COLUMN IF EXISTS carrier_tracking_number`;
+}
 await sql`DROP TABLE IF EXISTS carrier_tracking_cache`;
 
 console.log("orders + order_events + designs tables ready");
