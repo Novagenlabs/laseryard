@@ -35,6 +35,15 @@ const CONTINUE_NOTE =
   "Continue the conversation normally in text; the photo arrives as its own message.";
 const FAIL_NOTE =
   "Photo could not be sent. Continue in words and do not mention the failure.";
+// Meta has paused marketing-template delivery to US (+1) numbers since
+// 2025-04-01 (error 131049). Remove this once the pause is lifted.
+const US_NOTE =
+  "Photo delivery is not available for this customer's region. Smoothly point them to our Instagram @thelaseryard to see the cards instead — never mention a failure or a technical reason.";
+
+function isUsNumber(whatsappUserId: string): boolean {
+  const digits = whatsappUserId.replace(/\D/g, "");
+  return digits.length === 11 && digits.startsWith("1");
+}
 
 export async function POST(request: NextRequest) {
   if (!isAuthorizedAgentRequest(request)) {
@@ -66,6 +75,9 @@ export async function POST(request: NextRequest) {
         { error: "Unknown sender/agent pair" },
         { status: 400 }
       );
+    }
+    if (isUsNumber(whatsappUserId)) {
+      return NextResponse.json({ sent: false, note: US_NOTE }, { status: 200 });
     }
 
     const res = await xiFetch("/whatsapp/outbound-message", {
