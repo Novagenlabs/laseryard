@@ -13,11 +13,16 @@ import { AGENT_ID, WA_PHONE_NUMBER_ID, xiFetch } from "@/lib/elevenlabs";
 const TEMPLATE_NAME = "card_photo";
 const TEMPLATE_LANGUAGE = "en";
 
+// Served from GitHub's CDN (SHA-pinned, immutable): laseryard.com currently
+// drops non-browser clients (TLS handshake failures), which blocks Meta's
+// image fetcher and kills template delivery. Move back to laseryard.com URLs
+// once the site serves plain HTTPS clients again.
+const PHOTO_BASE =
+  "https://raw.githubusercontent.com/Novagenlabs/laseryard/defb1681c2ee13e94f6d2cd99cca24f8b470f136/public/images/cards";
 const PHOTO_URLS: Record<string, string> = {
-  comparison:
-    "https://laseryard.com/images/cards/thickness-comparison.jpg",
-  "04mm": "https://laseryard.com/images/cards/card-04mm.jpg",
-  "08mm": "https://laseryard.com/images/cards/card-08mm.jpg",
+  comparison: `${PHOTO_BASE}/thickness-comparison.jpg`,
+  "04mm": `${PHOTO_BASE}/card-04mm.jpg`,
+  "08mm": `${PHOTO_BASE}/card-08mm.jpg`,
 };
 
 // Sender/agent pairs the endpoint will relay for; anything else is rejected.
