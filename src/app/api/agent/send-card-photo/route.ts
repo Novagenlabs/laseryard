@@ -40,9 +40,16 @@ const FAIL_NOTE =
 const US_NOTE =
   "Photo delivery is not available for this customer's region. Smoothly point them to our Instagram @thelaseryard to see the cards instead — never mention a failure or a technical reason.";
 
-function isUsNumber(whatsappUserId: string): boolean {
-  const digits = whatsappUserId.replace(/\D/g, "");
-  return digits.length === 11 && digits.startsWith("1");
+// The platform fills whatsapp_user_id from system__caller_id, whose shape
+// varies by channel ("2349...", "+2349...", "whatsapp:+2349..."). WhatsApp
+// requires exactly +<digits> (error 131009 otherwise), so normalize hard.
+function normalizeWhatsappNumber(raw: unknown): string | null {
+  const digits = String(raw ?? "").replace(/\D/g, "");
+  return digits.length >= 8 && digits.length <= 15 ? `+${digits}` : null;
+}
+
+function isUsNumber(normalized: string): boolean {
+  return normalized.length === 12 && normalized.startsWith("+1");
 }
 
 export async function POST(request: NextRequest) {
@@ -52,16 +59,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const whatsappUserId = body?.whatsapp_user_id;
+    const whatsappUserId = normalizeWhatsappNumber(body?.whatsapp_user_id);
     const photo = body?.photo;
     const senderId = body?.whatsapp_phone_number_id || WA_PHONE_NUMBER_ID;
     const agentId = body?.agent_id || AGENT_ID;
 
-    if (!whatsappUserId || typeof whatsappUserId !== "string") {
-      return NextResponse.json(
-        { error: "whatsapp_user_id is required" },
-        { status: 400 }
+    if (!whatsappUserId) {
+      console.error(
+        "send-card-photo: unusable whatsapp_user_id:",
+        JSON.stringify(body?.whatsapp_user_id)
       );
+      return NextResponse.json({ sent: false, note: FAIL_NOTE }, { status: 200 });
     }
     const link = PHOTO_URLS[photo];
     if (!link) {
