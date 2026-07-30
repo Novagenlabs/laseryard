@@ -295,6 +295,23 @@
         div.append(buildEditForm(o));
       };
 
+      const logBtn = document.createElement("button");
+      logBtn.type = "button";
+      logBtn.textContent = "Log";
+      logBtn.onclick = async () => {
+        const open = div.querySelector(".logView");
+        if (open) { open.remove(); return; }
+        showError("");
+        setBusy(logBtn, true, "Loading…");
+        try {
+          const data = await api("/api/orders/" + encodeURIComponent(o.trackingNumber));
+          div.append(buildLogView(o, data.events || []));
+        } catch (e) {
+          showError(e.message);
+        }
+        setBusy(logBtn, false);
+      };
+
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.textContent = "Delete";
@@ -312,7 +329,7 @@
         await load();
       };
 
-      div.append(info, sel, editBtn, delBtn);
+      div.append(info, sel, editBtn, logBtn, delBtn);
       box.append(div);
     }
   }
@@ -417,6 +434,47 @@
       }
     };
     return form;
+  }
+
+  function buildLogView(o, events) {
+    const box = document.createElement("div");
+    box.className = "logView";
+    box.style.cssText = "flex-basis:100%;padding-top:10px;border-top:1px solid var(--border);margin-top:6px;";
+    if (!events.length) {
+      box.innerHTML = '<p class="empty">No timeline entries.</p>';
+      return box;
+    }
+    for (const ev of events) {
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:6px 0;";
+      const txt = document.createElement("div");
+      txt.style.flex = "1";
+      txt.innerHTML =
+        '<span class="mono" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;">' +
+        ev.status.replaceAll("_", " ") + "</span>" +
+        '<div style="font-size:12px;color:var(--muted);">' + (ev.note || "") + " · " +
+        new Date(ev.createdAt).toLocaleString() + "</div>";
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "copy";
+      del.style.color = "var(--red)";
+      del.textContent = "delete";
+      del.onclick = async () => {
+        if (!confirm("Remove this '" + ev.status.replaceAll("_", " ") + "' entry from the customer's timeline?")) return;
+        showError("");
+        setBusy(del, true, "…");
+        try {
+          await api("/api/orders/" + encodeURIComponent(o.trackingNumber) + "/events/" + ev.id, { method: "DELETE" });
+          row.remove();
+        } catch (e) {
+          showError(e.message);
+          setBusy(del, false);
+        }
+      };
+      row.append(txt, del);
+      box.append(row);
+    }
+    return box;
   }
 
   async function load() {

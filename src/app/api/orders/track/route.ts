@@ -81,7 +81,11 @@ export async function POST(request: NextRequest) {
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
       },
-      events,
+      events: events.map(({ status, note, createdAt }) => ({
+        status,
+        note,
+        createdAt,
+      })),
     });
   } catch (e) {
     console.error("Order tracking error:", e);
