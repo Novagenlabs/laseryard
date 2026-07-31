@@ -434,6 +434,13 @@ export function OrderDetails({
 
   const cancelled = order?.status === "cancelled";
   const delivered = order?.status === "delivered";
+  // When it actually arrived, not when we guessed it would. The estimate is
+  // a forecast made at dispatch and is routinely wrong by the time the
+  // parcel lands, so once there is a real delivered event we show that.
+  // Last match wins: a re-delivery supersedes an earlier attempt.
+  const deliveredAt = delivered
+    ? events.findLast((e) => e.status === "delivered")?.createdAt ?? null
+    : null;
   // Tracking only makes sense once the parcel has left us.
   const shipped = order?.status === "shipped" || delivered;
   const carrierName = order?.carrier
@@ -680,14 +687,19 @@ export function OrderDetails({
               </div>
 
               {/* Once the parcel has arrived an *estimate* is meaningless, so
-                  the label switches to a plain statement of fact. */}
-              {shipped && order.estimatedDelivery && (
+                  we state when it actually landed. Falling back to the
+                  estimate under a "Delivered" label would assert a date the
+                  parcel never arrived on, so without a real event we simply
+                  drop the row. */}
+              {shipped && (deliveredAt || (!delivered && order.estimatedDelivery)) && (
                 <div className="flex items-center gap-2 pt-4 border-t border-border">
                   <span className="text-muted-foreground">
-                    {delivered ? "Delivered" : "Estimated delivery"}
+                    {deliveredAt ? "Delivered" : "Estimated delivery"}
                   </span>
                   <span className="font-semibold">
-                    {formatDay(order.estimatedDelivery)}
+                    {deliveredAt
+                      ? formatDate(deliveredAt)
+                      : formatDay(order.estimatedDelivery!)}
                   </span>
                 </div>
               )}
