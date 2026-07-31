@@ -1054,6 +1054,19 @@ export function OrderDetails({
           </div>
         )}
 
+        {/* Feedback — only worth asking once the order has actually landed.
+            Sits above the Job Log: the log is a long reverse-chronological
+            list, and anything below it is easy to scroll past. Suppressed in
+            the dev preview, which has no order to post to. */}
+        {delivered && !override && (
+          <div className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
+            <FeedbackPanel
+              trackingNumber={order.trackingNumber}
+              existing={fetched?.feedback ?? null}
+            />
+          </div>
+        )}
+
         {/* Job Log */}
         {events.length > 0 && (
           <div className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
@@ -1100,17 +1113,6 @@ export function OrderDetails({
                 );
               })}
             </div>
-          </div>
-        )}
-
-        {/* Feedback — only worth asking once the order has actually landed.
-            Suppressed in the dev preview, which has no order to post to. */}
-        {delivered && !override && (
-          <div className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
-            <FeedbackPanel
-              trackingNumber={order.trackingNumber}
-              existing={fetched?.feedback ?? null}
-            />
           </div>
         )}
 
