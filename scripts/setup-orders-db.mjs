@@ -50,6 +50,20 @@ await sql`
   )
 `;
 
+// Customer feedback, collected on the tracking page once an order is
+// delivered. Private to us — nothing here is published on the site. One
+// row per order (the customer can revise, not stack up entries), so the
+// PK doubles as the uniqueness constraint.
+await sql`
+  CREATE TABLE IF NOT EXISTS order_feedback (
+    order_id uuid PRIMARY KEY REFERENCES orders(id) ON DELETE CASCADE,
+    rating smallint NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  )
+`;
+
 // migrations for earlier installs: widen the status set and retire
 // out_for_delivery (folded into shipped)
 await sql`UPDATE orders SET status = 'shipped' WHERE status = 'out_for_delivery'`;
@@ -75,12 +89,22 @@ await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipment_detail text`;
 await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS estimated_delivery date`;
 
 // Earlier installs of this feature used carrier_tracking_number and cached
-// DHL API payloads. Carry the waybills over, then drop the dead cache.
-await sql`
-  UPDATE orders SET waybill_number = carrier_tracking_number
-  WHERE waybill_number IS NULL AND carrier_tracking_number IS NOT NULL
+// DHL API payloads. Carry those waybills over, then drop the dead cache.
+// Guarded: on a database that never had that column the UPDATE would throw
+// and abort the whole migration, leaving the new columns uncommitted.
+const [{ exists: hadOldColumn }] = await sql`
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'orders' AND column_name = 'carrier_tracking_number'
+  ) AS exists
 `;
-await sql`ALTER TABLE orders DROP COLUMN IF EXISTS carrier_tracking_number`;
+if (hadOldColumn) {
+  await sql`
+    UPDATE orders SET waybill_number = carrier_tracking_number
+    WHERE waybill_number IS NULL AND carrier_tracking_number IS NOT NULL
+  `;
+  await sql`ALTER TABLE orders DROP COLUMN IF EXISTS carrier_tracking_number`;
+}
 await sql`DROP TABLE IF EXISTS carrier_tracking_cache`;
 
 console.log("orders + order_events + designs tables ready");

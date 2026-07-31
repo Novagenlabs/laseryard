@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createOrder, listOrders } from "@/lib/orders";
+import { createOrder, getFeedbackByOrderIds, listOrders } from "@/lib/orders";
 import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
 
 export function OPTIONS() {
@@ -14,7 +14,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const orders = await listOrders();
-    return adminJson({ orders });
+    // Attach any customer feedback so the console can show it inline.
+    const feedback = await getFeedbackByOrderIds(orders.map((o) => o.id));
+    return adminJson({
+      orders: orders.map((o) => ({ ...o, feedback: feedback[o.id] ?? null })),
+    });
   } catch (e) {
     console.error("Order list error:", e);
     return adminJson({ error: "Failed to list orders" }, 500);

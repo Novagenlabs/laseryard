@@ -66,6 +66,16 @@ export type OrderEvent = {
   createdAt: string;
 };
 
+// Customer feedback on a delivered order. Private to us — it is never
+// served by the public tracking route beyond telling the customer whether
+// they have already left it.
+export type OrderFeedback = {
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 // Unambiguous charset: no 0/O, 1/I/L to keep tracking numbers easy to
 // read back over WhatsApp or the phone.
 const TRACKING_CHARSET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
@@ -134,6 +144,78 @@ export async function getOrderWithEvents(
   `;
 
   return { order, events: events.map(rowToEvent) };
+}
+
+export async function getOrderFeedback(
+  orderId: string
+): Promise<OrderFeedback | null> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT rating, comment, created_at, updated_at
+    FROM order_feedback WHERE order_id = ${orderId} LIMIT 1
+  `;
+  if (rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    rating: Number(r.rating),
+    comment: (r.comment as string | null) ?? null,
+    createdAt: r.created_at as string,
+    updatedAt: r.updated_at as string,
+  };
+}
+
+// Only a delivered order can be reviewed, and only through its tracking
+// number — which is the customer's proof they own the order. Upsert so a
+// customer can revise what they left rather than stacking duplicates.
+export async function saveOrderFeedback(
+  trackingNumber: string,
+  rating: number,
+  comment: string | null
+): Promise<OrderFeedback | "not_found" | "not_delivered"> {
+  const sql = getDb();
+  const tn = normalizeTrackingNumber(trackingNumber);
+
+  const orders = await sql`
+    SELECT id, status FROM orders WHERE tracking_number = ${tn} LIMIT 1
+  `;
+  if (orders.length === 0) return "not_found";
+  if (orders[0].status !== "delivered") return "not_delivered";
+
+  const orderId = orders[0].id as string;
+  const trimmed = comment?.trim() || null;
+  await sql`
+    INSERT INTO order_feedback (order_id, rating, comment)
+    VALUES (${orderId}, ${rating}, ${trimmed})
+    ON CONFLICT (order_id) DO UPDATE
+      SET rating = EXCLUDED.rating,
+          comment = EXCLUDED.comment,
+          updated_at = now()
+  `;
+  const saved = await getOrderFeedback(orderId);
+  return saved ?? "not_found";
+}
+
+// Feedback for many orders at once, keyed by order id — so the console can
+// show ratings in the list without a query per row.
+export async function getFeedbackByOrderIds(
+  orderIds: string[]
+): Promise<Record<string, OrderFeedback>> {
+  if (orderIds.length === 0) return {};
+  const sql = getDb();
+  const rows = await sql`
+    SELECT order_id, rating, comment, created_at, updated_at
+    FROM order_feedback WHERE order_id = ANY(${orderIds})
+  `;
+  const out: Record<string, OrderFeedback> = {};
+  for (const r of rows) {
+    out[r.order_id as string] = {
+      rating: Number(r.rating),
+      comment: (r.comment as string | null) ?? null,
+      createdAt: r.created_at as string,
+      updatedAt: r.updated_at as string,
+    };
+  }
+  return out;
 }
 
 export async function listOrders(limit = 100): Promise<Order[]> {

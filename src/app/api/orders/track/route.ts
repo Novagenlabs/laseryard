@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOrderWithEvents } from "@/lib/orders";
+import { getOrderFeedback, getOrderWithEvents } from "@/lib/orders";
 import { carrierTrackingUrl } from "@/lib/carriers";
 
 // Rate limit: max lookups per IP per hour
@@ -62,6 +62,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { order, events } = result;
+    // Only so the page can show what they already left, and let them
+    // revise it, rather than inviting a review they have given.
+    const feedback =
+      order.status === "delivered" ? await getOrderFeedback(order.id) : null;
 
     // Public shape — never expose the customer's phone number
     return NextResponse.json({
@@ -82,6 +86,7 @@ export async function POST(request: NextRequest) {
         updatedAt: order.updatedAt,
       },
       events,
+      feedback,
     });
   } catch (e) {
     console.error("Order tracking error:", e);

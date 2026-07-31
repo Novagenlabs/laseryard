@@ -263,6 +263,28 @@
         info.append(ship);
       }
 
+      // Customer feedback, once they've left it. Private to us — it is not
+      // published anywhere on the site.
+      if (o.feedback) {
+        const fb = document.createElement("div");
+        fb.className = "meta";
+        fb.style.marginTop = "4px";
+        const stars = "★".repeat(o.feedback.rating) + "☆".repeat(5 - o.feedback.rating);
+        const when = new Date(o.feedback.updatedAt).toLocaleDateString();
+        fb.innerHTML =
+          '<span style="color:#EEC335;letter-spacing:1px">' + stars + "</span>" +
+          '<span style="opacity:.7"> · ' + when + "</span>";
+        if (o.feedback.comment) {
+          const c = document.createElement("div");
+          c.className = "meta";
+          c.style.cssText = "margin-top:2px;font-style:italic;opacity:.85;";
+          c.textContent = "“" + o.feedback.comment + "”";
+          info.append(fb, c);
+        } else {
+          info.append(fb);
+        }
+      }
+
       const sel = document.createElement("select");
       sel.className = "mono";
       for (const s of STATUSES) {
@@ -272,6 +294,8 @@
         if (s === o.status) opt.selected = true;
         sel.append(opt);
       }
+      // Changing status posts the default note for that status. To word it
+      // yourself, use "Add event" — it appends a note without moving status.
       sel.onchange = async () => {
         showError("");
         sel.disabled = true;
@@ -286,12 +310,28 @@
         await load();
       };
 
+      // Post a transit update to the customer's timeline — "Cleared customs
+      // in Madrid", "Out for delivery", and so on. Keeps the order's status
+      // where it is and just appends a dated entry.
+      const eventBtn = document.createElement("button");
+      eventBtn.type = "button";
+      eventBtn.textContent = "Add event";
+      eventBtn.onclick = () => {
+        const open = div.querySelector(".eventForm");
+        if (open) { open.remove(); return; }
+        div.querySelector(".editForm")?.remove();
+        div.append(buildEventForm(o));
+      };
+
       const editBtn = document.createElement("button");
       editBtn.type = "button";
       editBtn.textContent = "Edit";
       editBtn.onclick = () => {
         const open = div.querySelector(".editForm");
         if (open) { open.remove(); return; }
+        // Only one form at a time. Two stacked forms look nearly identical,
+        // and submitting the event one silently drops every shipment field.
+        div.querySelector(".eventForm")?.remove();
         div.append(buildEditForm(o));
       };
 
@@ -312,9 +352,72 @@
         await load();
       };
 
-      div.append(info, sel, editBtn, delBtn);
+      div.append(info, sel, eventBtn, editBtn, delBtn);
       box.append(div);
     }
+  }
+
+  // Common transit updates, so the usual ones are one click rather than
+  // retyped each time. The status stays put; only the note varies.
+  const EVENT_PRESETS = [
+    "Picked up by the courier",
+    "Departed origin facility",
+    "In transit",
+    "Arrived at destination country",
+    "Cleared customs",
+    "Out for delivery",
+  ];
+
+  function buildEventForm(o) {
+    const form = document.createElement("form");
+    form.className = "eventForm";
+    form.style.cssText = "flex-basis:100%;display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border:1px solid var(--border);border-left:3px solid var(--gold,#EEC335);border-radius:6px;margin-top:6px;";
+
+    const hint = document.createElement("div");
+    hint.className = "mono";
+    hint.textContent = "ADD TIMELINE EVENT — note only, does not change the waybill";
+    hint.style.cssText = "grid-column:1 / -1;font-size:10px;letter-spacing:.16em;color:var(--muted);";
+
+    const note = document.createElement("input");
+    note.placeholder = "What happened, e.g. Cleared customs in Madrid";
+    note.required = true;
+
+    const post = document.createElement("button");
+    post.className = "primary";
+    post.type = "submit";
+    post.textContent = "Post event";
+
+    const picks = document.createElement("div");
+    picks.style.cssText = "grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px;";
+    for (const preset of EVENT_PRESETS) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "mono";
+      b.textContent = preset;
+      b.style.cssText = "font-size:11px;padding:3px 8px;";
+      b.onclick = () => { note.value = preset; note.focus(); };
+      picks.append(b);
+    }
+
+    form.append(hint, note, post, picks);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      showError("");
+      setBusy(post, true, "Posting…");
+      try {
+        // Re-sending the current status appends an event without moving
+        // the order backwards or forwards in the pipeline.
+        await api("/api/orders/" + encodeURIComponent(o.trackingNumber), {
+          method: "PATCH",
+          body: JSON.stringify({ status: o.status, note: note.value.trim() }),
+        });
+        await load();
+      } catch (err) {
+        showError(err.message);
+        setBusy(post, false);
+      }
+    };
+    return form;
   }
 
   function buildEditForm(o) {
