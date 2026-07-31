@@ -50,6 +50,20 @@ await sql`
   )
 `;
 
+// Customer feedback, collected on the tracking page once an order is
+// delivered. Private to us — nothing here is published on the site. One
+// row per order (the customer can revise, not stack up entries), so the
+// PK doubles as the uniqueness constraint.
+await sql`
+  CREATE TABLE IF NOT EXISTS order_feedback (
+    order_id uuid PRIMARY KEY REFERENCES orders(id) ON DELETE CASCADE,
+    rating smallint NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  )
+`;
+
 // migrations for earlier installs: widen the status set and retire
 // out_for_delivery (folded into shipped)
 await sql`UPDATE orders SET status = 'shipped' WHERE status = 'out_for_delivery'`;

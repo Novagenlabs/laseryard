@@ -263,6 +263,28 @@
         info.append(ship);
       }
 
+      // Customer feedback, once they've left it. Private to us — it is not
+      // published anywhere on the site.
+      if (o.feedback) {
+        const fb = document.createElement("div");
+        fb.className = "meta";
+        fb.style.marginTop = "4px";
+        const stars = "★".repeat(o.feedback.rating) + "☆".repeat(5 - o.feedback.rating);
+        const when = new Date(o.feedback.updatedAt).toLocaleDateString();
+        fb.innerHTML =
+          '<span style="color:#EEC335;letter-spacing:1px">' + stars + "</span>" +
+          '<span style="opacity:.7"> · ' + when + "</span>";
+        if (o.feedback.comment) {
+          const c = document.createElement("div");
+          c.className = "meta";
+          c.style.cssText = "margin-top:2px;font-style:italic;opacity:.85;";
+          c.textContent = "“" + o.feedback.comment + "”";
+          info.append(fb, c);
+        } else {
+          info.append(fb);
+        }
+      }
+
       const sel = document.createElement("select");
       sel.className = "mono";
       for (const s of STATUSES) {

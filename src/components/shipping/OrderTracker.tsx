@@ -64,6 +64,11 @@ const CARRIER_LABELS: Record<string, string> = {
   other: "Courier",
 };
 
+export type OrderFeedbackInfo = {
+  rating: number;
+  comment: string | null;
+};
+
 export type OrderEvent = {
   status: OrderStatus;
   note: string | null;
@@ -127,6 +132,17 @@ function formatDay(dateStr: string) {
   const [y, m, d] = dateStr.split("-").map(Number);
   if (!y || !m || !d) return dateStr;
   return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+// A timestamp shown as a plain calendar day. The delivered date sits next to
+// the estimate, which has no time, so the two should read alike — and the
+// minute a parcel landed is noise the customer does not need.
+function formatDayOf(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -210,6 +226,213 @@ function TruckWithCard() {
 }
 
 /* ── Copy-to-clipboard for the waybill ───────────────────────────── */
+
+/* ── Feedback: shown once an order is delivered ───────────────────── */
+
+function FeedbackStars({
+  value,
+  hovered,
+  onPick,
+  onHover,
+  disabled,
+}: {
+  value: number;
+  hovered: number;
+  onPick: (n: number) => void;
+  onHover: (n: number) => void;
+  disabled?: boolean;
+}) {
+  // Hover previews the rating, but only as a hint — the committed value is
+  // what shows when the pointer leaves, and touch users never hover at all.
+  const shown = hovered || value;
+  return (
+    <div className="flex items-center gap-1" onMouseLeave={() => onHover(0)}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          disabled={disabled}
+          onClick={() => onPick(n)}
+          onMouseEnter={() => onHover(n)}
+          aria-label={`${n} star${n === 1 ? "" : "s"}`}
+          aria-pressed={value === n}
+          className="p-0.5 rounded transition-transform hover:scale-110 disabled:cursor-default disabled:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/30"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill={n <= shown ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth={n <= shown ? 0 : 1.5}
+            className={`w-7 h-7 transition-colors ${
+              n <= shown ? "text-amber-400" : "text-muted-foreground/30"
+            }`}
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const RATING_WORDS: Record<number, string> = {
+  1: "Not what you hoped for",
+  2: "Below par",
+  3: "Fine",
+  4: "Good",
+  5: "Exactly right",
+};
+
+function FeedbackPanel({
+  trackingNumber,
+  existing,
+}: {
+  trackingNumber: string;
+  existing: OrderFeedbackInfo | null;
+}) {
+  const [rating, setRating] = useState(existing?.rating ?? 0);
+  const [hovered, setHovered] = useState(0);
+  const [comment, setComment] = useState(existing?.comment ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Submitted in this session, as opposed to loaded from a past visit —
+  // only the former earns a thank-you.
+  const [justSaved, setJustSaved] = useState(false);
+  const [editing, setEditing] = useState(!existing);
+
+  const submit = async () => {
+    if (rating < 1) {
+      setError("Pick a rating first.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/orders/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          trackingNumber,
+          rating,
+          comment: comment.trim() || null,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data?.error ?? "Could not save your feedback.");
+        return;
+      }
+      setJustSaved(true);
+      setEditing(false);
+    } catch {
+      setError("Could not reach the server. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!editing) {
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-base font-semibold">
+          {justSaved ? "Thank you — we've got it." : "Your feedback"}
+        </p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <FeedbackStars
+            value={rating}
+            hovered={0}
+            onPick={() => {}}
+            onHover={() => {}}
+            disabled
+          />
+          <span className="text-muted-foreground text-sm">
+            {RATING_WORDS[rating]}
+          </span>
+        </div>
+        {comment.trim() && (
+          <p className="text-muted-foreground text-sm italic">
+            “{comment.trim()}”
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            setEditing(true);
+            setJustSaved(false);
+          }}
+          className="self-start text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+        >
+          Change my feedback
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <p className="text-base font-semibold">How did we do?</p>
+        <p className="text-muted-foreground text-xs">
+          Your order arrived — we&apos;d love to know how it turned out. This
+          goes straight to our team and isn&apos;t published anywhere.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <FeedbackStars
+          value={rating}
+          hovered={hovered}
+          onPick={(n) => {
+            setRating(n);
+            setError(null);
+          }}
+          onHover={setHovered}
+        />
+        {(hovered || rating) > 0 && (
+          <span className="text-muted-foreground text-sm">
+            {RATING_WORDS[hovered || rating]}
+          </span>
+        )}
+      </div>
+
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        rows={3}
+        maxLength={2000}
+        placeholder="Anything you'd like to tell us? (optional)"
+        className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:border-foreground/30 transition-colors resize-y"
+      />
+
+      {error && <p className="text-xs text-red-500">{error}</p>}
+
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={submit}
+          disabled={saving}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:border-foreground/30 disabled:opacity-60 transition-colors"
+        >
+          {saving ? "Sending…" : existing ? "Update feedback" : "Send feedback"}
+        </button>
+        {existing && (
+          <button
+            type="button"
+            onClick={() => {
+              setRating(existing.rating);
+              setComment(existing.comment ?? "");
+              setEditing(false);
+              setError(null);
+            }}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
@@ -395,6 +618,7 @@ export function OrderDetails({
   const [fetched, setFetched] = useState<{
     order: OrderInfo;
     events: OrderEvent[];
+    feedback?: OrderFeedbackInfo | null;
   } | null>(null);
   const [error, setError] = useState("");
 
@@ -413,7 +637,11 @@ export function OrderDetails({
         if (!res.ok || data.error) {
           setError(data.error || "Could not look up that order number.");
         } else {
-          setFetched({ order: data.order, events: data.events || [] });
+          setFetched({
+            order: data.order,
+            events: data.events || [],
+            feedback: data.feedback ?? null,
+          });
         }
       })
       .catch(() => {
@@ -437,9 +665,10 @@ export function OrderDetails({
   // When it actually arrived, not when we guessed it would. The estimate is
   // a forecast made at dispatch and is routinely wrong by the time the
   // parcel lands, so once there is a real delivered event we show that.
-  // Last match wins: a re-delivery supersedes an earlier attempt.
+  // Events arrive newest-first, so the first match is the latest delivery —
+  // a re-delivery supersedes an earlier attempt.
   const deliveredAt = delivered
-    ? events.findLast((e) => e.status === "delivered")?.createdAt ?? null
+    ? (events.find((e) => e.status === "delivered")?.createdAt ?? null)
     : null;
   // Tracking only makes sense once the parcel has left us.
   const shipped = order?.status === "shipped" || delivered;
@@ -698,7 +927,7 @@ export function OrderDetails({
                   </span>
                   <span className="font-semibold">
                     {deliveredAt
-                      ? formatDate(deliveredAt)
+                      ? formatDayOf(deliveredAt)
                       : formatDay(order.estimatedDelivery!)}
                   </span>
                 </div>
@@ -871,6 +1100,17 @@ export function OrderDetails({
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Feedback — only worth asking once the order has actually landed.
+            Suppressed in the dev preview, which has no order to post to. */}
+        {delivered && !override && (
+          <div className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
+            <FeedbackPanel
+              trackingNumber={order.trackingNumber}
+              existing={fetched?.feedback ?? null}
+            />
           </div>
         )}
 
