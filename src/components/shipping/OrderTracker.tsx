@@ -898,22 +898,36 @@ export function OrderDetails({
                 </div>
               )}
 
-              <div className="flex flex-col gap-1">
-                <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}>
-                  Order
-                </p>
-                <p className="font-medium">{order.itemDescription}</p>
+              {/* Order and Placed answer "where is my stuff?" — questions a
+                  delivered order has already answered, so they only add
+                  noise next to the review prompt. The item description stays
+                  as a subtitle: it is the only thing naming what arrived,
+                  and we are about to ask how it turned out. */}
+              {delivered ? (
                 <p className="text-muted-foreground text-xs">
-                  for {order.customerName}
+                  {order.itemDescription}
                   {order.destination ? ` · ${order.destination}` : ""}
                 </p>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}>
-                  Placed
-                </p>
-                <p className="font-medium">{formatDate(order.createdAt)}</p>
-              </div>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-1">
+                    <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}>
+                      Order
+                    </p>
+                    <p className="font-medium">{order.itemDescription}</p>
+                    <p className="text-muted-foreground text-xs">
+                      for {order.customerName}
+                      {order.destination ? ` · ${order.destination}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className={`${plexMono.className} text-[10px] uppercase tracking-[0.2em] text-muted-foreground`}>
+                      Placed
+                    </p>
+                    <p className="font-medium">{formatDate(order.createdAt)}</p>
+                  </div>
+                </>
+              )}
 
               {/* Once the parcel has arrived an *estimate* is meaningless, so
                   we state when it actually landed. Falling back to the
@@ -946,6 +960,20 @@ export function OrderDetails({
               )}
             </div>
           </div>
+
+          {/* Feedback lives inside the main card, under the hero row rather
+              than beside it — the two-column layout above is for the parcel,
+              and a rating prompt squeezed into that column would be cramped
+              on desktop. Suppressed in the dev preview, which has no order
+              to post to. */}
+          {delivered && !override && (
+            <div className="px-6 pb-6 pt-6 border-t border-border">
+              <FeedbackPanel
+                trackingNumber={order.trackingNumber}
+                existing={fetched?.feedback ?? null}
+              />
+            </div>
+          )}
         </div>
 
         {/* Laser Stepper */}
@@ -1051,19 +1079,6 @@ export function OrderDetails({
                 );
               })}
             </div>
-          </div>
-        )}
-
-        {/* Feedback — only worth asking once the order has actually landed.
-            Sits above the Job Log: the log is a long reverse-chronological
-            list, and anything below it is easy to scroll past. Suppressed in
-            the dev preview, which has no order to post to. */}
-        {delivered && !override && (
-          <div className={`${styles.reveal} ${styles.revealDelay2} ${styles.card} p-6 bg-card border border-border shadow-sm`}>
-            <FeedbackPanel
-              trackingNumber={order.trackingNumber}
-              existing={fetched?.feedback ?? null}
-            />
           </div>
         )}
 
