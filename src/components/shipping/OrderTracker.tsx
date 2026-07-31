@@ -618,13 +618,17 @@ export function OrderDetails({
             )}
 
             <div className="flex flex-col gap-6 text-sm flex-1">
-              {/* Shipment headline — only once the parcel is on its way */}
-              {shipped && order.shipmentStatus && (
+              {/* Shipment headline — only once the parcel is on its way.
+                  These two fields describe the parcel in transit ("On the
+                  way", "Departed our Lagos studio"), so once it has arrived
+                  they are stale by definition and we state the arrival
+                  instead of whatever the last transit update said. */}
+              {shipped && (order.shipmentStatus || delivered) && (
                 <div className="flex flex-col gap-1">
                   <p className="text-base font-semibold">
-                    {order.shipmentStatus}
+                    {delivered ? "Delivered" : order.shipmentStatus}
                   </p>
-                  {order.shipmentDetail && (
+                  {!delivered && order.shipmentDetail && (
                     <p className="text-muted-foreground text-xs">
                       {order.shipmentDetail}
                     </p>
@@ -675,10 +679,12 @@ export function OrderDetails({
                 <p className="font-medium">{formatDate(order.createdAt)}</p>
               </div>
 
+              {/* Once the parcel has arrived an *estimate* is meaningless, so
+                  the label switches to a plain statement of fact. */}
               {shipped && order.estimatedDelivery && (
                 <div className="flex items-center gap-2 pt-4 border-t border-border">
                   <span className="text-muted-foreground">
-                    Estimated delivery
+                    {delivered ? "Delivered" : "Estimated delivery"}
                   </span>
                   <span className="font-semibold">
                     {formatDay(order.estimatedDelivery)}
