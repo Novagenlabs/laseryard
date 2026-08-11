@@ -92,6 +92,20 @@
     </div>
   </div>
 
+  <div class="card">
+    <div class="row" style="margin-bottom:14px;">
+      <h2 style="margin:0;">Team bridge</h2>
+      <button class="primary small" onclick="loadBridge()">Refresh</button>
+    </div>
+    <div id="bridgeStatus" class="muted" style="font-size:13px;">Questions Yara has escalated to the team. Answer them by replying to the WhatsApp ping — this list is the backstop so nothing strands.</div>
+    <div style="overflow-x:auto;">
+      <table id="bridgeTable" class="hidden">
+        <thead><tr><th>Q</th><th>When</th><th>Customer</th><th>Question</th><th>Status</th><th>Answer</th><th></th></tr></thead>
+        <tbody id="bridgeBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="card hidden" id="detailCard">
     <div class="row" style="margin-bottom:8px;">
       <h2 style="margin:0;">Conversation</h2>
@@ -219,6 +233,39 @@ async function openDetail(id){
   }catch(e){ toast(e.message,false); }
 }
 function closeDetail(){ document.getElementById("detailCard").classList.add("hidden"); }
+
+function bridgePill(q){
+  if(q.status==="open") return '<span class="pill human">waiting</span>' + (q.pingSent?"":' <span class="pill grey">no ping</span>');
+  if(q.status==="answered") return '<span class="pill done">answered</span>' + (q.delivered?"":' <span class="pill grey">not delivered yet</span>');
+  return '<span class="pill grey">closed</span>';
+}
+async function loadBridge(){
+  const el=document.getElementById("bridgeStatus");
+  el.textContent="Loading…";
+  try{
+    const d=await api("/api/admin/bridge");
+    const rows=[...(d.open||[]), ...(d.recent||[])];
+    const body=document.getElementById("bridgeBody"); body.innerHTML="";
+    rows.forEach(q=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td class="mono" style="white-space:nowrap;">Q#${q.id}</td>`+
+        `<td style="white-space:nowrap;">${fmtTime(Math.floor(new Date(q.createdAt).getTime()/1000))}</td>`+
+        `<td class="mono" style="font-size:11px;">${escapeHtml(q.customerNumber||"")}</td>`+
+        `<td style="max-width:280px;">${escapeHtml(q.question||"")}${q.context?`<br/><span class="muted" style="font-size:11px;">${escapeHtml(q.context)}</span>`:""}</td>`+
+        `<td style="white-space:nowrap;">${bridgePill(q)}</td>`+
+        `<td class="muted" style="max-width:240px;">${escapeHtml(q.customerMessage||q.answer||"")}</td>`+
+        `<td>${q.status==="open"?`<button class="small" onclick="closeBridgeQ(${q.id})">Close</button>`:""}</td>`;
+      body.appendChild(tr);
+    });
+    document.getElementById("bridgeTable").classList.toggle("hidden", rows.length===0);
+    el.textContent = rows.length ? `${(d.open||[]).length} waiting · ${(d.recent||[]).length} recent` : "No bridge questions yet.";
+  }catch(e){ el.textContent="Error: "+e.message; toast(e.message,false); }
+}
+async function closeBridgeQ(id){
+  if(!confirm(`Close Q#${id} without an answer? The customer will NOT get a reply from this question.`)) return;
+  try{ await api("/api/admin/bridge",{method:"POST",body:JSON.stringify({action:"close",id})}); toast(`Q#${id} closed`); loadBridge(); }
+  catch(e){ toast("Failed: "+e.message,false); }
+}
 
 function initTemplates(){
   const sel=document.getElementById("tplSelect"); sel.innerHTML="";
