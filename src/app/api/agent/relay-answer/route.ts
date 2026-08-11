@@ -27,15 +27,32 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const caller = normalizeWhatsappNumber(body?.whatsapp_user_id);
+    // team_member_number is the current name; whatsapp_user_id kept as an
+    // alias for older tool schemas. The LLM has confused this with the
+    // CLIENT's number before — the rejection note below teaches the fix.
+    const caller = normalizeWhatsappNumber(
+      body?.team_member_number ?? body?.whatsapp_user_id
+    );
     const answer = typeof body?.answer === "string" ? body.answer.trim() : "";
     const customerMessage =
       typeof body?.customer_message === "string" ? body.customer_message.trim() : "";
-    const questionId = Number.parseInt(String(body?.question_id ?? ""), 10);
+    // LLMs pass "3", 3, or "Q#3" — keep the digits only.
+    const questionId = Number.parseInt(
+      String(body?.question_id ?? "").replace(/\D/g, ""),
+      10
+    );
 
     if (!caller || !isTeamNumber(caller)) {
       return NextResponse.json(
-        { relayed: false, note: "Only team members can relay answers. Continue the normal conversation." },
+        {
+          relayed: false,
+          saved: false,
+          note:
+            "NOTHING was sent or saved: team_member_number is not one of our staff numbers. " +
+            "You likely passed the CLIENT's number by mistake. If you are talking to a team member, " +
+            "call relay_answer again with team_member_number = the digits of system__caller_id from THIS " +
+            "conversation (the staff member's own number), never the client's. Do NOT tell them it was saved.",
+        },
         { status: 200 }
       );
     }
@@ -93,6 +110,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       relayed: pushed,
+      saved: true,
       question_ref: `Q#${q.id}`,
       customer: q.customerNumber,
       note: pushed
@@ -102,7 +120,7 @@ export async function POST(request: NextRequest) {
   } catch (e) {
     console.error("relay-answer error:", e);
     return NextResponse.json(
-      { relayed: false, note: "Relay failed — the answer was NOT saved. Ask the team member to try once more in a minute." },
+      { relayed: false, saved: false, note: "Relay failed — the answer was NOT saved. Ask the team member to try once more in a minute." },
       { status: 200 }
     );
   }
