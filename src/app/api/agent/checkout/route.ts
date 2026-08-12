@@ -27,8 +27,21 @@ const AGENT_PRICES: Record<CardThickness, Record<number, number>> = {
 };
 
 const THICKNESSES: CardThickness[] = ["0.4mm", "0.8mm"];
-// We currently do not ship to Germany.
-const BLOCKED_COUNTRIES = ["germany"];
+// Countries we cannot ship to at all. Germany/EU became shippable with the
+// 2026-07-29 policy (0.4mm EU orders pay shipping separately) — keep this
+// list in sync with the agent prompt's SHIPPING section.
+const BLOCKED_COUNTRIES: string[] = [];
+
+// CHECKOUT_LINK_STYLE=site serves the Whop checkout embedded on our own
+// domain (laseryard.com/checkout) — customers asked to "pay on the website".
+// Default stays "whop" (the hosted purchase_url) until the page is proven.
+function customerCheckoutUrl(purchaseUrl: string): string {
+  if ((process.env.CHECKOUT_LINK_STYLE || "whop") !== "site") return purchaseUrl;
+  const plan = purchaseUrl.match(/plan_[A-Za-z0-9]+/)?.[0];
+  if (!plan) return purchaseUrl;
+  const session = purchaseUrl.match(/ch_[A-Za-z0-9]+/)?.[0];
+  return `https://laseryard.com/checkout?plan=${plan}${session ? `&session=${session}` : ""}`;
+}
 
 export async function POST(request: NextRequest) {
   if (!isAuthorizedAgentRequest(request)) {
@@ -85,6 +98,7 @@ export async function POST(request: NextRequest) {
     const amount =
       AGENT_PRICES[thickness as CardThickness][quantity as CardQuantity];
     const checkoutRef = crypto.randomUUID();
+    let customerUrl = "";
 
     const config = await whop.checkoutConfigurations.create({
       plan: {
@@ -107,6 +121,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    customerUrl = customerCheckoutUrl(config.purchase_url ?? "");
+
     // Email the checkout link too when we know their address — better
     // conversion than a link buried in chat history.
     let emailSent = false;
@@ -125,8 +141,8 @@ export async function POST(request: NextRequest) {
           `<strong>${summaryLine}</strong>`,
           `Pay securely with the button below. Once your order is placed, the design team gets started right away.`,
         ],
-        text: `Here's everything ready to go:\n\n${summaryLine}\n\nPay securely: ${config.purchase_url}\n\nOnce your order is placed, the design team gets started right away.`,
-        cta: { label: "Pay securely", url: config.purchase_url ?? "" },
+        text: `Here's everything ready to go:\n\n${summaryLine}\n\nPay securely: ${customerUrl}\n\nOnce your order is placed, the design team gets started right away.`,
+        cta: { label: "Pay securely", url: customerUrl },
       });
       const { to, subjectPrefix } = resolveEmailRecipient(email);
       await fetch("https://api.resend.com/emails", {
@@ -152,7 +168,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      checkout_url: config.purchase_url,
+      checkout_url: customerUrl,
       order_reference: checkoutRef,
       email_sent: emailSent,
       price_usd: amount,
