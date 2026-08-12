@@ -77,13 +77,18 @@ export async function POST(request: NextRequest) {
       agentId,
     });
 
-    const pinged = await sendTeamPing({ senderId, agentId, question: q });
-    if (pinged) await markPingSent(q.id);
+    // Fire-and-forget: template sends are slow enough to trip the proxy
+    // timeout (the tool saw a 504 while the ping still completed). The
+    // question is already stored — the console's ping flag shows the truth.
+    // Dokploy runs a persistent `next start`, so the detached promise
+    // completes reliably after the response.
+    void sendTeamPing({ senderId, agentId, question: q })
+      .then((pinged) => (pinged ? markPingSent(q.id) : undefined))
+      .catch((e) => console.error("ask-team ping send failed:", e));
 
     return NextResponse.json({
       logged: true,
       question_ref: `Q#${q.id}`,
-      team_notified: pinged,
       note: HOLD_NOTE,
     });
   } catch (e) {
