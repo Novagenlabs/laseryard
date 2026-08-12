@@ -235,6 +235,9 @@ async function sendTemplate(opts: {
 }): Promise<{ ok: boolean; status: number; detail: string }> {
   const res = await xiFetch("/whatsapp/outbound-message", {
     method: "POST",
+    // Outbound sends can stall long enough to trip the proxy timeout (seen
+    // as a 504 on ask-team) — cap them hard.
+    signal: AbortSignal.timeout(12_000),
     body: JSON.stringify({
       whatsapp_phone_number_id: opts.senderId,
       whatsapp_user_id: opts.to,
