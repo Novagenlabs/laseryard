@@ -82,7 +82,18 @@ export async function POST(request: NextRequest) {
     // question is already stored — the console's ping flag shows the truth.
     // Dokploy runs a persistent `next start`, so the detached promise
     // completes reliably after the response.
-    void sendTeamPing({ senderId, agentId, question: q })
+    //
+    // Pings route through the +228 line by default: Meta silently drops
+    // +1 415 templates to the team number (while delivering its session
+    // messages, and its templates to other recipients — opaque pair-specific
+    // filtering). The team's replies reach the staging agent, which shares
+    // this same question queue; the relay back to the customer still goes
+    // out from the customer's own line (stored on the question row).
+    const pingSenderId =
+      process.env.BRIDGE_PING_SENDER_ID || "1024784710715053";
+    const pingAgentId =
+      process.env.BRIDGE_PING_AGENT_ID || "agent_2401kxx3zb77fzvrf0t0vt1hm7yz";
+    void sendTeamPing({ senderId: pingSenderId, agentId: pingAgentId, question: q })
       .then((pinged) => (pinged ? markPingSent(q.id) : undefined))
       .catch((e) => console.error("ask-team ping send failed:", e));
 
