@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--
+  Design stage email: sends the customer their design onboarding link.
+  Tokens: {{CUSTOMER_NAME}}  first name, e.g. Jane
+          {{ORDER_CODE}}     tracking code, e.g. LY-XXXX-XXXX
+  Suggested subject: Start your card design, order {{ORDER_CODE}}
+  Built from received.html; dark mode recipe per invoice-template/README.md.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>Start your card design | Laser Yard</title>
+<style type="text/css">
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+
+  /* Dark mode. Inline styles win on specificity, so every override needs !important. */
+  @media (prefers-color-scheme: dark) {
+    .ly-outer      { background-color:#0a0a0e !important; }
+    .ly-bar-ink    { background-color:#33333f !important; }
+    .ly-head       { background-color:#1A1A24 !important; }
+    .ly-hero       { background-color:#12121a !important; }
+    .ly-surface    { background-color:#1A1A24 !important; }
+    .ly-card       { background-color:#24242f !important; }
+    .ly-footer     { background-color:#12121a !important; }
+
+    .ly-t-ink      { color:#e8e8ee !important; }
+    .ly-t-muted    { color:#a0a0ac !important; }
+    .ly-t-onhero   { color:#c4c4ce !important; }
+
+    .ly-step-off   { background-color:#33333f !important; color:#a0a0ac !important; }
+    .ly-step-lbl   { color:#a0a0ac !important; }
+
+    /* keep the yellow button readable, clients like to recolor link text */
+    .ly-btn        { background-color:#FFD500 !important; }
+    .ly-btn a      { color:#1A1A24 !important; }
+    .ly-yellow     { color:#FFD500 !important; }
+
+    .ly-logo-light { display:none !important; mso-hide:all; }
+    .ly-logo-dark  { display:block !important; width:132px !important; max-height:none !important; overflow:visible !important; margin:-16px 0 -25px 0 !important; }
+  }
+</style>
+</head>
+<body class="ly-outer" style="margin:0; padding:0; background-color:#f0f0f2; -webkit-text-size-adjust:100%;">
+
+  <!-- preheader (hidden) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+    Your design brief is ready. It takes about three minutes.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="ly-outer" style="background-color:#f0f0f2;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%;">
+
+          <!-- accent bar -->
+          <tr>
+            <td style="height:6px; line-height:6px; font-size:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="30%" style="background-color:#FFD500; height:6px; line-height:6px; font-size:0;">&nbsp;</td>
+                  <td class="ly-bar-ink" style="background-color:#1A1A24; height:6px; line-height:6px; font-size:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- header / wordmark -->
+          <tr>
+            <td class="ly-head" style="background-color:#ffffff; padding:16px 36px 14px 36px;">
+              <a href="https://laseryard.com" target="_blank" style="text-decoration:none;"><img class="ly-logo-light" src="https://laseryard.com/images/laseryard_logos/logo_light.png" width="132" alt="Laseryard" style="display:block; border:0; outline:none; width:132px; max-width:132px; height:auto; margin:-16px 0 -25px 0; font-family:Helvetica,Arial,sans-serif; font-size:20px; font-weight:bold; color:#1A1A24; text-decoration:none;"><img class="ly-logo-dark" src="https://laseryard.com/images/laseryard_logos/logo_dark.png" width="132" alt="Laseryard" style="display:none; width:0; max-height:0; overflow:hidden; border:0; outline:none; margin:-16px 0 -25px 0; font-family:Helvetica,Arial,sans-serif; font-size:20px; font-weight:bold; color:#ffffff; text-decoration:none; mso-hide:all;"></a>
+            </td>
+          </tr>
+
+          <!-- hero -->
+          <tr>
+            <td class="ly-hero" style="background-color:#1A1A24; padding:40px 36px 36px 36px;" align="center">
+              <div class="ly-yellow" style="font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:2px; color:#FFD500; text-transform:uppercase; font-weight:bold;">
+                Order {{ORDER_CODE}}
+              </div>
+              <div style="font-family:Helvetica,Arial,sans-serif; font-size:30px; font-weight:bold; line-height:1.25; color:#ffffff; padding-top:12px;">
+                Time to design your <span class="ly-yellow" style="color:#FFD500;">cards</span>
+              </div>
+              <div class="ly-t-onhero" style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#b9b9c2; padding-top:14px; max-width:420px;">
+                Tell us what goes on the card and which designs feel right.
+              </div>
+
+              <!-- laser beam graphic -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;" width="100%">
+                <tr>
+                  <td style="height:2px; background-color:#3a3a48; font-size:0; line-height:0;" width="18%">&nbsp;</td>
+                  <td style="height:2px; background-color:#FFD500; font-size:0; line-height:0;" width="54%">&nbsp;</td>
+                  <td align="left" width="10" style="font-size:0; line-height:0;">
+                    <div style="width:10px; height:10px; background-color:#FFD500; border-radius:5px; margin-top:-4px;"></div>
+                  </td>
+                  <td style="height:2px; background-color:#3a3a48; font-size:0; line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- progress tracker -->
+          <tr>
+            <td class="ly-surface" style="background-color:#ffffff; padding:34px 28px 8px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <!-- step 1 completed -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td align="center" style="width:26px; height:26px; background-color:#FFD500; border-radius:13px; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; font-weight:bold; text-align:center; vertical-align:middle;">&#10003;</td></tr>
+                    </table>
+                    <div class="ly-t-ink" style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#1A1A24; padding-top:8px;">Order<br>received</div>
+                  </td>
+                  <!-- step 2 current -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td align="center" style="width:26px; height:26px; background-color:#FFD500; border-radius:13px; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; font-weight:bold; text-align:center; vertical-align:middle;">2</td></tr>
+                    </table>
+                    <div class="ly-t-ink" style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#1A1A24; font-weight:bold; padding-top:8px;">Design</div>
+                  </td>
+                  <!-- step 3 -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td class="ly-step-off" align="center" style="width:26px; height:26px; background-color:#e6e6ea; border-radius:13px; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#6b6b76; font-weight:bold; text-align:center; vertical-align:middle;">3</td></tr>
+                    </table>
+                    <div class="ly-step-lbl" style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#6b6b76; padding-top:8px;">Production</div>
+                  </td>
+                  <!-- step 4 -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td class="ly-step-off" align="center" style="width:26px; height:26px; background-color:#e6e6ea; border-radius:13px; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#6b6b76; font-weight:bold; text-align:center; vertical-align:middle;">4</td></tr>
+                    </table>
+                    <div class="ly-step-lbl" style="font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#6b6b76; padding-top:8px;">Shipped</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- body copy -->
+          <tr>
+            <td class="ly-surface" style="background-color:#ffffff; padding:26px 36px 0 36px;">
+              <div class="ly-t-ink" style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.7; color:#1A1A24;">
+                Hi {{CUSTOMER_NAME}},
+                <br><br>
+                Your design brief is ready. Answer a few short questions about what goes on your card, then pick the designs that look good to you. It takes about three minutes, and if you already have a finished design you can upload it there instead.
+              </div>
+            </td>
+          </tr>
+
+          <!-- CTA button -->
+          <tr>
+            <td class="ly-surface" style="background-color:#ffffff; padding:28px 36px 8px 36px;" align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr>
+                  <td class="ly-btn" align="center" style="background-color:#FFD500; border-radius:6px;">
+                    <a href="https://laseryard.com/design?order={{ORDER_CODE}}" target="_blank" style="display:inline-block; padding:15px 44px; font-family:Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#1A1A24; text-decoration:none; letter-spacing:1px;">START YOUR DESIGN</a>
+                  </td>
+                </tr>
+              </table>
+              <div class="ly-t-muted" style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#6b6b76; padding-top:12px;">
+                Track your order any time: <a href="https://laseryard.com/track?order={{ORDER_CODE}}" target="_blank" class="ly-t-ink" style="color:#1A1A24; font-weight:bold; text-decoration:none;">{{ORDER_CODE}}</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- what happens next card -->
+          <tr>
+            <td class="ly-surface" style="background-color:#ffffff; padding:28px 36px 34px 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="ly-card" style="background-color:#f7f7f9; border-radius:8px;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <div class="ly-t-muted" style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#6b6b76; text-transform:uppercase; font-weight:bold; padding-bottom:10px;">
+                      What happens next
+                    </div>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td class="ly-t-ink" style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; padding:4px 0;">
+                          <strong>1.</strong>&nbsp; You send the brief
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="ly-t-ink" style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; padding:4px 0;">
+                          <strong>2.</strong>&nbsp; We email your card concepts to choose from
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="ly-t-ink" style="font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; padding:4px 0;">
+                          <strong>3.</strong>&nbsp; Production starts after your approval
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- footer -->
+          <tr>
+            <td class="ly-footer" style="background-color:#1A1A24; padding:24px 36px; border-radius:0 0 8px 8px;" align="center">
+              <div class="ly-t-onhero" style="font-family:Helvetica,Arial,sans-serif; font-size:12px; color:#b9b9c2;">
+                <a href="https://laseryard.com" class="ly-yellow" style="color:#FFD500; text-decoration:none;">laseryard.com</a>
+                &nbsp;&middot;&nbsp;
+                <a href="mailto:hello@laseryard.com" class="ly-yellow" style="color:#FFD500; text-decoration:none;">hello@laseryard.com</a>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
