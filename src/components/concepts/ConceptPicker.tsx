@@ -49,6 +49,7 @@ export function ConceptPicker() {
   );
   const [data, setData] = useState<ConceptsResponse | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [loadedIds, setLoadedIds] = useState<Set<number>>(new Set());
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -210,6 +211,9 @@ export function ConceptPicker() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {data.concepts.map((c) => {
           const isSelected = selected.has(c.id);
+          const isLoaded = loadedIds.has(c.id);
+          const settle = () =>
+            setLoadedIds((prev) => new Set(prev).add(c.id));
           return (
             <button
               key={c.id}
@@ -223,17 +227,24 @@ export function ConceptPicker() {
               }}
             >
               <span
-                className="block aspect-[1586/1000] w-full overflow-hidden rounded-xl"
+                className={`block aspect-[1586/1000] w-full overflow-hidden rounded-xl ${
+                  isLoaded ? "" : "animate-pulse bg-muted"
+                }`}
                 style={finishCss ? { background: finishCss } : undefined}
               >
                 {/* Mockups can be any aspect; contain keeps them honest.
-                    Engraving is monochrome, so previews render grayscale. */}
+                    Engraving is monochrome, so previews render grayscale.
+                    The tile pulses until the image arrives, then fades in. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={c.image}
                   alt={c.label || "Card design"}
                   loading="lazy"
-                  className="h-full w-full object-contain grayscale"
+                  onLoad={settle}
+                  onError={settle}
+                  className={`h-full w-full object-contain grayscale transition-opacity duration-300 ${
+                    isLoaded ? "opacity-100" : "opacity-0"
+                  }`}
                 />
               </span>
               <span className="mt-3 flex items-center justify-between px-1">

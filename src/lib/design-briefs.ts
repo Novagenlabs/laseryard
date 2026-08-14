@@ -18,7 +18,9 @@ import { getDb } from "@/lib/db";
 
 export const MAX_LOGO_BYTES = 20 * 1024 * 1024; // matches the form's client cap
 
-export const LOGO_CHOICES = ["upload", "later", "none"] as const;
+// "design" = the customer supplied a complete finished card design; the
+// form skips the content/direction/taste questions for that path.
+export const LOGO_CHOICES = ["upload", "later", "none", "design"] as const;
 export const BACK_CHOICES = ["logo", "name", "message", "blank"] as const;
 export const DIRECTIONS = ["minimal", "bold", "classic", "technical"] as const;
 
@@ -86,12 +88,17 @@ export function sanitizeBrief(
   const logoRaw = (b.logo ?? {}) as Record<string, unknown>;
   const logoChoice = oneOf(logoRaw.choice, LOGO_CHOICES);
   if (!logoChoice) return { ok: false, error: "logo.choice is invalid" };
+  const finishedDesign = logoChoice === "design";
 
+  // A finished-design brief legitimately skips the back and direction
+  // questions, so those fields default instead of failing validation.
   const backRaw = (b.back ?? {}) as Record<string, unknown>;
-  const backChoice = oneOf(backRaw.choice, BACK_CHOICES);
+  const backChoice =
+    oneOf(backRaw.choice, BACK_CHOICES) ?? (finishedDesign ? "blank" : null);
   if (!backChoice) return { ok: false, error: "back.choice is invalid" };
 
-  const direction = oneOf(b.direction, DIRECTIONS);
+  const direction =
+    oneOf(b.direction, DIRECTIONS) ?? (finishedDesign ? "minimal" : null);
   if (!direction) return { ok: false, error: "direction is invalid" };
 
   const finish = str(b.finish, 40);

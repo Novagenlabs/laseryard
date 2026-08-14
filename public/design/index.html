@@ -125,6 +125,16 @@ input:focus,textarea:focus{outline:none;border-color:var(--yellow)}
 .tile.taste.sel .tick::after{content:'✓'}
 .taste-count{font-size:13.5px;color:var(--muted);margin-top:16px;font-variant-numeric:tabular-nums}
 
+/* taste tile loading state: shimmer placeholder until the image arrives */
+.tile.taste .ph{position:absolute;inset:8px;border-radius:6px;background:#16161c}
+@media (prefers-reduced-motion: no-preference){
+  .tile.taste .ph{background:linear-gradient(100deg,#14141a 40%,#23232e 50%,#14141a 60%);background-size:200% 100%;animation:tasteshimmer 1.2s linear infinite}
+  @keyframes tasteshimmer{to{background-position:-200% 0}}
+}
+.tile.taste img{opacity:0;transition:opacity .35s ease}
+.tile.taste.loaded img{opacity:1}
+.tile.taste.loaded .ph{display:none}
+
 /* ---------- card preview ---------- */
 .preview{margin:0 0 26px}
 .card{
@@ -399,15 +409,16 @@ screens.push({ id:'company', key:'company', render(){
   return i;
 }, validate:()=> data.company.trim() ? null : 'Please enter a company or brand name.' });
 
-/* 4 — logo */
+/* 4 — logo or finished design */
 screens.push({ id:'logo', render(){
   const i = el('div','inner');
-  i.appendChild(el('h2','','Do you have a logo?'));
+  i.appendChild(el('h2','','Do you have a logo, or a finished design?'));
   i.appendChild(el('p','help','Vector files engrave best. SVG, AI, EPS or PDF. A high resolution PNG also works.'));
 
   const opts = [
-    { id:'upload',  b:'Yes, I will upload it now', s:'' },
-    { id:'later',   b:'Yes, but I will send it separately', s:'We will email you for it.' },
+    { id:'upload',  b:'I will upload my logo now', s:'' },
+    { id:'design',  b:'I have a complete card design ready', s:'Upload it and we prepare it for engraving. The design questions are skipped.' },
+    { id:'later',   b:'I will send my logo separately', s:'We will email you for it.' },
     { id:'none',    b:'No logo', s:'We will build something from your name and initials.' }
   ];
   const box = el('div','choices');
@@ -453,7 +464,7 @@ screens.push({ id:'logo', render(){
     chip.appendChild(thumb); chip.appendChild(meta); chip.appendChild(rm);
     chipHost.appendChild(chip);
   }
-  function toggleDrop(){ dropWrap.style.display = data.logoChoice==='upload' ? 'block':'none'; }
+  function toggleDrop(){ dropWrap.style.display = (data.logoChoice==='upload' || data.logoChoice==='design') ? 'block':'none'; }
   setTimeout(toggleDrop,0);
   return i;
 }, paint(root){
@@ -461,11 +472,12 @@ screens.push({ id:'logo', render(){
 }, validate(){
   if(!data.logoChoice) return 'Please choose one of the options.';
   if(data.logoChoice==='upload' && !data.logoFile) return 'Please attach your logo file, or pick one of the other options.';
+  if(data.logoChoice==='design' && !data.logoFile) return 'Please attach your design file, or pick one of the other options.';
   return null;
 }});
 
-/* 5 — which details */
-screens.push({ id:'details', render(){
+/* 5 — which details (skipped when a finished design is supplied) */
+screens.push({ id:'details', skip:()=>data.logoChoice==='design', render(){
   const i = el('div','inner');
   i.appendChild(el('h2','','What should we put on the card?'));
   i.appendChild(el('p','help','Pick everything you want engraved. Fewer items usually looks better on metal.'));
@@ -507,8 +519,8 @@ screens.push({ id:'detailValues', skip:()=>!data.details.length, render(){
   return missing.length ? 'Please fill in every detail you selected.' : null;
 }});
 
-/* 7 — back of card */
-screens.push({ id:'back', render(){
+/* 7 — back of card (skipped when a finished design is supplied) */
+screens.push({ id:'back', skip:()=>data.logoChoice==='design', render(){
   const i = el('div','inner');
   i.appendChild(el('h2','','What goes on the back?'));
   i.appendChild(el('p','help','Both sides are engraved at no extra cost.'));
@@ -627,8 +639,8 @@ screens.push({ id:'infill', wide:true,
   return null;
 }});
 
-/* 10 — style direction */
-screens.push({ id:'style', wide:true, render(){
+/* 10 — style direction (skipped when a finished design is supplied) */
+screens.push({ id:'style', wide:true, skip:()=>data.logoChoice==='design', render(){
   const i = el('div','inner');
   i.appendChild(el('h2','','Which direction feels right?'));
   i.appendChild(el('p','help','Pick the one closest to what you want. This steers the concepts we send you.'));
@@ -652,8 +664,8 @@ screens.push({ id:'style', wide:true, render(){
   root.querySelectorAll('.tile').forEach(t=>t.classList.toggle('sel', t.dataset.val===data.style));
 }, validate:()=> data.style ? null : 'Please pick a direction.' });
 
-/* 11 — references and avoid */
-screens.push({ id:'refs', render(){
+/* 11 — references and avoid (skipped when a finished design is supplied) */
+screens.push({ id:'refs', skip:()=>data.logoChoice==='design', render(){
   const i = el('div','inner');
   i.appendChild(el('h2','','Anything we should look at, or avoid?'));
   i.appendChild(el('p','help','Optional. Links to cards you like, or a note on what you do not want.'));
@@ -677,9 +689,9 @@ screens.push({ id:'notes', render(){
   return i;
 }});
 
-/* 13 — taste gallery */
+/* 13 — taste gallery (skipped when a finished design is supplied) */
 screens.push({ id:'taste', wide:true,
-  skip:()=> TASTE.designs.length < CONFIG.taste.minShown,
+  skip:()=> data.logoChoice==='design' || TASTE.designs.length < CONFIG.taste.minShown,
   render(){
   const i = el('div','inner');
   i.appendChild(el('h2','','Which of these look good to you?'));
@@ -688,9 +700,15 @@ screens.push({ id:'taste', wide:true,
   TASTE.designs.forEach(d=>{
     const t = el('button','tile taste'); t.type='button'; t.dataset.val=String(d.id);
     const img = el('img');
-    img.src = d.image; img.alt = d.label || 'Card design'; img.loading = 'lazy';
+    img.alt = d.label || 'Card design'; img.loading = 'lazy';
+    const settle = ()=>t.classList.add('loaded');
+    img.onload = settle;
+    img.onerror = settle; // no shimmer forever on a failed image
+    img.src = d.image;
     t.appendChild(img);
+    t.appendChild(el('span','ph',''));
     t.appendChild(el('span','tick',''));
+    if (img.complete && img.naturalWidth) settle(); // cache hit fires no onload
     t.onclick = ()=>{
       const k = data.tastePicks.indexOf(d.id);
       if (k>=0) data.tastePicks.splice(k,1);
@@ -727,7 +745,11 @@ screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
   const fin = CONFIG.finishes.find(f=>f.id===data.finish);
   const inf = CONFIG.infill.colours.find(c=>c.id===data.infill);
   const backMap = { logo:'Logo only', name:'Company name only', message:'Text: '+data.backText, blank:'Blank' };
-  const logoMap = { upload: data.logoFile ? data.logoFile.name : 'File attached', later:'Sending separately', none:'No logo' };
+  const logoMap = {
+    upload: data.logoFile ? data.logoFile.name : 'File attached',
+    design: 'Finished design: ' + (data.logoFile ? data.logoFile.name : 'file attached'),
+    later:'Sending separately', none:'No logo'
+  };
 
   const rows = [
     ['Name', data.name],
@@ -760,8 +782,10 @@ screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
 screens.push({ id:'done', chromeless:true, terminal:true, render(){
   const i = el('div','inner done');
   i.appendChild(el('div','mark','✓'));
-  i.appendChild(el('h2','','Brief received'));
-  i.appendChild(el('p','help','We will design a set of concepts from this and email them to you to choose from. If anything is unclear we will ask before we start.'));
+  i.appendChild(el('h2','', data.logoChoice==='design' ? 'Design received' : 'Brief received'));
+  i.appendChild(el('p','help', data.logoChoice==='design'
+    ? 'We will prepare your design for engraving and email you a proof before production. If anything is unclear we will ask first.'
+    : 'We will design a set of concepts from this and email them to you to choose from. If anything is unclear we will ask before we start.'));
   return i;
 }});
 
