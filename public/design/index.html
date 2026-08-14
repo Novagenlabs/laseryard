@@ -218,10 +218,16 @@ input:focus,textarea:focus{outline:none;border-color:var(--yellow)}
    CONFIG — edit these to match what Laser Yard actually sells.
    Everything below renders from this object.
    ============================================================ */
+// The form is served from the same app that hosts its API (laseryard.com in
+// production, localhost in preview), so endpoints are origin-relative and the
+// same file works everywhere. Opened as a plain file:// there is no origin,
+// so fall back to production.
+const API_ORIGIN = location.protocol === 'file:' ? 'https://laseryard.com' : '';
+
 const CONFIG = {
   // POST target for submissions. Leave empty to fall back to a local
   // JSON download so the form is testable before the backend exists.
-  endpoint: 'https://laseryard.com/api/design-brief',
+  endpoint: API_ORIGIN + '/api/design-brief',
 
   // ---- STOCK AVAILABILITY -------------------------------------------------
   // Every finish and infill colour below carries an `available` flag. Only
@@ -239,7 +245,7 @@ const CONFIG = {
   //      Unknown ids in the response are ignored. Ids missing from the
   //      response keep whatever is set below.
   availability: {
-    endpoint: 'https://laseryard.com/api/design-availability',
+    endpoint: API_ORIGIN + '/api/design-availability',
     showUnavailable: false // true = render out-of-stock options greyed as "Coming soon"
   },
 
@@ -249,7 +255,7 @@ const CONFIG = {
   // (order code "taste"). If the endpoint is unreachable or holds fewer
   // than minShown designs the step quietly disappears.
   taste: {
-    endpoint: 'https://laseryard.com/api/taste-designs',
+    endpoint: API_ORIGIN + '/api/taste-designs',
     minShown: 8,
     minPicks: 5,
     maxPicks: 10
