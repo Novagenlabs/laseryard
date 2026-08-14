@@ -40,7 +40,7 @@ export async function setOrderCustomerEmail(
   `;
 }
 
-async function getOrderCustomerEmail(
+export async function getOrderCustomerEmail(
   trackingNumber: string
 ): Promise<string | null> {
   await ensureColumn();

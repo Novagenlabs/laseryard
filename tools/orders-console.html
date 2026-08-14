@@ -359,6 +359,40 @@
         div.append(buildEditForm(o));
       };
 
+      // Send the design onboarding email for this order. The click IS the
+      // approval; nothing sends without it.
+      const dlBtn = document.createElement("button");
+      dlBtn.type = "button";
+      dlBtn.textContent = "Design link";
+      dlBtn.onclick = async () => {
+        showError("");
+        setBusy(dlBtn, true, "Sending…");
+        try {
+          let res = await api("/api/admin/send-design-link", {
+            method: "POST",
+            body: JSON.stringify({ trackingNumber: o.trackingNumber }),
+          }).catch((e) => ({ error: e.message }));
+          if (res && res.error === "no_email") {
+            const em = window.prompt("Customer email for the design link:");
+            if (!em) { setBusy(dlBtn, false); return; }
+            res = await api("/api/admin/send-design-link", {
+              method: "POST",
+              body: JSON.stringify({ trackingNumber: o.trackingNumber, email: em.trim() }),
+            });
+          } else if (res && res.error) {
+            throw new Error(res.error);
+          }
+          setBusy(dlBtn, false);
+          if (res && res.sent) {
+            dlBtn.textContent = "Sent to " + res.to;
+            setTimeout(() => (dlBtn.textContent = "Design link"), 4000);
+          }
+        } catch (e) {
+          setBusy(dlBtn, false);
+          showError("Design link: " + e.message);
+        }
+      };
+
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.textContent = "Delete";
@@ -376,7 +410,7 @@
         await load();
       };
 
-      div.append(info, sel, eventBtn, editBtn, delBtn);
+      div.append(info, sel, eventBtn, editBtn, dlBtn, delBtn);
       box.append(div);
     }
   }
