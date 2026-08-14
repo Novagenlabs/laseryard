@@ -110,6 +110,30 @@
 
   <div class="eyebrow">Orders</div>
   <div id="orders"><p class="empty">Connect to load orders.</p></div>
+
+  <div class="eyebrow" style="margin-top:28px;">Design pipeline</div>
+
+  <div class="card">
+    <div class="eyebrow">Design briefs</div>
+    <div id="briefs"><p class="empty">Connect to load briefs.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Concept mockups</div>
+    <form id="conceptForm">
+      <div class="grid">
+        <input id="cOrder" class="mono" placeholder="Order code, e.g. LY-Z54M-PSWZ" required />
+        <input id="cStyle" placeholder="Style tag for this batch (optional), e.g. minimal" />
+        <input id="cFiles" class="full" type="file" multiple accept=".png,.jpg,.jpeg,.webp" />
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="primary" type="submit">Upload concepts</button>
+        <button type="button" id="cLoad">View set</button>
+      </div>
+      <p class="hint">Upload mockups for an order, then send the customer the picker link. The customer taps the 5 to 10 designs that look good; picks land back here and by email.</p>
+    </form>
+    <div id="concepts"></div>
+  </div>
 </div>
 
 <script>
@@ -586,6 +610,234 @@
     await load();
     setBusy($("refreshBtn"), false);
   };
+
+  /* ---------- design pipeline ---------- */
+
+  async function loadBriefs() {
+    if (!store.key) return;
+    try {
+      const data = await api("/api/admin/design-briefs");
+      const box = $("briefs");
+      box.innerHTML = "";
+      if (!data.briefs.length) {
+        box.innerHTML = '<p class="empty">No briefs yet. They appear here when a customer submits the design form.</p>';
+        return;
+      }
+      for (const b of data.briefs) {
+        const div = document.createElement("div");
+        div.className = "order";
+        const info = document.createElement("div");
+        info.style.flex = "1";
+        const head = document.createElement("div");
+        head.innerHTML =
+          '<span class="mono">B#' + b.id + "</span> · <strong>" +
+          esc(b.customerName) + "</strong> · " +
+          (b.orderRef ? '<span class="mono">' + esc(b.orderRef) + "</span>" : "LEAD") +
+          ' · <span style="color:var(--muted);">' +
+          new Date(b.createdAt).toLocaleString() + "</span>";
+        const meta = document.createElement("div");
+        meta.style.cssText = "color:var(--muted);font-size:12px;margin-top:2px;";
+        const brief = b.brief || {};
+        meta.textContent =
+          (brief.direction || "?") + " · " + (brief.finish || "?") +
+          " · infill " + ((brief.infill && brief.infill.choice) || "?") +
+          (brief.deadline ? " · by " + brief.deadline : "");
+        info.append(head, meta);
+
+        const detailBtn = document.createElement("button");
+        detailBtn.type = "button";
+        detailBtn.textContent = "Details";
+        detailBtn.onclick = () => {
+          const open = div.querySelector(".briefDetail");
+          if (open) { open.remove(); return; }
+          const pre = document.createElement("pre");
+          pre.className = "briefDetail mono";
+          pre.style.cssText = "flex-basis:100%;white-space:pre-wrap;font-size:11px;background:var(--bg,#f6f6f8);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:6px;overflow-x:auto;";
+          const lines = [];
+          if (brief.jobTitle || brief.company) lines.push((brief.jobTitle || "") + (brief.company ? " · " + brief.company : ""));
+          for (const e of brief.engrave || []) lines.push(e.field + ": " + e.value);
+          if (brief.back) lines.push("back: " + brief.back.choice + (brief.back.text ? " · " + brief.back.text : ""));
+          if (brief.references) lines.push("references: " + brief.references);
+          if (brief.avoid) lines.push("avoid: " + brief.avoid);
+          if (brief.notes) lines.push("notes: " + brief.notes);
+          pre.textContent = lines.join("\n") || "(no extra detail)";
+          div.append(pre);
+        };
+
+        div.append(info, detailBtn);
+
+        if (b.logoId) {
+          const logoBtn = document.createElement("button");
+          logoBtn.type = "button";
+          logoBtn.textContent = "Logo";
+          logoBtn.onclick = async () => {
+            setBusy(logoBtn, true, "Fetching…");
+            try {
+              const res = await fetch(store.base.replace(/\/$/, "") + "/api/admin/design-briefs/" + b.id + "/logo", {
+                headers: { "Authorization": "Bearer " + store.key },
+              });
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              const blob = await res.blob();
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = ((b.brief.logo && b.brief.logo.filename) || "logo").replace(/[^\w.\- ]/g, "_");
+              a.click();
+              setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+            } catch (e) {
+              showError("Logo download failed: " + e.message);
+            }
+            setBusy(logoBtn, false);
+          };
+          div.append(logoBtn);
+        }
+
+        if (b.orderRef) {
+          const setBtn = document.createElement("button");
+          setBtn.type = "button";
+          setBtn.textContent = "Concepts";
+          setBtn.onclick = () => {
+            $("cOrder").value = b.orderRef;
+            loadConcepts(b.orderRef);
+            $("conceptForm").scrollIntoView({ behavior: "smooth" });
+          };
+          div.append(setBtn);
+        }
+        box.append(div);
+      }
+    } catch (e) {
+      $("briefs").innerHTML = '<p class="empty">Could not load briefs.</p>';
+    }
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  async function loadConcepts(order) {
+    const box = $("concepts");
+    box.innerHTML = '<div class="loadingRow"><span class="spinner"></span>Loading set…</div>';
+    try {
+      const data = await api("/api/admin/concepts?order=" + encodeURIComponent(order));
+      box.innerHTML = "";
+
+      const linkRow = document.createElement("div");
+      linkRow.style.cssText = "display:flex;align-items:center;gap:8px;margin:12px 0;";
+      const link = "https://laseryard.com/concepts?order=" + data.order;
+      const linkEl = document.createElement("span");
+      linkEl.className = "mono";
+      linkEl.style.fontSize = "12px";
+      linkEl.textContent = link;
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.textContent = "Copy picker link";
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(link);
+        copyBtn.textContent = "Copied";
+        setTimeout(() => (copyBtn.textContent = "Copy picker link"), 1500);
+      };
+      linkRow.append(copyBtn, linkEl);
+      box.append(linkRow);
+
+      if (!data.concepts.length) {
+        box.append(Object.assign(document.createElement("p"), { className: "empty", textContent: "No mockups uploaded for this order yet." }));
+      } else {
+        const grid = document.createElement("div");
+        grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;";
+        for (const c of data.concepts) {
+          const cell = document.createElement("div");
+          cell.style.cssText = "border:1px solid var(--border);border-radius:8px;padding:8px;" + (c.archived ? "opacity:.4;" : "");
+          const img = document.createElement("img");
+          img.src = store.base.replace(/\/$/, "") + "/api/concepts/" + c.id + "/image";
+          img.alt = c.label || "concept";
+          img.loading = "lazy";
+          img.style.cssText = "width:100%;aspect-ratio:1586/1000;object-fit:contain;background:#26262e;border-radius:5px;";
+          if (c.archived) img.removeAttribute("src"); // archived images 404 by design
+          const cap = document.createElement("div");
+          cap.style.cssText = "font-size:11px;margin-top:6px;display:flex;justify-content:space-between;gap:6px;align-items:center;";
+          const capText = document.createElement("span");
+          capText.textContent = (c.label || "#" + c.id) + (c.archived ? " (hidden)" : "");
+          const arch = document.createElement("button");
+          arch.type = "button";
+          arch.textContent = c.archived ? "Show" : "Hide";
+          arch.style.cssText = "font-size:10px;padding:2px 7px;";
+          arch.onclick = async () => {
+            try {
+              await api("/api/admin/concepts", { method: "PATCH", body: JSON.stringify({ id: c.id, archived: !c.archived }) });
+              await loadConcepts(order);
+            } catch (e) { showError(e.message); }
+          };
+          cap.append(capText, arch);
+          cell.append(img, cap);
+          grid.append(cell);
+        }
+        box.append(grid);
+      }
+
+      if (data.picks.length) {
+        const ph = document.createElement("div");
+        ph.className = "mono";
+        ph.style.cssText = "font-size:10px;letter-spacing:.16em;color:var(--muted);margin:14px 0 6px;";
+        ph.textContent = "CUSTOMER PICKS";
+        box.append(ph);
+        for (const p of data.picks) {
+          const row = document.createElement("div");
+          row.style.cssText = "font-size:12px;padding:6px 0;border-top:1px solid var(--border);";
+          const labels = p.picks.map((id) => {
+            const c = data.concepts.find((x) => x.id === id);
+            return c ? (c.label || "#" + id) : "#" + id;
+          });
+          row.innerHTML = "<strong>" + p.picks.length + " picked</strong> · " +
+            new Date(p.createdAt).toLocaleString() + "<br>" + esc(labels.join(", ")) +
+            (p.notes ? '<br><em>"' + esc(p.notes) + '"</em>' : "");
+          box.append(row);
+        }
+      }
+    } catch (e) {
+      box.innerHTML = '<p class="empty">Could not load that set.</p>';
+      showError(e.message);
+    }
+  }
+
+  $("cLoad").onclick = () => {
+    const order = $("cOrder").value.trim().toUpperCase();
+    if (order) loadConcepts(order);
+  };
+
+  $("conceptForm").onsubmit = async (e) => {
+    e.preventDefault();
+    showError("");
+    const btn = e.target.querySelector("button.primary");
+    const order = $("cOrder").value.trim().toUpperCase();
+    const files = [...$("cFiles").files];
+    if (!files.length) { showError("Pick at least one mockup file."); return; }
+    setBusy(btn, true, "Uploading…");
+    try {
+      const fd = new FormData();
+      fd.append("order", order);
+      if ($("cStyle").value.trim()) fd.append("style", $("cStyle").value.trim().toLowerCase());
+      for (const f of files) fd.append("file", await prepareArtwork(f));
+      const res = await fetch(store.base.replace(/\/$/, "") + "/api/admin/concepts", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + store.key },
+        body: fd,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+      $("cFiles").value = "";
+      await loadConcepts(order);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setBusy(btn, false);
+    }
+  };
+
+  const origLoad = load;
+  load = async function () {
+    await origLoad();
+    await loadBriefs();
+  };
+
   $("apiBase").value = store.base;
   load();
 </script>
