@@ -226,13 +226,14 @@ export function ConceptPicker() {
                 className="block aspect-[1586/1000] w-full overflow-hidden rounded-xl"
                 style={finishCss ? { background: finishCss } : undefined}
               >
-                {/* Mockups can be any aspect; contain keeps them honest. */}
+                {/* Mockups can be any aspect; contain keeps them honest.
+                    Engraving is monochrome, so previews render grayscale. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={c.image}
                   alt={c.label || "Card design"}
                   loading="lazy"
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-contain grayscale"
                 />
               </span>
               <span className="mt-3 flex items-center justify-between px-1">
