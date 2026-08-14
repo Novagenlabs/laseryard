@@ -130,7 +130,7 @@
         <button class="primary" type="submit">Upload concepts</button>
         <button type="button" id="cLoad">View set</button>
       </div>
-      <p class="hint">Upload mockups for an order, then send the customer the picker link. The customer taps the 5 to 10 designs that look good; picks land back here and by email.</p>
+      <p class="hint">Order code <span class="mono">taste</span> manages the standing gallery shown at the end of the design brief form (customer taps the 5-10 that look good; picks arrive inside each brief). A real order code manages a per-order concept set with its own picker link.</p>
     </form>
     <div id="concepts"></div>
   </div>
@@ -660,6 +660,10 @@
           if (brief.references) lines.push("references: " + brief.references);
           if (brief.avoid) lines.push("avoid: " + brief.avoid);
           if (brief.notes) lines.push("notes: " + brief.notes);
+          if (brief.taste && brief.taste.picks) {
+            lines.push("taste: " + brief.taste.picks.length + " of " + brief.taste.shown + " shown — " +
+              brief.taste.picks.map((p) => p.label || ("#" + p.id)).join(", "));
+          }
           pre.textContent = lines.join("\n") || "(no extra detail)";
           div.append(pre);
         };
@@ -722,20 +726,27 @@
 
       const linkRow = document.createElement("div");
       linkRow.style.cssText = "display:flex;align-items:center;gap:8px;margin:12px 0;";
-      const link = "https://laseryard.com/concepts?order=" + data.order;
-      const linkEl = document.createElement("span");
-      linkEl.className = "mono";
-      linkEl.style.fontSize = "12px";
-      linkEl.textContent = link;
-      const copyBtn = document.createElement("button");
-      copyBtn.type = "button";
-      copyBtn.textContent = "Copy picker link";
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(link);
-        copyBtn.textContent = "Copied";
-        setTimeout(() => (copyBtn.textContent = "Copy picker link"), 1500);
-      };
-      linkRow.append(copyBtn, linkEl);
+      if (data.order === "_TASTE") {
+        const note = document.createElement("span");
+        note.style.cssText = "font-size:12px;color:var(--muted);";
+        note.textContent = "Standing taste gallery. Shown at the end of the design brief form; needs at least 8 live designs to appear there.";
+        linkRow.append(note);
+      } else {
+        const link = "https://laseryard.com/concepts?order=" + data.order;
+        const linkEl = document.createElement("span");
+        linkEl.className = "mono";
+        linkEl.style.fontSize = "12px";
+        linkEl.textContent = link;
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.textContent = "Copy picker link";
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(link);
+          copyBtn.textContent = "Copied";
+          setTimeout(() => (copyBtn.textContent = "Copy picker link"), 1500);
+        };
+        linkRow.append(copyBtn, linkEl);
+      }
       box.append(linkRow);
 
       if (!data.concepts.length) {

@@ -27,6 +27,11 @@ export const MAX_CONCEPT_BYTES = 8 * 1024 * 1024;
 
 export const MAX_PICKS = 10;
 
+// order_ref sentinel for the standing taste gallery shown inside the brief
+// form. Uppercase with a leading underscore so it can never collide with a
+// real LY- tracking code (normalizeTrackingNumber only trims + uppercases).
+export const TASTE_GALLERY_REF = "_TASTE";
+
 let ensured: Promise<unknown> | null = null;
 function ensureTables() {
   if (!ensured) {

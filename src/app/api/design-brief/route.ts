@@ -184,6 +184,18 @@ async function notifyStudio(
   const customerEmail =
     brief.engrave.find((e) => e.field === "email")?.value || null;
 
+  const site = process.env.SITE_ORIGIN || "https://laseryard.com";
+  const tasteBlock = brief.taste
+    ? `<p style="margin:20px 0 8px;font-size:14px;"><strong>Taste picks</strong>, ${brief.taste.picks.length} of ${brief.taste.shown} shown</p>
+       <div>${brief.taste.picks
+         .map(
+           (p) =>
+             `<a href="${site}/api/concepts/${p.id}/image" style="display:inline-block;margin:0 6px 6px 0;">` +
+             `<img src="${site}/api/concepts/${p.id}/image" alt="${escapeHtml(p.label || `design ${p.id}`)}" width="120" style="border-radius:6px;background:#26262e;vertical-align:top;"></a>`
+         )
+         .join("")}</div>`
+    : "";
+
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px 0;color:#1A1A24;">
       <h2 style="font-size:18px;margin:0 0 4px;">New design brief</h2>
@@ -203,6 +215,7 @@ async function notifyStudio(
         ${row("Notes", brief.notes)}
         ${row("Logo", logoLine)}
       </table>
+      ${tasteBlock}
       <p style="margin-top:24px;font-size:12px;color:#6b6b76;">From the design brief form on laseryard.com</p>
     </div>
   `;

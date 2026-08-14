@@ -3,12 +3,21 @@ import { adminJson, adminPreflight, isAdminRequest } from "@/lib/admin-auth";
 import {
   CONCEPT_IMAGE_TYPES,
   MAX_CONCEPT_BYTES,
+  TASTE_GALLERY_REF,
   conceptsForOrder,
   picksForOrder,
   saveConcept,
   setConceptArchived,
 } from "@/lib/concepts";
 import { normalizeTrackingNumber } from "@/lib/orders";
+
+// "taste" (any casing) addresses the standing gallery shown inside the
+// brief form instead of a per-order set.
+function resolveOrderRef(raw: string): string {
+  const trimmed = raw.trim();
+  if (/^_?taste$/i.test(trimmed)) return TASTE_GALLERY_REF;
+  return normalizeTrackingNumber(trimmed);
+}
 
 /**
  * Admin: manage an order's concept set.
@@ -31,9 +40,7 @@ export function OPTIONS() {
 
 export async function GET(request: NextRequest) {
   if (!isAdminRequest(request)) return adminJson({ error: "Unauthorized" }, 401);
-  const orderRef = normalizeTrackingNumber(
-    request.nextUrl.searchParams.get("order") || ""
-  );
+  const orderRef = resolveOrderRef(request.nextUrl.searchParams.get("order") || "");
   if (!orderRef) return adminJson({ error: "order is required" }, 400);
   try {
     const [concepts, picks] = await Promise.all([
@@ -51,7 +58,7 @@ export async function POST(request: NextRequest) {
   if (!isAdminRequest(request)) return adminJson({ error: "Unauthorized" }, 401);
   try {
     const form = await request.formData();
-    const orderRef = normalizeTrackingNumber(String(form.get("order") || ""));
+    const orderRef = resolveOrderRef(String(form.get("order") || ""));
     if (!orderRef) return adminJson({ error: "order is required" }, 400);
 
     const styleRaw = String(form.get("style") || "").trim().toLowerCase();
@@ -92,7 +99,10 @@ export async function POST(request: NextRequest) {
         ok: true,
         added: saved.length,
         concepts: saved,
-        picker: `https://laseryard.com/concepts?order=${orderRef}`,
+        picker:
+          orderRef === TASTE_GALLERY_REF
+            ? null // gallery designs show inside the brief form, not a picker page
+            : `https://laseryard.com/concepts?order=${orderRef}`,
       },
       201
     );

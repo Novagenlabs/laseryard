@@ -46,6 +46,9 @@ export type CleanBrief = {
   avoid: string;
   deadline: string;
   notes: string;
+  // Taste capture: the designs the customer tapped in the gallery step at
+  // the end of the form. Null when the gallery was empty or unreachable.
+  taste: { picks: { id: number; label: string | null }[]; shown: number } | null;
 };
 
 function str(v: unknown, cap: number): string {
@@ -125,6 +128,29 @@ export function sanitizeBrief(
     ? null
     : submittedAtRaw;
 
+  let taste: CleanBrief["taste"] = null;
+  const tasteRaw = b.taste as Record<string, unknown> | undefined;
+  if (tasteRaw && Array.isArray(tasteRaw.picks)) {
+    const picks = tasteRaw.picks
+      .slice(0, 10)
+      .map((p) => {
+        const pick = (p ?? {}) as Record<string, unknown>;
+        const id = Number.parseInt(String(pick.id), 10);
+        if (!Number.isInteger(id) || id <= 0) return null;
+        return { id, label: str(pick.label, 120) || null };
+      })
+      .filter((p): p is { id: number; label: string | null } => p !== null);
+    const shownRaw = Number.parseInt(String(tasteRaw.shown), 10);
+    if (picks.length > 0) {
+      taste = {
+        picks,
+        shown: Number.isInteger(shownRaw)
+          ? Math.max(picks.length, Math.min(shownRaw, 500))
+          : picks.length,
+      };
+    }
+  }
+
   return {
     ok: true,
     brief: {
@@ -146,6 +172,7 @@ export function sanitizeBrief(
       avoid: str(b.avoid, TEXT_CAPS.long),
       deadline,
       notes: str(b.notes, TEXT_CAPS.long),
+      taste,
     },
   };
 }

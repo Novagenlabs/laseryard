@@ -115,6 +115,14 @@ input:focus,textarea:focus{outline:none;border-color:var(--yellow)}
 .tile b{display:block;font-size:14.5px;font-weight:700}
 .tile span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;line-height:1.45}
 
+/* taste gallery */
+.tile.taste{padding:8px;position:relative}
+.tile.taste img{width:100%;aspect-ratio:1586/1000;object-fit:contain;display:block;border-radius:6px;background:#0d0d12}
+.tile.taste .tick{position:absolute;top:16px;right:16px;width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:rgba(10,10,14,.55);display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--ink)}
+.tile.taste.sel .tick{background:var(--yellow);border-color:var(--yellow)}
+.tile.taste.sel .tick::after{content:'✓'}
+.taste-count{font-size:13.5px;color:var(--muted);margin-top:16px;font-variant-numeric:tabular-nums}
+
 /* ---------- card preview ---------- */
 .preview{margin:0 0 26px}
 .card{
@@ -233,6 +241,18 @@ const CONFIG = {
     showUnavailable: false // true = render out-of-stock options greyed as "Coming soon"
   },
 
+  // ---- TASTE GALLERY ------------------------------------------------------
+  // Generic card designs shown as the last question so we can read the
+  // customer's taste. The studio maintains the set from the orders console
+  // (order code "taste"). If the endpoint is unreachable or holds fewer
+  // than minShown designs the step quietly disappears.
+  taste: {
+    endpoint: 'https://laseryard.com/api/taste-designs',
+    minShown: 8,
+    minPicks: 5,
+    maxPicks: 10
+  },
+
   // Metal colour / finish options.
   finishes: [
     { id:'black-matte',    name:'Matte black',     note:'Deep black, no shine',            css:'linear-gradient(135deg,#26262e,#3b3b46 45%,#16161c)', dark:true,  available:true  },
@@ -275,6 +295,7 @@ const CONFIG = {
 /* ============================================================ */
 
 const params = new URLSearchParams(location.search);
+const TASTE = { designs: [] };
 const data = {
   order: params.get('order') || '',
   name:'', role:'', company:'',
@@ -282,7 +303,8 @@ const data = {
   details:[], detailValues:{},
   back:'', backText:'',
   finish:'', infill:'', infillCustom:'',
-  style:'', references:'', avoid:'', deadline:'', notes:''
+  style:'', references:'', avoid:'', deadline:'', notes:'',
+  tastePicks:[]
 };
 
 if (data.order) document.getElementById('ordertag').textContent = 'Order ' + data.order;
@@ -648,7 +670,47 @@ screens.push({ id:'deadline', render(){
   return i;
 }});
 
-/* 13 — review */
+/* 13 — taste gallery */
+screens.push({ id:'taste', wide:true,
+  skip:()=> TASTE.designs.length < CONFIG.taste.minShown,
+  render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Which of these look good to you?'));
+  i.appendChild(el('p','help','Last question. Tap every design you like, '+CONFIG.taste.minPicks+' to '+CONFIG.taste.maxPicks+' of them. None of these is your final card. They teach us your taste, so close enough counts.'));
+  const g = el('div','grid');
+  TASTE.designs.forEach(d=>{
+    const t = el('button','tile taste'); t.type='button'; t.dataset.val=String(d.id);
+    const img = el('img');
+    img.src = d.image; img.alt = d.label || 'Card design'; img.loading = 'lazy';
+    t.appendChild(img);
+    t.appendChild(el('span','tick',''));
+    t.onclick = ()=>{
+      const k = data.tastePicks.indexOf(d.id);
+      if (k>=0) data.tastePicks.splice(k,1);
+      else if (data.tastePicks.length < CONFIG.taste.maxPicks) data.tastePicks.push(d.id);
+      paint();
+    };
+    g.appendChild(t);
+  });
+  i.appendChild(g);
+  i.appendChild(el('div','taste-count',''));
+  i.appendChild(el('div','err',''));
+  return i;
+}, paint(root){
+  root.querySelectorAll('.tile.taste').forEach(t=>t.classList.toggle('sel', data.tastePicks.includes(Number(t.dataset.val))));
+  const n = data.tastePicks.length;
+  const c = root.querySelector('.taste-count');
+  if (c) c.textContent =
+    n === 0 ? 'Nothing picked yet.' :
+    n < CONFIG.taste.minPicks ? n+' picked. Pick at least '+CONFIG.taste.minPicks+'.' :
+    n+' of '+CONFIG.taste.maxPicks+' picked.';
+}, validate(){
+  return data.tastePicks.length >= CONFIG.taste.minPicks
+    ? null
+    : 'Please pick at least '+CONFIG.taste.minPicks+' designs. Close enough counts.';
+}});
+
+/* 14 — review */
 screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
   const i = el('div','inner');
   i.appendChild(el('h2','','Check it over'));
@@ -670,6 +732,7 @@ screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
     ['Metal', fin?fin.name:''],
     ['Engraving colour', inf ? (inf.id==='custom' ? data.infillCustom : inf.name) : ''],
     ['Direction', data.style ? data.style.charAt(0).toUpperCase()+data.style.slice(1) : ''],
+    ['Designs you liked', data.tastePicks.length ? data.tastePicks.length+' picked from the gallery' : ''],
     ['References', data.references],
     ['Avoid', data.avoid],
     ['Needed by', data.deadline],
@@ -687,7 +750,7 @@ screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
   return i;
 }});
 
-/* 14 — done */
+/* 15 — done */
 screens.push({ id:'done', chromeless:true, terminal:true, render(){
   const i = el('div','inner done');
   i.appendChild(el('div','mark','✓'));
@@ -792,7 +855,14 @@ async function submit(){
     infill: { choice: data.infill, custom: data.infillCustom },
     direction: data.style,
     references: data.references, avoid: data.avoid,
-    deadline: data.deadline, notes: data.notes
+    deadline: data.deadline, notes: data.notes,
+    taste: data.tastePicks.length ? {
+      picks: data.tastePicks.map(id=>{
+        const d = TASTE.designs.find(x=>x.id===id);
+        return { id: id, label: d ? d.label : null };
+      }),
+      shown: TASTE.designs.length
+    } : null
   };
 
   try{
@@ -849,8 +919,23 @@ async function loadAvailability(){
   }
 }
 
+async function loadTasteGallery(){
+  if (!CONFIG.taste.endpoint) return;
+  try{
+    const r = await fetch(CONFIG.taste.endpoint, { headers:{ 'Accept':'application/json' } });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const body = await r.json();
+    TASTE.designs = (body.designs||[]).filter(d=>d && d.id && d.image);
+    // The step count recomputes on the next show(); if the customer is
+    // already past it they simply never see the gallery this visit.
+  } catch(err){
+    console.warn('Taste gallery unavailable, skipping that step.', err);
+  }
+}
+
 applyDefaults();
 loadAvailability();
+loadTasteGallery();
 show(0,1);
 </script>
 </body>
