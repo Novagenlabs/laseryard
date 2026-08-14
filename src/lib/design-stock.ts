@@ -30,10 +30,12 @@ export const DEFAULT_FINISHES: Record<string, boolean> = {
   "rose-gold": false,
 };
 
-// The owner has confirmed colour infill is offered but not yet which
-// colours, so no server defaults: ids absent from design_stock keep the
-// form's hardcoded flags. Add rows (or trim the form CONFIG) once the real
-// range is settled.
+// Owner confirmed 2026-08-14: colour infill is NOT offered. The form's
+// infill step is off (CONFIG.infill.offered = false, briefs record "none")
+// and the guard in checkBriefStock rejects anything else a tampered client
+// might send. Flip this with the form CONFIG if infill is ever introduced.
+export const INFILL_OFFERED = false;
+
 export const DEFAULT_INFILL: Record<string, boolean> = {};
 
 const ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,39}$/;
@@ -147,7 +149,11 @@ export async function checkBriefStock(
     return { ok: false, reason: `Finish "${finish}" is not available` };
   }
 
-  if (infillChoice !== "custom" && map.infill[infillChoice] === false) {
+  if (!INFILL_OFFERED) {
+    if (infillChoice !== "none") {
+      return { ok: false, reason: "Colour infill is not offered" };
+    }
+  } else if (infillChoice !== "custom" && map.infill[infillChoice] === false) {
     return { ok: false, reason: `Infill "${infillChoice}" is not available` };
   }
 

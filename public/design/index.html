@@ -267,10 +267,12 @@ const CONFIG = {
   // statement instead of a one-option question.
   singleFinishNote: 'That is the only finish we stock right now. More metals are coming soon.',
 
-  // Colour infill options. Set offered:false to remove the whole step.
-  // TODO confirm which of these you actually run, and flip the rest to false.
+  // Colour infill options. Owner confirmed 2026-08-14: colour infill is not
+  // offered, so the whole step is off and briefs record "none". Flip
+  // offered back to true (and trim the colour list) if that ever changes;
+  // the server guard in design-stock.ts must flip with it.
   infill: {
-    offered: true,
+    offered: false,
     colours: [
       { id:'none',   name:'No infill',   note:'Raw engrave only', hex:'transparent', available:true },
       { id:'black',  name:'Black',       note:'',  hex:'#111114', available:true },
@@ -656,16 +658,13 @@ screens.push({ id:'refs', render(){
   return i;
 }});
 
-/* 12 — deadline */
-screens.push({ id:'deadline', render(){
+/* 12 — anything else (deadline question dropped 2026-08-14 per owner) */
+screens.push({ id:'notes', render(){
   const i = el('div','inner');
-  i.appendChild(el('h2','','Do you need these by a certain date?'));
-  i.appendChild(el('p','help','Optional. If you have an event or a trip, tell us and we will work back from it.'));
-  const f = el('div','field');
-  f.innerHTML='<label for="q-deadline">Needed by</label><input type="date" id="q-deadline">';
-  i.appendChild(f);
+  i.appendChild(el('h2','','Anything else we should know?'));
+  i.appendChild(el('p','help','Optional. Whatever does not fit the questions above.'));
   const n = el('div','field');
-  n.innerHTML='<label for="q-notes">Anything else</label><textarea id="q-notes" placeholder="Optional"></textarea>';
+  n.innerHTML='<label for="q-notes">Notes</label><textarea id="q-notes" placeholder="Optional"></textarea>';
   i.appendChild(n);
   return i;
 }});
@@ -735,7 +734,6 @@ screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
     ['Designs you liked', data.tastePicks.length ? data.tastePicks.length+' picked from the gallery' : ''],
     ['References', data.references],
     ['Avoid', data.avoid],
-    ['Needed by', data.deadline],
     ['Notes', data.notes]
   ].filter(r=>r[1]);
 
@@ -783,7 +781,7 @@ function paint(){
 }
 
 function bindInputs(s, root){
-  const map = { name:'q-name', role:'q-role', company:'q-company', references:'q-refs', avoid:'q-avoid', deadline:'q-deadline', notes:'q-notes' };
+  const map = { name:'q-name', role:'q-role', company:'q-company', references:'q-refs', avoid:'q-avoid', notes:'q-notes' };
   Object.entries(map).forEach(([k,id])=>{
     const n = root.querySelector('#'+id);
     if(!n) return;
