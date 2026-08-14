@@ -654,6 +654,7 @@
           pre.className = "briefDetail mono";
           pre.style.cssText = "flex-basis:100%;white-space:pre-wrap;font-size:11px;background:var(--bg,#f6f6f8);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:6px;overflow-x:auto;";
           const lines = [];
+          if (brief.logo && brief.logo.choice === "design") lines.push("FINISHED DESIGN SUPPLIED — prepare for engraving, no concepts needed");
           if (brief.jobTitle || brief.company) lines.push((brief.jobTitle || "") + (brief.company ? " · " + brief.company : ""));
           for (const e of brief.engrave || []) lines.push(e.field + ": " + e.value);
           if (brief.back) lines.push("back: " + brief.back.choice + (brief.back.text ? " · " + brief.back.text : ""));

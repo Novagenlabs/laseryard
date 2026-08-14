@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
       data,
     };
   }
-  if (brief.logo.choice === "upload" && !logoFile) {
-    return json({ error: "logo.choice is upload but no file arrived" }, 400);
+  if ((brief.logo.choice === "upload" || brief.logo.choice === "design") && !logoFile) {
+    return json({ error: `logo.choice is ${brief.logo.choice} but no file arrived` }, 400);
   }
 
   try {
@@ -161,6 +161,7 @@ async function notifyStudio(
     return false;
   }
 
+  const isFinished = brief.logo.choice === "design";
   const orderLabel = record.orderRef || `LEAD (sent code: ${brief.order || "none"})`;
   const engrave = brief.engrave
     .map((e) => `${e.field}: ${e.value}`)
@@ -201,21 +202,22 @@ async function notifyStudio(
       <h2 style="font-size:18px;margin:0 0 4px;">New design brief</h2>
       <p style="margin:0 0 20px;color:#6b6b76;">Brief B#${record.id}, ${escapeHtml(orderLabel)}</p>
       <table style="border-collapse:collapse;font-size:14px;">
+        ${isFinished ? row("Supplied", "Finished card design, prepare for engraving") : ""}
         ${row("Name", brief.name)}
         ${row("Title", brief.jobTitle)}
         ${row("Company", brief.company)}
         ${row("Engrave", engrave)}
-        ${row("Back of card", back)}
+        ${isFinished ? "" : row("Back of card", back)}
         ${row("Finish", brief.finish)}
         ${row("Infill", infill)}
-        ${row("Direction", brief.direction)}
+        ${isFinished ? "" : row("Direction", brief.direction)}
         ${row("References", brief.references)}
         ${row("Avoid", brief.avoid)}
         ${row("Deadline", brief.deadline)}
         ${row("Notes", brief.notes)}
-        ${row("Logo", logoLine)}
+        ${row(isFinished ? "Design file" : "Logo", logoLine)}
       </table>
-      ${tasteBlock}
+      ${isFinished ? "" : tasteBlock}
       <p style="margin-top:24px;font-size:12px;color:#6b6b76;">From the design brief form on laseryard.com</p>
     </div>
   `;
@@ -223,7 +225,7 @@ async function notifyStudio(
   const payload: Record<string, unknown> = {
     from: FROM_ADDRESS,
     to: STUDIO_TO,
-    subject: `New design brief, ${record.orderRef || "lead"}, ${brief.name}`,
+    subject: `New design brief, ${record.orderRef || "lead"}, ${brief.name}${isFinished ? ", finished design supplied" : ""}`,
     html,
   };
   if (customerEmail) payload.reply_to = customerEmail;
