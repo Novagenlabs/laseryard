@@ -57,10 +57,11 @@ await sql`
   )
 `;
 
-const existing = new Set(
-  (await sql`SELECT label FROM design_concepts WHERE order_ref = '_TASTE'`).map(
-    (r) => r.label
-  )
+const existing = new Map(
+  (
+    await sql`SELECT id, label, sort, md5(data) AS hash
+              FROM design_concepts WHERE order_ref = '_TASTE'`
+  ).map((r) => [r.label, r])
 );
 
 const files = readdirSync(folder)
@@ -68,29 +69,50 @@ const files = readdirSync(folder)
   .sort();
 if (files.length === 0) throw new Error("No PNGs in " + folder);
 
+const { createHash } = await import("node:crypto");
+
 let added = 0;
+let replaced = 0;
 let sort = existing.size;
 for (const file of files) {
   const label = basename(file, ".png");
-  if (existing.has(label)) {
-    console.log(`skip  ${label} (already in gallery)`);
-    continue;
-  }
   const data = readFileSync(join(folder, file));
   if (!data.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]))) {
     console.log(`skip  ${label} (not a png)`);
     continue;
   }
-  await sql`
-    INSERT INTO design_concepts (order_ref, label, style, content_type, data, sort)
-    VALUES ('_TASTE', ${label}, NULL, 'image/png', ${data.toString("base64")}, ${sort++})
-  `;
-  console.log(`added ${label}  ${Math.round(data.length / 1024)} KB`);
-  added++;
+  const b64 = data.toString("base64");
+  const hash = createHash("md5").update(b64).digest("hex");
+  const row = existing.get(label);
+  if (row && row.hash === hash) {
+    console.log(`skip  ${label} (unchanged)`);
+    continue;
+  }
+  if (row) {
+    // Replace rather than update in place: concept images are served with an
+    // immutable cache header keyed on id, so a changed image must get a new
+    // id or cached browsers keep the old pixels forever.
+    await sql`DELETE FROM design_concepts WHERE id = ${row.id}`;
+    await sql`
+      INSERT INTO design_concepts (order_ref, label, style, content_type, data, sort)
+      VALUES ('_TASTE', ${label}, NULL, 'image/png', ${b64}, ${row.sort})
+    `;
+    console.log(`replaced ${label}  ${Math.round(data.length / 1024)} KB`);
+    replaced++;
+  } else {
+    await sql`
+      INSERT INTO design_concepts (order_ref, label, style, content_type, data, sort)
+      VALUES ('_TASTE', ${label}, NULL, 'image/png', ${b64}, ${sort++})
+    `;
+    console.log(`added ${label}  ${Math.round(data.length / 1024)} KB`);
+    added++;
+  }
 }
 
 const live = await sql`
   SELECT count(*)::int AS n FROM design_concepts
   WHERE order_ref = '_TASTE' AND archived = false
 `;
-console.log(`\n${added} added, gallery now holds ${live[0].n} live designs`);
+console.log(
+  `\n${added} added, ${replaced} replaced, gallery now holds ${live[0].n} live designs`
+);
