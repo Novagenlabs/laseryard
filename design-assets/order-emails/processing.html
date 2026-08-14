@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<!--
+  STALE. This file predates the design audit and must NOT be sent as is.
+  It breaks three current rules:
+    1. @imports Google Fonts. Emails are system sans only.
+    2. Renders the wordmark as Playfair/Georgia TEXT instead of the hosted PNG.
+    3. Has no dark mode handling, so Apple Mail inverts the whole thing.
+  Rebuild it from received.html. Kept here only so the original copy is not lost.
+  See invoice-template/README.md.
+-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Your order is processing | Laser Yard</title>
+<style type="text/css">
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Playfair+Display:ital,wght@0,800;1,500&display=swap');
+</style>
+</head>
+<body style="margin:0; padding:0; background-color:#f0f0f2; -webkit-text-size-adjust:100%;">
+
+  <!-- preheader (hidden) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+    Your order is processing. Track it any time.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0f0f2;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%;">
+
+          <!-- accent bar -->
+          <tr>
+            <td style="height:6px; line-height:6px; font-size:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="30%" style="background-color:#FFD500; height:6px; line-height:6px; font-size:0;">&nbsp;</td>
+                  <td style="background-color:#1A1A24; height:6px; line-height:6px; font-size:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- header / wordmark -->
+          <tr>
+            <td style="background-color:#ffffff; padding:14px 36px 12px 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="left" valign="middle" style="font-family:'Playfair Display',Georgia,'Times New Roman',serif; font-size:23px; line-height:1; color:#0b0b0f; white-space:nowrap;">
+                    <span style="font-weight:800;">Laser</span><span style="font-style:italic; font-weight:500;">yard</span>
+                  </td>
+                  <td align="right" valign="middle">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="width:22px; height:10px; background-color:#FFD500; border-radius:11px 11px 0 0; font-size:0; line-height:0;">&nbsp;</td></tr>
+                      <tr><td style="height:2px; font-size:0; line-height:0;">&nbsp;</td></tr>
+                      <tr><td style="width:22px; height:8px; background-color:#FFD500; border-radius:11px 11px 0 0; font-size:0; line-height:0;">&nbsp;</td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- hero -->
+          <tr>
+            <td style="background-color:#1A1A24; padding:40px 36px 36px 36px;" align="center">
+              <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:2px; color:#FFD500; text-transform:uppercase; font-weight:bold;">
+                Order LY-2026-11041
+              </div>
+              <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:30px; font-weight:bold; line-height:1.25; color:#ffffff; padding-top:12px;">
+                Your order is <span style="color:#FFD500;">processing</span>
+              </div>
+              <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#b9b9c2; padding-top:14px; max-width:420px;">
+                30 silver metal business cards, 0.8mm stainless steel.
+              </div>
+
+              <!-- laser beam graphic -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;" width="100%">
+                <tr>
+                  <td style="height:2px; background-color:#3a3a48; font-size:0; line-height:0;" width="18%">&nbsp;</td>
+                  <td style="height:2px; background-color:#FFD500; font-size:0; line-height:0;" width="54%">&nbsp;</td>
+                  <td align="left" width="10" style="font-size:0; line-height:0;">
+                    <div style="width:10px; height:10px; background-color:#FFD500; border-radius:5px; margin-top:-4px;"></div>
+                  </td>
+                  <td style="height:2px; background-color:#3a3a48; font-size:0; line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- progress tracker -->
+          <tr>
+            <td style="background-color:#ffffff; padding:34px 28px 8px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <!-- step 1 done -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td align="center" style="width:26px; height:26px; background-color:#1A1A24; border-radius:13px; font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:13px; color:#FFD500; font-weight:bold; text-align:center; vertical-align:middle;">&#10003;</td></tr>
+                    </table>
+                    <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:11px; color:#1A1A24; font-weight:bold; padding-top:8px;">Order<br>confirmed</div>
+                  </td>
+                  <!-- step 2 current -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td align="center" style="width:26px; height:26px; background-color:#FFD500; border-radius:13px; font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; font-weight:bold; text-align:center; vertical-align:middle;">2</td></tr>
+                    </table>
+                    <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:11px; color:#1A1A24; font-weight:bold; padding-top:8px;">Processing</div>
+                  </td>
+                  <!-- step 3 -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td align="center" style="width:26px; height:26px; background-color:#e6e6ea; border-radius:13px; font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:13px; color:#6b6b76; font-weight:bold; text-align:center; vertical-align:middle;">3</td></tr>
+                    </table>
+                    <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:11px; color:#6b6b76; padding-top:8px;">Production</div>
+                  </td>
+                  <!-- step 4 -->
+                  <td width="25%" align="center" valign="top">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr><td align="center" style="width:26px; height:26px; background-color:#e6e6ea; border-radius:13px; font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:13px; color:#6b6b76; font-weight:bold; text-align:center; vertical-align:middle;">4</td></tr>
+                    </table>
+                    <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:11px; color:#6b6b76; padding-top:8px;">Shipped</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- body copy -->
+          <tr>
+            <td style="background-color:#ffffff; padding:26px 36px 0 36px;">
+              <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.7; color:#1A1A24;">
+                Hi Vincent,
+                <br><br>
+                Your artwork is going through design fidelity checks before engraving. Once verified, your cards move into production. We will email you the shipping tracking link as soon as they ship.
+              </div>
+            </td>
+          </tr>
+
+          <!-- CTA button -->
+          <tr>
+            <td style="background-color:#ffffff; padding:28px 36px 8px 36px;" align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr>
+                  <td align="center" style="background-color:#FFD500; border-radius:6px;">
+                    <a href="https://laseryard.com/track?order=LY-PDWR-V95X" target="_blank" style="display:inline-block; padding:15px 44px; font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#1A1A24; text-decoration:none; letter-spacing:1px;">TRACK YOUR ORDER</a>
+                  </td>
+                </tr>
+              </table>
+              <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:12px; color:#6b6b76; padding-top:12px;">
+                Tracking code: <strong style="color:#1A1A24;">LY-PDWR-V95X</strong>
+              </div>
+            </td>
+          </tr>
+
+          <!-- order summary card -->
+          <tr>
+            <td style="background-color:#ffffff; padding:28px 36px 34px 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7f7f9; border-radius:8px;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:3px; color:#6b6b76; text-transform:uppercase; font-weight:bold; padding-bottom:10px;">
+                      Order summary
+                    </div>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; font-weight:bold; padding:4px 0;">
+                          Silver Metal Business Cards, 0.8mm
+                        </td>
+                        <td align="right" style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:13px; color:#1A1A24; font-weight:bold; padding:4px 0;">
+                          Qty 30
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:12px; color:#6b6b76;">
+                          American Express style &nbsp;&middot;&nbsp; Custom laser engraved &nbsp;&middot;&nbsp; Shipping included
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- footer -->
+          <tr>
+            <td style="background-color:#1A1A24; padding:24px 36px; border-radius:0 0 8px 8px;" align="center">
+              <div style="font-family:'Manrope',Helvetica,Arial,sans-serif; font-size:12px; color:#b9b9c2;">
+                <a href="https://laseryard.com" style="color:#FFD500; text-decoration:none;">laseryard.com</a>
+                &nbsp;&middot;&nbsp;
+                <a href="mailto:hello@laseryard.com" style="color:#FFD500; text-decoration:none;">hello@laseryard.com</a>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

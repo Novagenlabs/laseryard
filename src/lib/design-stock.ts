@@ -17,12 +17,17 @@ import { getDb } from "@/lib/db";
 export const STOCK_KINDS = ["finish", "infill"] as const;
 export type StockKind = (typeof STOCK_KINDS)[number];
 
-// Mirrors CONFIG.finishes in the form. Laser Yard currently stocks exactly
-// one finish; the form renders a statement instead of a one-option question.
+// Mirrors CONFIG.finishes in public/design/index.html — the two lists must
+// stay in sync because brief validation rejects finishes not present here.
+// Laser Yard currently stocks exactly one finish; the form renders a
+// statement instead of a one-option question.
 export const DEFAULT_FINISHES: Record<string, boolean> = {
   "black-matte": true,
-  gold: false,
   "silver-brushed": false,
+  "silver-mirror": false,
+  "black-mirror": false,
+  gold: false,
+  "rose-gold": false,
 };
 
 // The owner has confirmed colour infill is offered but not yet which

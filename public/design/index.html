@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Design brief | Laser Yard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1A1A24;
+  --ink-2:#22222e;
+  --ink-3:#2c2c3a;
+  --yellow:#FFD500;
+  --muted:#9a9aa6;
+  --line:rgba(255,255,255,.14);
+  --text:#f2f2f5;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--ink);color:var(--text);
+  font-family:'Manrope','Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.5;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+/* ---------- chrome ---------- */
+.topbar{flex:0 0 auto;padding:18px 24px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand img{width:112px;height:auto;display:block;margin:-14px 0 -21px 0}
+.brand .fallback{font-weight:800;font-size:17px;letter-spacing:-.01em;color:#fff}
+.ordertag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;white-space:nowrap}
+
+.progress{flex:0 0 auto;height:3px;background:rgba(255,255,255,.10);margin:18px 0 0}
+.progress i{display:block;height:100%;width:0;background:var(--yellow);transition:width .35s cubic-bezier(.4,0,.2,1)}
+
+/* ---------- stage ---------- */
+.stage{flex:1 1 auto;position:relative;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:flex-start;
+  padding:32px 24px 24px;
+  opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .3s ease,transform .3s ease,visibility .3s;
+  overflow-y:auto;
+}
+.screen.on{opacity:1;visibility:visible;transform:none}
+/* margin:auto centres the block without clipping when it overflows,
+   which justify-content:center would do */
+.inner{width:100%;max-width:560px;margin:auto}
+.screen.wide .inner{max-width:760px}
+
+.kicker{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--yellow);margin-bottom:14px}
+h1{font-size:30px;line-height:1.22;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+h2{font-size:23px;line-height:1.28;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.help{color:var(--muted);font-size:14.5px;line-height:1.6;margin-bottom:26px}
+.help:last-of-type{margin-bottom:26px}
+
+/* ---------- fields ---------- */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+input[type=text],input[type=email],input[type=tel],input[type=url],input[type=date],textarea{
+  width:100%;background:transparent;border:0;border-bottom:2px solid var(--line);
+  padding:10px 2px;font-size:20px;font-weight:600;
+  transition:border-color .2s;
+}
+textarea{font-size:17px;font-weight:500;line-height:1.6;border:2px solid var(--line);border-radius:var(--radius);padding:14px;resize:vertical;min-height:120px}
+input::placeholder,textarea::placeholder{color:#5c5c68;font-weight:500}
+input:focus,textarea:focus{outline:none;border-color:var(--yellow)}
+.err{color:#ff9d9d;font-size:13px;margin-top:8px;display:none}
+.err.on{display:block}
+
+/* ---------- choices ---------- */
+.choices{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
+.choice{
+  display:flex;align-items:center;gap:14px;
+  border:2px solid var(--line);border-radius:var(--radius);
+  padding:15px 16px;cursor:pointer;background:var(--ink-2);
+  transition:border-color .15s,background .15s;
+}
+.choice:hover{border-color:rgba(255,255,255,.32)}
+.choice input{position:absolute;opacity:0;pointer-events:none}
+.choice .box{
+  flex:0 0 auto;width:22px;height:22px;border:2px solid rgba(255,255,255,.35);
+  border-radius:6px;display:grid;place-items:center;font-size:13px;color:var(--ink);font-weight:800;
+}
+.choice.radio .box{border-radius:50%}
+.choice .txt{flex:1 1 auto}
+.choice .txt b{display:block;font-weight:700;font-size:16px}
+.choice .txt span{display:block;color:var(--muted);font-size:13.5px;margin-top:2px;line-height:1.5}
+.choice.sel{border-color:var(--yellow);background:rgba(255,213,0,.07)}
+.choice.sel .box{background:var(--yellow);border-color:var(--yellow)}
+.choice.sel .box::after{content:'✓'}
+
+/* swatch + style grids */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px}
+.tile{
+  border:2px solid var(--line);border-radius:var(--radius);background:var(--ink-2);
+  padding:14px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;
+}
+.tile:hover{border-color:rgba(255,255,255,.32)}
+.tile.sel{border-color:var(--yellow);background:rgba(255,213,0,.07)}
+.tile.off{opacity:.4;cursor:not-allowed;filter:saturate(.5)}
+.tile.off:hover{border-color:var(--line)}
+.tile .soon{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
+.stock-note{font-size:12.5px;color:var(--muted);margin-top:16px}
+.tile .sw{width:100%;height:46px;border-radius:6px;margin-bottom:11px;border:1px solid rgba(0,0,0,.35)}
+.tile svg{width:100%;height:auto;display:block;border-radius:6px;margin-bottom:11px;background:#0d0d12}
+.tile b{display:block;font-size:14.5px;font-weight:700}
+.tile span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;line-height:1.45}
+
+/* ---------- card preview ---------- */
+.preview{margin:0 0 26px}
+.card{
+  width:100%;max-width:340px;aspect-ratio:1.75/1;border-radius:12px;
+  padding:20px;display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:0 18px 40px rgba(0,0,0,.45);
+  background:linear-gradient(135deg,#c9ccd2 0%,#f2f4f7 42%,#a8acb4 100%);
+  color:#15151c;overflow:hidden;
+}
+.card.dark{background:linear-gradient(135deg,#26262e 0%,#3b3b46 45%,#16161c 100%);color:#f0f0f3}
+.card .pv-name{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.2;word-break:break-word}
+.card .pv-role{font-size:11px;font-weight:600;opacity:.72;margin-top:3px;word-break:break-word}
+.card .pv-co{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;opacity:.85;word-break:break-word}
+.card .pv-lines{font-size:10.5px;line-height:1.65;opacity:.72;word-break:break-word}
+.pv-hint{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* ---------- review ---------- */
+.review{border:2px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:22px}
+.review .row{display:flex;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:14.5px}
+.review .row:last-child{border-bottom:0}
+.review .row .k{flex:0 0 40%;color:var(--muted);font-weight:600}
+.review .row .v{flex:1 1 auto;font-weight:600;word-break:break-word;white-space:pre-wrap}
+
+/* ---------- nav ---------- */
+.nav{flex:0 0 auto;padding:16px 24px calc(18px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;border-top:1px solid var(--line)}
+.btn{
+  border:0;border-radius:8px;padding:14px 30px;font-weight:800;font-size:15px;letter-spacing:.04em;
+  background:var(--yellow);color:var(--ink);cursor:pointer;transition:transform .1s,opacity .15s;
+}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);border:2px solid var(--line);padding:12px 20px}
+.spacer{flex:1 1 auto}
+.stepno{font-size:12.5px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.enterhint{font-size:12px;color:#55555f;margin-left:12px}
+
+/* ---------- upload ---------- */
+.drop{
+  border:2px dashed var(--line);border-radius:var(--radius);padding:26px 20px;text-align:center;
+  cursor:pointer;transition:border-color .15s,background .15s;background:var(--ink-2);
+}
+.drop:hover,.drop.over{border-color:var(--yellow);background:rgba(255,213,0,.06)}
+.drop b{display:block;font-size:15px;font-weight:700;margin-bottom:4px}
+.drop span{color:var(--muted);font-size:13px}
+.filechip{display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--ink-2);border:2px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.filechip img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:6px;flex:0 0 auto}
+.filechip .fmeta{flex:1 1 auto;min-width:0}
+.filechip .fmeta b{display:block;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filechip .fmeta span{font-size:12.5px;color:var(--muted)}
+.filechip button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;text-decoration:underline;flex:0 0 auto}
+
+.done{text-align:center}
+.done .mark{width:64px;height:64px;border-radius:50%;background:var(--yellow);color:var(--ink);display:grid;place-items:center;font-size:32px;font-weight:800;margin:0 auto 22px}
+
+@media (max-width:520px){
+  h1{font-size:25px}
+  h2{font-size:21px}
+  .topbar{padding:14px 18px 0}
+  .screen{padding:24px 18px 18px}
+  .nav{padding:14px 18px calc(16px + env(safe-area-inset-bottom))}
+  .btn{padding:13px 24px;font-size:14.5px}
+  .enterhint{display:none}
+  input[type=text],input[type=email],input[type=tel],input[type=url],input[type=date]{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="https://laseryard.com">
+    <img src="https://laseryard.com/images/laseryard_logos/logo_dark.png" alt="Laseryard"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="fallback" style="display:none">Laseryard</span>
+  </a>
+  <div class="ordertag" id="ordertag"></div>
+</div>
+<div class="progress"><i id="bar"></i></div>
+
+<div class="stage" id="stage"></div>
+
+<div class="nav">
+  <button class="btn ghost" id="back" type="button">Back</button>
+  <button class="btn" id="next" type="button">Continue</button>
+  <span class="enterhint" id="enterhint">press Enter</span>
+  <span class="spacer"></span>
+  <span class="stepno" id="stepno"></span>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — edit these to match what Laser Yard actually sells.
+   Everything below renders from this object.
+   ============================================================ */
+const CONFIG = {
+  // POST target for submissions. Leave empty to fall back to a local
+  // JSON download so the form is testable before the backend exists.
+  endpoint: 'https://laseryard.com/api/design-brief',
+
+  // ---- STOCK AVAILABILITY -------------------------------------------------
+  // Every finish and infill colour below carries an `available` flag. Only
+  // available ones can be chosen. Two ways to drive it:
+  //
+  //   1. Manually. Flip `available` here and redeploy. Fine for now.
+  //   2. From the CRM / inventory. Set `availability.endpoint` to a URL that
+  //      returns a plain id -> boolean map. It is fetched on page load and
+  //      merged over the flags below, so the hardcoded values act as the
+  //      fallback whenever the CRM is unreachable. Expected response:
+  //
+  //        { "finishes": { "black-matte": true, "gold": false },
+  //          "infill":   { "red": true, "green": false } }
+  //
+  //      Unknown ids in the response are ignored. Ids missing from the
+  //      response keep whatever is set below.
+  availability: {
+    endpoint: 'https://laseryard.com/api/design-availability',
+    showUnavailable: false // true = render out-of-stock options greyed as "Coming soon"
+  },
+
+  // Metal colour / finish options.
+  finishes: [
+    { id:'black-matte',    name:'Matte black',     note:'Deep black, no shine',            css:'linear-gradient(135deg,#26262e,#3b3b46 45%,#16161c)', dark:true,  available:true  },
+    { id:'silver-brushed', name:'Brushed silver',  note:'Matte stainless, softly grained', css:'linear-gradient(135deg,#c9ccd2,#f2f4f7 45%,#a8acb4)', dark:false, available:false },
+    { id:'silver-mirror',  name:'Mirror silver',   note:'High polish, reflective',         css:'linear-gradient(135deg,#e9ecf1,#ffffff 40%,#b9bdc6)', dark:false, available:false },
+    { id:'black-mirror',   name:'Black mirror',    note:'Gloss black, reflective',         css:'linear-gradient(135deg,#101015,#3a3a48 40%,#0a0a0e)', dark:true,  available:false },
+    { id:'gold',           name:'Gold',            note:'Warm gold tone',                  css:'linear-gradient(135deg,#c9a227,#f3dd8a 42%,#a5801a)', dark:false, available:false },
+    { id:'rose-gold',      name:'Rose gold',       note:'Soft copper pink',                css:'linear-gradient(135deg,#c58a72,#f0c4b3 42%,#a76f58)', dark:false, available:false }
+  ],
+
+  // Copy shown when only one finish is in stock, so the step reads as a
+  // statement instead of a one-option question.
+  singleFinishNote: 'That is the only finish we stock right now. More metals are coming soon.',
+
+  // Colour infill options. Set offered:false to remove the whole step.
+  // TODO confirm which of these you actually run, and flip the rest to false.
+  infill: {
+    offered: true,
+    colours: [
+      { id:'none',   name:'No infill',   note:'Raw engrave only', hex:'transparent', available:true },
+      { id:'black',  name:'Black',       note:'',  hex:'#111114', available:true },
+      { id:'white',  name:'White',       note:'',  hex:'#ffffff', available:true },
+      { id:'red',    name:'Red',         note:'',  hex:'#c62828', available:true },
+      { id:'blue',   name:'Blue',        note:'',  hex:'#1f4fd8', available:true },
+      { id:'green',  name:'Green',       note:'',  hex:'#1f7a44', available:true },
+      { id:'custom', name:'Custom',      note:'Give us the hex or Pantone', hex:'linear-gradient(135deg,#ff4d4d,#ffd500,#4dd2ff)', available:true }
+    ]
+  },
+
+  // Contact details a customer can put on the card.
+  details: [
+    { id:'phone',   label:'Phone number',  type:'tel',  ph:'+34 600 000 000' },
+    { id:'email',   label:'Email address', type:'email',ph:'you@company.com' },
+    { id:'website', label:'Website',       type:'text', ph:'company.com' },
+    { id:'address', label:'Address',       type:'text', ph:'Street, city, country' },
+    { id:'social',  label:'Social handle', type:'text', ph:'@yourhandle' }
+  ]
+};
+
+/* ============================================================ */
+
+const params = new URLSearchParams(location.search);
+const data = {
+  order: params.get('order') || '',
+  name:'', role:'', company:'',
+  logoChoice:'', logoFile:null,
+  details:[], detailValues:{},
+  back:'', backText:'',
+  finish:'', infill:'', infillCustom:'',
+  style:'', references:'', avoid:'', deadline:'', notes:''
+};
+
+if (data.order) document.getElementById('ordertag').textContent = 'Order ' + data.order;
+
+/* ---------- tiny helpers ---------- */
+const el = (tag, cls, html) => { const n=document.createElement(tag); if(cls)n.className=cls; if(html!=null)n.innerHTML=html; return n; };
+const esc = s => String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function cardPreview(){
+  const f = CONFIG.finishes.find(x=>x.id===data.finish);
+  const wrap = el('div','preview');
+  const card = el('div','card' + (f && f.dark ? ' dark':''));
+  if (f) card.style.background = f.css;
+  const top = el('div');
+  top.appendChild(el('div','pv-name', esc(data.name) || 'Your name'));
+  if (data.role) top.appendChild(el('div','pv-role', esc(data.role)));
+  const bot = el('div');
+  if (data.company) bot.appendChild(el('div','pv-co', esc(data.company)));
+  const lines = data.details.map(id=>data.detailValues[id]).filter(Boolean);
+  if (lines.length) bot.appendChild(el('div','pv-lines', lines.map(esc).join('<br>')));
+  card.appendChild(top); card.appendChild(bot);
+  wrap.appendChild(card);
+  wrap.appendChild(el('div','pv-hint','Rough preview of the content only. Layout comes later.'));
+  return wrap;
+}
+
+/* style direction thumbnails, drawn inline so there are no assets to host */
+function styleArt(kind){
+  const g = {
+    minimal:  '<rect x="18" y="30" width="52" height="5" rx="2.5" fill="#e8e8ee"/><rect x="18" y="42" width="34" height="3.5" rx="1.75" fill="#8b8b96"/><rect x="18" y="74" width="26" height="3.5" rx="1.75" fill="#8b8b96"/>',
+    bold:     '<rect x="0" y="0" width="160" height="46" fill="#FFD500"/><rect x="16" y="16" width="66" height="14" rx="3" fill="#1A1A24"/><rect x="16" y="60" width="88" height="6" rx="3" fill="#e8e8ee"/><rect x="16" y="74" width="52" height="4" rx="2" fill="#8b8b96"/>',
+    classic:  '<rect x="16" y="16" width="128" height="68" fill="none" stroke="#c9a227" stroke-width="1.6"/><rect x="52" y="36" width="56" height="6" rx="3" fill="#e8e8ee"/><rect x="64" y="50" width="32" height="3.5" rx="1.75" fill="#8b8b96"/><rect x="70" y="62" width="20" height="2" rx="1" fill="#c9a227"/>',
+    technical:'<g stroke="#3a3a48" stroke-width="1"><path d="M0 25h160M0 50h160M0 75h160M40 0v100M80 0v100M120 0v100"/></g><rect x="16" y="40" width="48" height="7" rx="1" fill="#e8e8ee"/><rect x="16" y="54" width="72" height="3.5" rx="1" fill="#8b8b96"/><circle cx="128" cy="46" r="13" fill="none" stroke="#FFD500" stroke-width="2"/>'
+  }[kind];
+  return '<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">' + g + '</svg>';
+}
+
+/* ---------- screen definitions ---------- */
+const screens = [];
+
+/* 0 — intro */
+screens.push({ id:'intro', chromeless:true, nextLabel:'Start', render(){
+  const i = el('div','inner');
+  i.appendChild(el('div','kicker','Design brief'));
+  i.appendChild(el('h1','',"Let's design your cards"));
+  i.appendChild(el('p','help','A few questions about what you want on the card and how you want it to feel. It takes about three minutes. When you are done we will send you a set of concepts to choose from.'));
+  return i;
+}});
+
+/* 1 — name */
+screens.push({ id:'name', key:'name', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','What name goes on the card?'));
+  i.appendChild(el('p','help','Exactly as you want it engraved, including any accents.'));
+  const f = el('div','field');
+  f.innerHTML = '<label for="q-name">Full name</label><input type="text" id="q-name" placeholder="Leonardo Camilleri" autocomplete="name">';
+  i.appendChild(f);
+  i.appendChild(el('div','err','Please enter the name for the card.'));
+  return i;
+}, validate:()=> data.name.trim() ? null : 'Please enter the name for the card.' });
+
+/* 2 — role */
+screens.push({ id:'role', key:'role', optional:true, render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','And your job title?'));
+  i.appendChild(el('p','help','Optional. Leave it blank if you would rather keep the card clean.'));
+  const f = el('div','field');
+  f.innerHTML = '<label for="q-role">Job title or role</label><input type="text" id="q-role" placeholder="Founder" autocomplete="organization-title">';
+  i.appendChild(f);
+  return i;
+}});
+
+/* 3 — company */
+screens.push({ id:'company', key:'company', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','What is the company or brand name?'));
+  i.appendChild(el('p','help','If you are trading under your own name, put that here.'));
+  const f = el('div','field');
+  f.innerHTML = '<label for="q-company">Company name</label><input type="text" id="q-company" placeholder="Camilleri Studio" autocomplete="organization">';
+  i.appendChild(f);
+  i.appendChild(el('div','err','Please enter a company or brand name.'));
+  return i;
+}, validate:()=> data.company.trim() ? null : 'Please enter a company or brand name.' });
+
+/* 4 — logo */
+screens.push({ id:'logo', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Do you have a logo?'));
+  i.appendChild(el('p','help','Vector files engrave best. SVG, AI, EPS or PDF. A high resolution PNG also works.'));
+
+  const opts = [
+    { id:'upload',  b:'Yes, I will upload it now', s:'' },
+    { id:'later',   b:'Yes, but I will send it separately', s:'We will email you for it.' },
+    { id:'none',    b:'No logo', s:'We will build something from your name and initials.' }
+  ];
+  const box = el('div','choices');
+  opts.forEach(o=>{
+    const c = el('label','choice radio');
+    c.innerHTML = '<span class="box"></span><span class="txt"><b>'+o.b+'</b>'+(o.s?'<span>'+o.s+'</span>':'')+'</span>';
+    c.dataset.val = o.id;
+    c.onclick = ()=>{ data.logoChoice=o.id; paint(); toggleDrop(); };
+    box.appendChild(c);
+  });
+  i.appendChild(box);
+
+  const dropWrap = el('div');
+  dropWrap.id='dropwrap';
+  dropWrap.style.marginTop='16px';
+  dropWrap.style.display='none';
+  const drop = el('div','drop');
+  drop.innerHTML = '<b>Choose a file</b><span>or drag it here. Max 20 MB.</span>';
+  const fin = el('input'); fin.type='file'; fin.accept='.svg,.ai,.eps,.pdf,.png,.jpg,.jpeg'; fin.style.display='none';
+  drop.onclick = ()=>fin.click();
+  drop.ondragover = e=>{e.preventDefault();drop.classList.add('over');};
+  drop.ondragleave = ()=>drop.classList.remove('over');
+  drop.ondrop = e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0]);};
+  fin.onchange = ()=>{ if(fin.files[0]) setFile(fin.files[0]); };
+  dropWrap.appendChild(drop); dropWrap.appendChild(fin);
+  const chipHost = el('div'); chipHost.id='chiphost';
+  dropWrap.appendChild(chipHost);
+  i.appendChild(dropWrap);
+  i.appendChild(el('div','err','Please choose one of the options.'));
+
+  function setFile(file){
+    if (file.size > 20*1024*1024){ flash('That file is over 20 MB. Please send it by email instead.'); return; }
+    data.logoFile = file;
+    chipHost.innerHTML='';
+    const chip = el('div','filechip');
+    const thumb = el('img');
+    if (/^image\//.test(file.type)) thumb.src = URL.createObjectURL(file);
+    else thumb.style.background='#2c2c3a';
+    const meta = el('div','fmeta');
+    meta.innerHTML = '<b>'+esc(file.name)+'</b><span>'+(file.size/1024/1024).toFixed(2)+' MB</span>';
+    const rm = el('button',null,'Remove');
+    rm.onclick = ()=>{ data.logoFile=null; chipHost.innerHTML=''; };
+    chip.appendChild(thumb); chip.appendChild(meta); chip.appendChild(rm);
+    chipHost.appendChild(chip);
+  }
+  function toggleDrop(){ dropWrap.style.display = data.logoChoice==='upload' ? 'block':'none'; }
+  setTimeout(toggleDrop,0);
+  return i;
+}, paint(root){
+  root.querySelectorAll('.choice').forEach(c=>c.classList.toggle('sel', c.dataset.val===data.logoChoice));
+}, validate(){
+  if(!data.logoChoice) return 'Please choose one of the options.';
+  if(data.logoChoice==='upload' && !data.logoFile) return 'Please attach your logo file, or pick one of the other options.';
+  return null;
+}});
+
+/* 5 — which details */
+screens.push({ id:'details', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','What should we put on the card?'));
+  i.appendChild(el('p','help','Pick everything you want engraved. Fewer items usually looks better on metal.'));
+  const box = el('div','choices');
+  CONFIG.details.forEach(d=>{
+    const c = el('label','choice');
+    c.innerHTML = '<span class="box"></span><span class="txt"><b>'+d.label+'</b></span>';
+    c.dataset.val = d.id;
+    c.onclick = ()=>{
+      const k = data.details.indexOf(d.id);
+      if (k<0) data.details.push(d.id); else data.details.splice(k,1);
+      paint();
+    };
+    box.appendChild(c);
+  });
+  i.appendChild(box);
+  i.appendChild(el('div','err','Pick at least one detail to engrave.'));
+  return i;
+}, paint(root){
+  root.querySelectorAll('.choice').forEach(c=>c.classList.toggle('sel', data.details.includes(c.dataset.val)));
+}, validate:()=> data.details.length ? null : 'Pick at least one detail to engrave.' });
+
+/* 6 — detail values */
+screens.push({ id:'detailValues', skip:()=>!data.details.length, render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','What are those details?'));
+  i.appendChild(el('p','help','Type them exactly as they should read on the card.'));
+  CONFIG.details.filter(d=>data.details.includes(d.id)).forEach(d=>{
+    const f = el('div','field');
+    f.innerHTML = '<label for="dv-'+d.id+'">'+d.label+'</label>'+
+      '<input type="'+d.type+'" id="dv-'+d.id+'" placeholder="'+d.ph+'" value="'+esc(data.detailValues[d.id]||'')+'">';
+    f.querySelector('input').addEventListener('input', e=>{ data.detailValues[d.id]=e.target.value; });
+    i.appendChild(f);
+  });
+  i.appendChild(el('div','err','Please fill in every detail you selected.'));
+  return i;
+}, validate(){
+  const missing = data.details.filter(id=>!(data.detailValues[id]||'').trim());
+  return missing.length ? 'Please fill in every detail you selected.' : null;
+}});
+
+/* 7 — back of card */
+screens.push({ id:'back', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','What goes on the back?'));
+  i.appendChild(el('p','help','Both sides are engraved at no extra cost.'));
+  const opts = [
+    { id:'logo',    b:'Logo only',            s:'Centred, nothing else. The most common choice.' },
+    { id:'name',    b:'Company name only',    s:'Wordmark or plain text.' },
+    { id:'message', b:'A short line of text', s:'A tagline or a few words.' },
+    { id:'blank',   b:'Leave it blank',       s:'Plain metal.' }
+  ];
+  const box = el('div','choices');
+  opts.forEach(o=>{
+    const c = el('label','choice radio');
+    c.innerHTML='<span class="box"></span><span class="txt"><b>'+o.b+'</b><span>'+o.s+'</span></span>';
+    c.dataset.val=o.id;
+    c.onclick=()=>{ data.back=o.id; paint(); tog(); };
+    box.appendChild(c);
+  });
+  i.appendChild(box);
+  const fw = el('div','field'); fw.id='backtextwrap'; fw.style.display='none'; fw.style.marginTop='16px';
+  fw.innerHTML='<label for="q-backtext">Text for the back</label><input type="text" id="q-backtext" placeholder="Precision, every time" maxlength="60">';
+  fw.querySelector('input').addEventListener('input',e=>{data.backText=e.target.value;});
+  i.appendChild(fw);
+  i.appendChild(el('div','err','Please choose what goes on the back.'));
+  function tog(){ fw.style.display = data.back==='message' ? 'block':'none'; }
+  setTimeout(tog,0);
+  return i;
+}, paint(root){
+  root.querySelectorAll('.choice').forEach(c=>c.classList.toggle('sel', c.dataset.val===data.back));
+}, validate(){
+  if(!data.back) return 'Please choose what goes on the back.';
+  if(data.back==='message' && !data.backText.trim()) return 'Please type the line you want on the back.';
+  return null;
+}});
+
+/* 8 — finish */
+screens.push({ id:'finish', wide:true, render(){
+  const i = el('div','inner');
+  const inStock = CONFIG.finishes.filter(f=>f.available);
+  const only = inStock.length === 1 ? inStock[0] : null;
+
+  if (only){
+    // One finish in stock. State it rather than asking a question with one answer.
+    data.finish = only.id;
+    i.appendChild(el('h2','','Your cards will be '+only.name.toLowerCase()));
+    i.appendChild(el('p','help',CONFIG.singleFinishNote));
+  } else {
+    i.appendChild(el('h2','','Which metal do you want?'));
+    i.appendChild(el('p','help','Swatches are indicative. The real finish is richer than a screen can show.'));
+  }
+
+  const shown = CONFIG.availability.showUnavailable ? CONFIG.finishes : inStock;
+  const g = el('div','grid');
+  shown.forEach(f=>{
+    const t = el('button','tile'+(f.available?'':' off')); t.type='button'; t.dataset.val=f.id;
+    const sw = el('div','sw'); sw.style.background=f.css;
+    t.appendChild(sw);
+    t.appendChild(el('b',null,f.name));
+    if (f.note) t.appendChild(el('span',null,f.note));
+    if (!f.available) t.appendChild(el('span','soon','Coming soon'));
+    if (f.available) t.onclick=()=>{ data.finish=f.id; paint(); };
+    else t.disabled = true;
+    g.appendChild(t);
+  });
+  i.appendChild(g);
+  if (!only && CONFIG.availability.showUnavailable && inStock.length < CONFIG.finishes.length){
+    i.appendChild(el('div','stock-note','Greyed finishes are not in stock yet.'));
+  }
+  i.appendChild(el('div','err','Please pick a metal.'));
+  return i;
+}, paint(root){
+  root.querySelectorAll('.tile').forEach(t=>t.classList.toggle('sel', t.dataset.val===data.finish));
+}, validate(){
+  const f = CONFIG.finishes.find(x=>x.id===data.finish);
+  if (!f) return 'Please pick a metal.';
+  if (!f.available) return 'That finish is out of stock. Please pick another.';
+  return null;
+}});
+
+/* 9 — infill */
+screens.push({ id:'infill', wide:true,
+  skip:()=> !CONFIG.infill.offered || CONFIG.infill.colours.filter(c=>c.available).length < 2,
+  render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Any colour in the engraving?'));
+  i.appendChild(el('p','help','We can fill the engraved areas with colour, or leave the bare metal to show through.'));
+  const inStock = CONFIG.infill.colours.filter(c=>c.available);
+  const shown = CONFIG.availability.showUnavailable ? CONFIG.infill.colours : inStock;
+  const g = el('div','grid');
+  shown.forEach(c=>{
+    const t = el('button','tile'+(c.available?'':' off')); t.type='button'; t.dataset.val=c.id;
+    const sw = el('div','sw');
+    sw.style.background = c.hex==='transparent'
+      ? 'repeating-linear-gradient(45deg,#2c2c3a 0 8px,#22222e 8px 16px)' : c.hex;
+    t.appendChild(sw);
+    t.appendChild(el('b',null,c.name));
+    if(c.note) t.appendChild(el('span',null,c.note));
+    if(!c.available) t.appendChild(el('span','soon','Coming soon'));
+    if (c.available) t.onclick=()=>{ data.infill=c.id; paint(); tog(); };
+    else t.disabled = true;
+    g.appendChild(t);
+  });
+  i.appendChild(g);
+  const fw = el('div','field'); fw.id='infillwrap'; fw.style.display='none'; fw.style.marginTop='18px';
+  fw.innerHTML='<label for="q-infill">Which colour?</label><input type="text" id="q-infill" placeholder="#1F4FD8 or Pantone 2728 C">';
+  fw.querySelector('input').addEventListener('input',e=>{data.infillCustom=e.target.value;});
+  i.appendChild(fw);
+  i.appendChild(el('div','err','Please pick a colour option.'));
+  function tog(){ fw.style.display = data.infill==='custom' ? 'block':'none'; }
+  setTimeout(tog,0);
+  return i;
+}, paint(root){
+  root.querySelectorAll('.tile').forEach(t=>t.classList.toggle('sel', t.dataset.val===data.infill));
+}, validate(){
+  if(!data.infill) return 'Please pick a colour option.';
+  if(data.infill==='custom' && !data.infillCustom.trim()) return 'Please tell us the hex or Pantone.';
+  return null;
+}});
+
+/* 10 — style direction */
+screens.push({ id:'style', wide:true, render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Which direction feels right?'));
+  i.appendChild(el('p','help','Pick the one closest to what you want. This steers the concepts we send you.'));
+  const opts = [
+    { id:'minimal',   n:'Minimal',   s:'Lots of space, small type, nothing decorative' },
+    { id:'bold',      n:'Bold',      s:'Large type, strong blocks, high contrast' },
+    { id:'classic',   n:'Classic',   s:'Centred, framed, traditional and formal' },
+    { id:'technical', n:'Technical', s:'Grid based, precise, industrial' }
+  ];
+  const g = el('div','grid');
+  opts.forEach(o=>{
+    const t = el('button','tile'); t.type='button'; t.dataset.val=o.id;
+    t.innerHTML = styleArt(o.id) + '<b>'+o.n+'</b><span>'+o.s+'</span>';
+    t.onclick=()=>{ data.style=o.id; paint(); };
+    g.appendChild(t);
+  });
+  i.appendChild(g);
+  i.appendChild(el('div','err','Please pick a direction.'));
+  return i;
+}, paint(root){
+  root.querySelectorAll('.tile').forEach(t=>t.classList.toggle('sel', t.dataset.val===data.style));
+}, validate:()=> data.style ? null : 'Please pick a direction.' });
+
+/* 11 — references and avoid */
+screens.push({ id:'refs', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Anything we should look at, or avoid?'));
+  i.appendChild(el('p','help','Optional. Links to cards you like, or a note on what you do not want.'));
+  const a = el('div','field');
+  a.innerHTML='<label for="q-refs">Cards or brands you like</label><textarea id="q-refs" placeholder="Links, brand names, or a short description"></textarea>';
+  i.appendChild(a);
+  const b = el('div','field');
+  b.innerHTML='<label for="q-avoid">Anything to avoid</label><textarea id="q-avoid" placeholder="For example: no icons, do not use my middle initial"></textarea>';
+  i.appendChild(b);
+  return i;
+}});
+
+/* 12 — deadline */
+screens.push({ id:'deadline', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Do you need these by a certain date?'));
+  i.appendChild(el('p','help','Optional. If you have an event or a trip, tell us and we will work back from it.'));
+  const f = el('div','field');
+  f.innerHTML='<label for="q-deadline">Needed by</label><input type="date" id="q-deadline">';
+  i.appendChild(f);
+  const n = el('div','field');
+  n.innerHTML='<label for="q-notes">Anything else</label><textarea id="q-notes" placeholder="Optional"></textarea>';
+  i.appendChild(n);
+  return i;
+}});
+
+/* 13 — review */
+screens.push({ id:'review', wide:true, nextLabel:'Submit brief', render(){
+  const i = el('div','inner');
+  i.appendChild(el('h2','','Check it over'));
+  i.appendChild(el('p','help','Make sure the spelling is right. We engrave exactly what is written here.'));
+  i.appendChild(cardPreview());
+
+  const fin = CONFIG.finishes.find(f=>f.id===data.finish);
+  const inf = CONFIG.infill.colours.find(c=>c.id===data.infill);
+  const backMap = { logo:'Logo only', name:'Company name only', message:'Text: '+data.backText, blank:'Blank' };
+  const logoMap = { upload: data.logoFile ? data.logoFile.name : 'File attached', later:'Sending separately', none:'No logo' };
+
+  const rows = [
+    ['Name', data.name],
+    ['Job title', data.role],
+    ['Company', data.company],
+    ['Logo', logoMap[data.logoChoice]||''],
+    ['On the card', CONFIG.details.filter(d=>data.details.includes(d.id)).map(d=>d.label+': '+(data.detailValues[d.id]||'')).join('\n')],
+    ['Back of card', backMap[data.back]||''],
+    ['Metal', fin?fin.name:''],
+    ['Engraving colour', inf ? (inf.id==='custom' ? data.infillCustom : inf.name) : ''],
+    ['Direction', data.style ? data.style.charAt(0).toUpperCase()+data.style.slice(1) : ''],
+    ['References', data.references],
+    ['Avoid', data.avoid],
+    ['Needed by', data.deadline],
+    ['Notes', data.notes]
+  ].filter(r=>r[1]);
+
+  const box = el('div','review');
+  rows.forEach(r=>{
+    const row = el('div','row');
+    row.appendChild(el('div','k',esc(r[0])));
+    row.appendChild(el('div','v',esc(r[1])));
+    box.appendChild(row);
+  });
+  i.appendChild(box);
+  return i;
+}});
+
+/* 14 — done */
+screens.push({ id:'done', chromeless:true, terminal:true, render(){
+  const i = el('div','inner done');
+  i.appendChild(el('div','mark','✓'));
+  i.appendChild(el('h2','','Brief received'));
+  i.appendChild(el('p','help','We will design a set of concepts from this and email them to you to choose from. If anything is unclear we will ask before we start.'));
+  return i;
+}});
+
+/* ---------- engine ---------- */
+const stage=document.getElementById('stage'), bar=document.getElementById('bar');
+const nextBtn=document.getElementById('next'), backBtn=document.getElementById('back');
+const stepno=document.getElementById('stepno'), enterhint=document.getElementById('enterhint');
+let idx=0, current=null;
+
+const visible = () => screens.filter(s=>!(s.skip&&s.skip()));
+/* the intro and the thank you page are not questions, so they do not count */
+const counted = () => visible().filter(s=>!s.chromeless);
+
+function flash(msg){
+  const e = current && current.querySelector('.err');
+  if(!e) return;
+  e.textContent = msg; e.classList.add('on');
+}
+function clearFlash(){ const e = current && current.querySelector('.err'); if(e) e.classList.remove('on'); }
+
+function paint(){
+  const s = screens[idx];
+  if (s.paint && current) s.paint(current);
+  clearFlash();
+}
+
+function bindInputs(s, root){
+  const map = { name:'q-name', role:'q-role', company:'q-company', references:'q-refs', avoid:'q-avoid', deadline:'q-deadline', notes:'q-notes' };
+  Object.entries(map).forEach(([k,id])=>{
+    const n = root.querySelector('#'+id);
+    if(!n) return;
+    n.value = data[k]||'';
+    n.addEventListener('input', e=>{ data[k]=e.target.value; clearFlash(); });
+  });
+  const bt = root.querySelector('#q-backtext'); if(bt) bt.value=data.backText||'';
+  const ic = root.querySelector('#q-infill');  if(ic) ic.value=data.infillCustom||'';
+}
+
+function show(i, dir){
+  const s = screens[i];
+  if (s.skip && s.skip()) { show(i + (dir||1), dir); return; }
+  idx = i;
+  stage.innerHTML='';
+  const scr = el('div','screen'+(s.wide?' wide':''));
+  scr.appendChild(s.render());
+  stage.appendChild(scr);
+  current = scr;
+  requestAnimationFrame(()=>scr.classList.add('on'));
+  bindInputs(s, scr);
+  if (s.paint) s.paint(scr);
+
+  const list = counted();
+  const pos = list.indexOf(s);
+  bar.style.width = (s.terminal ? 100 : (pos<0 ? 0 : pos/list.length*100)) + '%';
+
+  nextBtn.textContent = s.nextLabel || 'Continue';
+  nextBtn.style.display = s.terminal ? 'none':'';
+  backBtn.style.display = (s.terminal || i===0) ? 'none':'';
+  enterhint.style.display = s.terminal ? 'none':'';
+  stepno.textContent = (pos<0) ? '' : (pos+1)+' of '+list.length;
+
+  const first = scr.querySelector('input[type=text],input[type=email],input[type=tel],input[type=url],textarea');
+  if (first && window.matchMedia('(min-width:760px)').matches) setTimeout(()=>first.focus(),340);
+}
+
+function go(dir){
+  const s = screens[idx];
+  if (dir>0 && s.validate){
+    const msg = s.validate();
+    if (msg){ flash(msg); return; }
+  }
+  const ni = idx+dir;
+  if (ni<0 || ni>=screens.length) return;
+  if (screens[idx].id==='review' && dir>0){ submit(); return; }
+  show(ni, dir);
+}
+
+nextBtn.onclick = ()=>go(1);
+backBtn.onclick = ()=>go(-1);
+document.addEventListener('keydown', e=>{
+  if (e.key==='Enter' && !e.shiftKey && e.target.tagName!=='TEXTAREA'){ e.preventDefault(); go(1); }
+});
+
+/* ---------- submit ---------- */
+async function submit(){
+  nextBtn.disabled = true;
+  nextBtn.textContent = 'Sending';
+
+  const payload = {
+    order: data.order,
+    submittedAt: new Date().toISOString(),
+    name: data.name, jobTitle: data.role, company: data.company,
+    logo: { choice: data.logoChoice, filename: data.logoFile ? data.logoFile.name : null },
+    engrave: data.details.map(id=>({ field:id, value:data.detailValues[id]||'' })),
+    back: { choice: data.back, text: data.backText },
+    finish: data.finish,
+    infill: { choice: data.infill, custom: data.infillCustom },
+    direction: data.style,
+    references: data.references, avoid: data.avoid,
+    deadline: data.deadline, notes: data.notes
+  };
+
+  try{
+    if (CONFIG.endpoint){
+      const fd = new FormData();
+      fd.append('brief', JSON.stringify(payload));
+      if (data.logoFile) fd.append('logo', data.logoFile, data.logoFile.name);
+      const r = await fetch(CONFIG.endpoint, { method:'POST', body:fd });
+      if (!r.ok) throw new Error('HTTP '+r.status);
+    } else {
+      // No endpoint configured. Hand the brief back as a file so nothing is lost.
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'design-brief' + (data.order ? '-'+data.order : '') + '.json';
+      a.click();
+    }
+    show(screens.findIndex(s=>s.id==='done'), 1);
+  } catch(err){
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Submit brief';
+    flash('Something went wrong sending the brief. Please try again, or email it to hello@laseryard.com.');
+  }
+}
+
+/* ---------- stock availability ---------- */
+function applyDefaults(){
+  // If the infill step will be skipped for lack of choice, still record
+  // whatever single option is live so the brief is not left blank.
+  const live = CONFIG.infill.colours.filter(c=>c.available);
+  if (CONFIG.infill.offered && live.length === 1) data.infill = live[0].id;
+  if (!CONFIG.infill.offered) data.infill = 'none';
+}
+
+async function loadAvailability(){
+  if (!CONFIG.availability.endpoint) return;
+  try{
+    const r = await fetch(CONFIG.availability.endpoint, { headers:{ 'Accept':'application/json' } });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const stock = await r.json();
+    const merge = (list, map) => {
+      if (!map) return;
+      list.forEach(item=>{ if (Object.prototype.hasOwnProperty.call(map, item.id)) item.available = !!map[item.id]; });
+    };
+    merge(CONFIG.finishes, stock.finishes);
+    merge(CONFIG.infill.colours, stock.infill);
+    applyDefaults();
+    // Redraw if the customer is already sitting on an affected step.
+    if (current && ['finish','infill'].includes(screens[idx].id)) show(idx,1);
+  } catch(err){
+    // Inventory is unreachable. The hardcoded flags stand, which is the
+    // whole point of keeping them accurate.
+    console.warn('Stock lookup failed, using built in availability.', err);
+  }
+}
+
+applyDefaults();
+loadAvailability();
+show(0,1);
+</script>
+</body>
+</html>
