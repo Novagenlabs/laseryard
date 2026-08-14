@@ -344,6 +344,7 @@
         const open = div.querySelector(".eventForm");
         if (open) { open.remove(); return; }
         div.querySelector(".editForm")?.remove();
+        div.querySelector(".designMailForm")?.remove();
         div.append(buildEventForm(o));
       };
 
@@ -356,41 +357,112 @@
         // Only one form at a time. Two stacked forms look nearly identical,
         // and submitting the event one silently drops every shipment field.
         div.querySelector(".eventForm")?.remove();
+        div.querySelector(".designMailForm")?.remove();
         div.append(buildEditForm(o));
       };
 
-      // Send the design onboarding email for this order. The click IS the
-      // approval; nothing sends without it.
+      // Design onboarding email for this order. Opens a panel with the
+      // filled email: copy it for your own mail app (rich text, pastes
+      // rendered into Gmail or Apple Mail) or send it from the Laser Yard
+      // address. Either way the click is the approval.
       const dlBtn = document.createElement("button");
       dlBtn.type = "button";
-      dlBtn.textContent = "Design link";
+      dlBtn.textContent = "Design email";
       dlBtn.onclick = async () => {
+        const open = div.querySelector(".designMailForm");
+        if (open) { open.remove(); return; }
+        div.querySelector(".eventForm")?.remove();
+        div.querySelector(".editForm")?.remove();
         showError("");
-        setBusy(dlBtn, true, "Sending…");
+        setBusy(dlBtn, true, "Filling…");
+        let gen;
         try {
-          let res = await api("/api/admin/send-design-link", {
-            method: "POST",
-            body: JSON.stringify({ trackingNumber: o.trackingNumber }),
-          }).catch((e) => ({ error: e.message }));
-          if (res && res.error === "no_email") {
-            const em = window.prompt("Customer email for the design link:");
-            if (!em) { setBusy(dlBtn, false); return; }
-            res = await api("/api/admin/send-design-link", {
-              method: "POST",
-              body: JSON.stringify({ trackingNumber: o.trackingNumber, email: em.trim() }),
-            });
-          } else if (res && res.error) {
-            throw new Error(res.error);
-          }
-          setBusy(dlBtn, false);
-          if (res && res.sent) {
-            dlBtn.textContent = "Sent to " + res.to;
-            setTimeout(() => (dlBtn.textContent = "Design link"), 4000);
-          }
+          gen = await api("/api/admin/send-design-link?trackingNumber=" + encodeURIComponent(o.trackingNumber));
         } catch (e) {
           setBusy(dlBtn, false);
-          showError("Design link: " + e.message);
+          showError("Design email: " + e.message);
+          return;
         }
+        setBusy(dlBtn, false);
+
+        const form = document.createElement("div");
+        form.className = "designMailForm";
+        form.style.cssText = "flex-basis:100%;display:grid;gap:8px;padding:10px;border:1px solid var(--border);border-left:3px solid var(--gold,#EEC335);border-radius:6px;margin-top:6px;";
+        const hint = document.createElement("div");
+        hint.className = "mono";
+        hint.textContent = "DESIGN ONBOARDING EMAIL — ready to use";
+        hint.style.cssText = "font-size:10px;letter-spacing:.16em;color:var(--muted);";
+        const subjRow = document.createElement("div");
+        subjRow.style.fontSize = "13px";
+        subjRow.innerHTML = "<strong>Subject:</strong> " + esc(gen.subject) +
+          '<br><span style="color:var(--muted);">To: ' + esc(gen.to || "no email stored, you choose in your mail app") + "</span>";
+
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;";
+
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "primary";
+        copyBtn.textContent = "Copy email";
+        copyBtn.onclick = async () => {
+          try {
+            // text/html pastes fully rendered into Gmail and Apple Mail
+            // compose windows; the plain fallback carries subject + link.
+            const plain = gen.subject + "\n\nhttps://laseryard.com/design?order=" + o.trackingNumber;
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                "text/html": new Blob([gen.html], { type: "text/html" }),
+                "text/plain": new Blob([plain], { type: "text/plain" }),
+              }),
+            ]);
+            copyBtn.textContent = "Copied, paste into your compose window";
+            setTimeout(() => (copyBtn.textContent = "Copy email"), 3500);
+          } catch (e) {
+            showError("Clipboard: " + e.message);
+          }
+        };
+
+        const subjBtn = document.createElement("button");
+        subjBtn.type = "button";
+        subjBtn.textContent = "Copy subject";
+        subjBtn.onclick = () => {
+          navigator.clipboard.writeText(gen.subject);
+          subjBtn.textContent = "Copied";
+          setTimeout(() => (subjBtn.textContent = "Copy subject"), 1500);
+        };
+
+        const sendBtn = document.createElement("button");
+        sendBtn.type = "button";
+        sendBtn.textContent = "Send from Laser Yard";
+        sendBtn.onclick = async () => {
+          showError("");
+          setBusy(sendBtn, true, "Sending…");
+          try {
+            let res = await api("/api/admin/send-design-link", {
+              method: "POST",
+              body: JSON.stringify({ trackingNumber: o.trackingNumber }),
+            }).catch((e) => ({ error: e.message }));
+            if (res && res.error === "no_email") {
+              const em = window.prompt("Customer email for the design link:");
+              if (!em) { setBusy(sendBtn, false); return; }
+              res = await api("/api/admin/send-design-link", {
+                method: "POST",
+                body: JSON.stringify({ trackingNumber: o.trackingNumber, email: em.trim() }),
+              });
+            } else if (res && res.error) {
+              throw new Error(res.error);
+            }
+            setBusy(sendBtn, false);
+            if (res && res.sent) sendBtn.textContent = "Sent to " + res.to;
+          } catch (e) {
+            setBusy(sendBtn, false);
+            showError("Design email: " + e.message);
+          }
+        };
+
+        row.append(copyBtn, subjBtn, sendBtn);
+        form.append(hint, subjRow, row);
+        div.append(form);
       };
 
       const delBtn = document.createElement("button");
