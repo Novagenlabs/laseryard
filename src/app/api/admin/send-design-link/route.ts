@@ -35,6 +35,40 @@ export function OPTIONS() {
   return adminPreflight();
 }
 
+async function fillTemplate(tn: string, customerName: string): Promise<{ subject: string; html: string }> {
+  const template = await readFile(
+    path.join(process.cwd(), "public", "emails", "design-link.html"),
+    "utf8"
+  );
+  const firstName = (customerName || "").trim().split(/\s+/)[0] || "there";
+  return {
+    subject: `Start your card design, order ${tn}`,
+    html: template
+      .replaceAll("{{CUSTOMER_NAME}}", escapeHtml(firstName))
+      .replaceAll("{{ORDER_CODE}}", tn),
+  };
+}
+
+// GET ?trackingNumber= — generate the filled email without sending, for the
+// console's copy-to-clipboard flow (owner pastes it into their own mail app).
+export async function GET(request: NextRequest) {
+  if (!isAdminRequest(request)) return adminJson({ error: "Unauthorized" }, 401);
+  try {
+    const tn = normalizeTrackingNumber(
+      request.nextUrl.searchParams.get("trackingNumber") || ""
+    );
+    if (!tn) return adminJson({ error: "trackingNumber is required" }, 400);
+    const found = await getOrderWithEvents(tn);
+    if (!found) return adminJson({ error: "Order not found" }, 404);
+    const { subject, html } = await fillTemplate(tn, found.order.customerName);
+    const to = await getOrderCustomerEmail(tn);
+    return adminJson({ subject, html, to, order: tn });
+  } catch (e) {
+    console.error("design-link preview error:", e);
+    return adminJson({ error: "Failed to generate email" }, 500);
+  }
+}
+
 export async function POST(request: NextRequest) {
   if (!isAdminRequest(request)) return adminJson({ error: "Unauthorized" }, 401);
 
@@ -64,14 +98,7 @@ export async function POST(request: NextRequest) {
       return adminJson({ error: "RESEND_API_KEY is not configured" }, 500);
     }
 
-    const template = await readFile(
-      path.join(process.cwd(), "public", "emails", "design-link.html"),
-      "utf8"
-    );
-    const firstName = (order.customerName || "").trim().split(/\s+/)[0] || "there";
-    const html = template
-      .replaceAll("{{CUSTOMER_NAME}}", escapeHtml(firstName))
-      .replaceAll("{{ORDER_CODE}}", tn);
+    const { subject, html } = await fillTemplate(tn, order.customerName);
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -83,7 +110,7 @@ export async function POST(request: NextRequest) {
         from: FROM_ADDRESS,
         to,
         reply_to: "hello@laseryard.com",
-        subject: `Start your card design, order ${tn}`,
+        subject,
         html,
       }),
       signal: AbortSignal.timeout(15_000),
