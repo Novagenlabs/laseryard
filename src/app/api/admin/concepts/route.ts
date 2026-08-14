@@ -30,7 +30,7 @@ function resolveOrderRef(raw: string): string {
  *
  * curl -X POST https://laseryard.com/api/admin/concepts \
  *   -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
- *   -F "order=LY-Z54M-PSWZ" -F "style=minimal" \
+ *   -F "order=LY-XXXX-XXXX" -F "style=minimal" \
  *   -F "file=@concept-01.png" -F "file=@concept-02.png"
  */
 

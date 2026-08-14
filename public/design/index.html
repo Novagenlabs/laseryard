@@ -288,7 +288,7 @@ const CONFIG = {
 
   // Contact details a customer can put on the card.
   details: [
-    { id:'phone',   label:'Phone number',  type:'tel',  ph:'+34 600 000 000' },
+    { id:'phone',   label:'Phone number',  type:'tel',  ph:'+1 555 010 0100' },
     { id:'email',   label:'Email address', type:'email',ph:'you@company.com' },
     { id:'website', label:'Website',       type:'text', ph:'company.com' },
     { id:'address', label:'Address',       type:'text', ph:'Street, city, country' },
@@ -364,7 +364,7 @@ screens.push({ id:'name', key:'name', render(){
   i.appendChild(el('h2','','What name goes on the card?'));
   i.appendChild(el('p','help','Exactly as you want it engraved, including any accents.'));
   const f = el('div','field');
-  f.innerHTML = '<label for="q-name">Full name</label><input type="text" id="q-name" placeholder="Leonardo Camilleri" autocomplete="name">';
+  f.innerHTML = '<label for="q-name">Full name</label><input type="text" id="q-name" placeholder="Jane Doe" autocomplete="name">';
   i.appendChild(f);
   i.appendChild(el('div','err','Please enter the name for the card.'));
   return i;
@@ -387,7 +387,7 @@ screens.push({ id:'company', key:'company', render(){
   i.appendChild(el('h2','','What is the company or brand name?'));
   i.appendChild(el('p','help','If you are trading under your own name, put that here.'));
   const f = el('div','field');
-  f.innerHTML = '<label for="q-company">Company name</label><input type="text" id="q-company" placeholder="Camilleri Studio" autocomplete="organization">';
+  f.innerHTML = '<label for="q-company">Company name</label><input type="text" id="q-company" placeholder="Northline Studio" autocomplete="organization">';
   i.appendChild(f);
   i.appendChild(el('div','err','Please enter a company or brand name.'));
   return i;
