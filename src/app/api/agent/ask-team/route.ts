@@ -5,9 +5,8 @@ import {
   createQuestion,
   findOpenQuestionForCustomer,
   isTeamNumber,
-  markPingSent,
   normalizeWhatsappNumber,
-  sendTeamPing,
+  runPingRound,
 } from "@/lib/bridge";
 
 /**
@@ -59,27 +58,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pingSenderId =
-      process.env.BRIDGE_PING_SENDER_ID || "1024784710715053";
-    const pingAgentId =
-      process.env.BRIDGE_PING_AGENT_ID || "agent_2401kxx3zb77fzvrf0t0vt1hm7yz";
-
     const existing = await findOpenQuestionForCustomer(customerNumber);
     if (existing) {
-      // Don't stack duplicate questions — but a stale or never-pinged open
-      // question must not silently suppress notifications (a customer once
-      // waited 10h behind an eaten ping). Re-ping when the ping never
-      // confirmed or the question has been open for over 30 minutes.
-      const ageMinutes =
-        (Date.now() - new Date(existing.createdAt).getTime()) / 60000;
-      if (!existing.pingSent || ageMinutes > 30) {
-        void sendTeamPing({
-          senderId: pingSenderId,
-          agentId: pingAgentId,
-          question: existing,
-        })
-          .then((pinged) => (pinged ? markPingSent(existing.id) : undefined))
-          .catch((e) => console.error("ask-team re-ping failed:", e));
+      // Don't stack duplicate questions — but an open question must not
+      // silently suppress notifications (a customer once waited 10h behind an
+      // eaten ping). Re-ping when no notification round has ever landed, or
+      // the last round was over 30 minutes ago.
+      const lastPingMs = existing.lastPingAt
+        ? new Date(existing.lastPingAt).getTime()
+        : new Date(existing.createdAt).getTime();
+      const minutesSincePing = (Date.now() - lastPingMs) / 60000;
+      if (existing.pingCount === 0 || minutesSincePing > 30) {
+        void runPingRound(existing, "reminder").catch((e) =>
+          console.error("ask-team re-ping failed:", e)
+        );
       }
       return NextResponse.json({
         logged: true,
@@ -103,16 +95,14 @@ export async function POST(request: NextRequest) {
     // Dokploy runs a persistent `next start`, so the detached promise
     // completes reliably after the response.
     //
-    // Pings route through the +228 line by default (pingSenderId above):
-    // Meta silently drops +1 415 templates to the team number (while
-    // delivering its session messages, and its templates to other recipients
-    // — opaque pair-specific filtering). The team's replies reach the
-    // staging agent, which shares this same question queue; the relay back
-    // to the customer still goes out from the customer's own line (stored
-    // on the question row).
-    void sendTeamPing({ senderId: pingSenderId, agentId: pingAgentId, question: q })
-      .then((pinged) => (pinged ? markPingSent(q.id) : undefined))
-      .catch((e) => console.error("ask-team ping send failed:", e));
+    // The round pings WhatsApp (through the +228 line by default — Meta
+    // silently drops +1 415 templates to the team number) AND emails the
+    // studio inbox; the background sweeper re-runs rounds for questions that
+    // stay open. The relay back to the customer still goes out from the
+    // customer's own line (stored on the question row).
+    void runPingRound(q, "new").catch((e) =>
+      console.error("ask-team ping send failed:", e)
+    );
 
     return NextResponse.json({
       logged: true,

@@ -27,6 +27,8 @@ export type BridgeQuestion = {
   agentId: string | null;
   createdAt: string;
   answeredAt: string | null;
+  lastPingAt: string | null;
+  pingCount: number;
 };
 
 // Team WhatsApp numbers allowed to answer bridge questions. Comparison is on
@@ -53,24 +55,31 @@ let ensured: Promise<unknown> | null = null;
 function ensureTable() {
   if (!ensured) {
     const sql = getDb();
-    ensured = sql`
-      CREATE TABLE IF NOT EXISTS bridge_questions (
-        id SERIAL PRIMARY KEY,
-        customer_number TEXT NOT NULL,
-        question TEXT NOT NULL,
-        context TEXT,
-        status TEXT NOT NULL DEFAULT 'open',
-        answer TEXT,
-        customer_message TEXT,
-        answered_by TEXT,
-        ping_sent BOOLEAN NOT NULL DEFAULT false,
-        delivered BOOLEAN NOT NULL DEFAULT false,
-        sender_phone_number_id TEXT,
-        agent_id TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-        answered_at TIMESTAMPTZ
-      )
-    `;
+    ensured = (async () => {
+      await sql`
+        CREATE TABLE IF NOT EXISTS bridge_questions (
+          id SERIAL PRIMARY KEY,
+          customer_number TEXT NOT NULL,
+          question TEXT NOT NULL,
+          context TEXT,
+          status TEXT NOT NULL DEFAULT 'open',
+          answer TEXT,
+          customer_message TEXT,
+          answered_by TEXT,
+          ping_sent BOOLEAN NOT NULL DEFAULT false,
+          delivered BOOLEAN NOT NULL DEFAULT false,
+          sender_phone_number_id TEXT,
+          agent_id TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+          answered_at TIMESTAMPTZ,
+          last_ping_at TIMESTAMPTZ,
+          ping_count INTEGER NOT NULL DEFAULT 0
+        )
+      `;
+      // The production table predates the re-ping columns.
+      await sql`ALTER TABLE bridge_questions ADD COLUMN IF NOT EXISTS last_ping_at TIMESTAMPTZ`;
+      await sql`ALTER TABLE bridge_questions ADD COLUMN IF NOT EXISTS ping_count INTEGER NOT NULL DEFAULT 0`;
+    })();
   }
   return ensured;
 }
@@ -92,6 +101,8 @@ function rowToQuestion(row: any): BridgeQuestion {
     agentId: row.agent_id,
     createdAt: row.created_at,
     answeredAt: row.answered_at,
+    lastPingAt: row.last_ping_at ?? null,
+    pingCount: row.ping_count ?? 0,
   };
 }
 
@@ -131,6 +142,16 @@ export async function createQuestion(input: {
 export async function markPingSent(id: number): Promise<void> {
   const sql = getDb();
   await sql`UPDATE bridge_questions SET ping_sent = true WHERE id = ${id}`;
+}
+
+/** Record that a notification round reached at least one channel. */
+export async function recordPingRound(id: number): Promise<void> {
+  const sql = getDb();
+  await sql`
+    UPDATE bridge_questions
+    SET last_ping_at = now(), ping_count = ping_count + 1
+    WHERE id = ${id}
+  `;
 }
 
 export async function openQuestions(): Promise<BridgeQuestion[]> {
@@ -335,4 +356,151 @@ export async function sendAnswerToCustomer(opts: {
     console.error("bridge answer fallback template failed:", fallback.status, fallback.detail);
   }
   return fallback.ok;
+}
+
+// ---------------------------------------------------------------------------
+// Team notification rounds (WhatsApp + email) and the re-ping sweep
+//
+// WhatsApp template delivery to the team phone has proven opaque (Meta accepts
+// sends that surface late or never), so every notification round also emails
+// the studio inbox — a channel with no Meta layer in it. The sweep re-runs
+// rounds for questions that stay open, so one swallowed ping can no longer
+// strand a customer question.
+
+const NOTIFY_FROM = "Yara at Laseryard <yara@updates.laseryard.com>";
+const notifyEmailTo = () =>
+  process.env.BRIDGE_NOTIFY_EMAIL || "hello@laseryard.com";
+
+// Reminder rounds after the initial ping: at most 2, at least 15 minutes
+// apart, and nothing older than a day (stale questions live in the console).
+const PING_MAX_ROUNDS = 3;
+const PING_RETRY_GAP_MS = 15 * 60_000;
+const PING_MAX_AGE_MS = 24 * 60 * 60_000;
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export async function sendTeamPingEmail(
+  q: BridgeQuestion,
+  kind: "new" | "reminder"
+): Promise<boolean> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return false;
+
+  const ageMinutes = Math.max(
+    0,
+    Math.round((Date.now() - new Date(q.createdAt).getTime()) / 60000)
+  );
+  const eyebrow = kind === "new" ? "New team question" : "Still waiting";
+  const subject =
+    kind === "new"
+      ? `Yara needs an answer: Q#${q.id} from ${q.customerNumber}`
+      : `Still waiting on Q#${q.id} from ${q.customerNumber}`;
+
+  const row = (label: string, value: string) => `
+    <tr>
+      <td style="padding:6px 12px 6px 0;color:#6b6b76;font-size:13px;vertical-align:top;white-space:nowrap;">${label}</td>
+      <td style="padding:6px 0;color:#ffffff;font-size:14px;">${value}</td>
+    </tr>`;
+
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0 auto;padding:24px 16px;">
+    <div style="background:#1A1A24;border-radius:12px;padding:24px;">
+      <p style="margin:0 0 6px;font-size:11px;letter-spacing:1.5px;color:#FFD500;text-transform:uppercase;font-weight:700;">${eyebrow}</p>
+      <p style="margin:0 0 16px;font-size:18px;font-weight:700;color:#ffffff;">Q#${q.id} is waiting for the team</p>
+      <table style="border-collapse:collapse;width:100%;">
+        ${row("Client", escapeHtml(q.customerNumber))}
+        ${row("Question", escapeHtml(q.question))}
+        ${q.context ? row("Context", escapeHtml(q.context)) : ""}
+        ${row("Logged", `${ageMinutes} min ago`)}
+      </table>
+      <p style="margin:16px 0 0;font-size:13px;line-height:1.5;color:#6b6b76;">Message Yara from the team WhatsApp with the question number and the answer, and she relays it to the client. The orders console Team bridge panel shows the full queue.</p>
+    </div>
+  </div>`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    signal: AbortSignal.timeout(12_000),
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from: NOTIFY_FROM, to: [notifyEmailTo()], subject, html }),
+  });
+  if (!res.ok) {
+    console.error(
+      "bridge ping email failed:",
+      res.status,
+      await res.text().catch(() => "")
+    );
+  }
+  return res.ok;
+}
+
+/**
+ * One full notification round: WhatsApp template + email, in parallel.
+ * Updates ping_sent (WhatsApp accepted) and the round counters (any channel
+ * landed). Never throws — callers may fire-and-forget.
+ */
+export async function runPingRound(
+  q: BridgeQuestion,
+  kind: "new" | "reminder"
+): Promise<{ whatsapp: boolean; email: boolean }> {
+  const senderId = process.env.BRIDGE_PING_SENDER_ID || "1024784710715053";
+  const agentId =
+    process.env.BRIDGE_PING_AGENT_ID || "agent_2401kxx3zb77fzvrf0t0vt1hm7yz";
+  const [whatsapp, email] = await Promise.all([
+    sendTeamPing({ senderId, agentId, question: q }).catch((e) => {
+      console.error("bridge whatsapp ping failed:", e);
+      return false;
+    }),
+    sendTeamPingEmail(q, kind).catch((e) => {
+      console.error("bridge email ping failed:", e);
+      return false;
+    }),
+  ]);
+  try {
+    if (whatsapp) await markPingSent(q.id);
+    if (whatsapp || email) await recordPingRound(q.id);
+  } catch (e) {
+    console.error("bridge ping bookkeeping failed:", e);
+  }
+  return { whatsapp, email };
+}
+
+let sweepInFlight = false;
+
+/**
+ * Re-ping open questions that nobody has answered yet. Runs from the
+ * in-process sweeper every 10 minutes and from the admin sweep endpoint.
+ */
+export async function sweepOpenQuestions(): Promise<{
+  open: number;
+  pinged: number[];
+}> {
+  if (sweepInFlight) return { open: 0, pinged: [] };
+  sweepInFlight = true;
+  try {
+    const rows = await openQuestions();
+    const pinged: number[] = [];
+    for (const q of rows) {
+      const ageMs = Date.now() - new Date(q.createdAt).getTime();
+      if (ageMs > PING_MAX_AGE_MS) continue;
+      if (q.pingCount >= PING_MAX_ROUNDS) continue;
+      if (q.pingCount > 0) {
+        const lastMs = q.lastPingAt ? new Date(q.lastPingAt).getTime() : 0;
+        if (Date.now() - lastMs < PING_RETRY_GAP_MS) continue;
+      }
+      const res = await runPingRound(q, q.pingCount > 0 ? "reminder" : "new");
+      if (res.whatsapp || res.email) pinged.push(q.id);
+    }
+    return { open: rows.length, pinged };
+  } finally {
+    sweepInFlight = false;
+  }
 }
