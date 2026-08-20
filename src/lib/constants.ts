@@ -4,7 +4,7 @@ export const SITE_CONFIG = {
   name: "Laser Yard",
   tagline: "Precision Laser Engraving",
   description:
-    "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Ready-made engraved products and custom engraving:metal, wood, crystal, acrylic, and leather.",
+    "Precision laser engraving studio serving clients worldwide. Ready-made engraved products and custom engraving:metal, wood, crystal, acrylic, and leather.",
   url: "https://laseryard.com",
 };
 
@@ -205,7 +205,7 @@ export const TESTIMONIALS = [
       "These cards changed how people perceive my brand. Every meeting starts with compliments.",
     author: "Adaeze Okonkwo",
     title: "CEO, Fintech Solutions Ltd",
-    location: "Lagos, Nigeria",
+    location: "Nigeria",
     rating: 5,
   },
   {
@@ -292,14 +292,14 @@ export const COUNTRIES = [
   {
     slug: "africa",
     name: "Africa",
-    cities: ["Lagos", "Accra", "Abuja", "Nairobi", "Johannesburg"],
+    cities: ["Accra", "Abuja", "Nairobi", "Johannesburg", "Cairo"],
     currency: "USD",
     phone: "+234",
   },
   {
     slug: "nigeria",
     name: "Nigeria",
-    cities: ["Lagos", "Abuja", "Port Harcourt", "Kano"],
+    cities: ["Abuja", "Port Harcourt", "Ibadan", "Kano"],
     currency: "NGN",
     phone: "+234",
   },

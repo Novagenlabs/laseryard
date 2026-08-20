@@ -87,15 +87,15 @@ const faqCategories = [
     questions: [
       {
         q: "Where do you ship to?",
-        a: "We ship worldwide! Local delivery in Lagos is 24-48 hours, rest of Nigeria in 3-5 days, and international orders typically arrive within 7-14 business days.",
+        a: "We ship worldwide! Orders typically arrive within 7-14 business days after design approval, tracked door-to-door.",
       },
       {
         q: "How long does delivery take?",
-        a: "Lagos: 24-48 hours. Other Nigerian cities: 3-5 days. International: 7-14 business days depending on destination. Contact us for specific delivery estimates to your location.",
+        a: "Most orders arrive within 7-14 business days depending on destination. Contact us for specific delivery estimates to your location.",
       },
       {
         q: "How much does shipping cost?",
-        a: "Shipping costs vary by destination. Local Lagos delivery starts at $5, other Nigerian cities from $10. International shipping is quoted per order. Contact us on WhatsApp for exact costs to your location.",
+        a: "Most quoted prices include worldwide shipping. Where shipping is extra (for example EU orders on 0.4mm cards), we confirm the exact cost before you pay. Contact us on WhatsApp for specifics.",
       },
       {
         q: "Can I track my order?",

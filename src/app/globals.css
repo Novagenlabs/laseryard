@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ===== LASER YARD DESIGN SYSTEM ===== */
-/* Premium, Apple-esque aesthetic with West African executive sophistication */
+/* Premium, Apple-esque aesthetic with global executive sophistication */
 
 @theme inline {
   --color-background: var(--background);

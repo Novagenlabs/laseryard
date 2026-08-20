@@ -83,7 +83,7 @@ function buildPreview(d: {
       carrier: "dhl",
       waybillNumber: hasWaybill ? waybill : null,
       shipmentStatus: "On the way",
-      shipmentDetail: "Departed our Lagos studio, bound for London",
+      shipmentDetail: "Departed our studio, bound for London",
       estimatedDelivery: "2026-07-29",
       carrierUrl: hasWaybill
         ? `https://www.dhl.com/en/express/tracking.html?AWB=${waybill.replace(/\s+/g, "")}&brand=DHL`
@@ -118,7 +118,7 @@ export function OrderTrackerPreview({ orderParam }: { orderParam?: string }) {
         },
         destination: {
           type: "text",
-          default: "Lekki, Lagos",
+          default: "London, UK",
           placeholder: "Destination",
         },
         tracking: {

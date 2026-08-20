@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: "%s | Laser Yard",
   },
   description:
-    "Precision laser engraving studio headquartered in Lagos, serving clients in Nigeria, Ghana, UK, US, UAE, and the EU. Metal business cards, crystal awards, wood engraving, and custom laser engraving services.",
+    "Precision laser engraving studio serving clients in the UK, US, EU, UAE, and 20+ countries worldwide. Metal business cards, crystal awards, wood engraving, and custom laser engraving services.",
   keywords: [
     "laser engraving",
     "metal business cards",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     siteName: "Laser Yard",
     title: "Precision Laser Engraving",
     description:
-      "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Shop products or bring your own items for custom engraving.",
+      "Precision laser engraving studio serving clients worldwide. Shop products or bring your own items for custom engraving.",
     images: [
       {
         url: "/og-image.jpg",
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Laser Yard | Precision Laser Engraving",
     description:
-      "Precision laser engraving studio headquartered in Lagos, serving clients worldwide. Shop products or bring your own items for custom engraving.",
+      "Precision laser engraving studio serving clients worldwide. Shop products or bring your own items for custom engraving.",
     images: ["/og-image.jpg"],
   },
   robots: {

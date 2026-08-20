@@ -67,9 +67,9 @@ const steps = [
     description:
       "Your finished products are carefully packaged and shipped to your location. Track your order and receive updates via WhatsApp.",
     details: [
-      "Lagos: 24-48 hours",
-      "Rest of Nigeria: 3-5 days",
-      "International: 7-14 days",
+      "Tracked door-to-door delivery",
+      "Worldwide: 7-14 business days",
+      "Rush options on request",
     ],
   },
 ];
@@ -114,7 +114,7 @@ export default function ProcessPage() {
               },
               {
                 name: "Delivery",
-                text: "Finished products are carefully packaged and shipped. Lagos: 24-48 hours, Nigeria: 3-5 days, International: 7-14 days.",
+                text: "Finished products are carefully packaged and shipped worldwide, arriving within 7-14 business days, tracked door-to-door.",
               },
             ],
           }),

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 // curl -X POST https://laseryard.com/api/orders \
 //   -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
 //   -H "Content-Type: application/json" \
-//   -d '{"customerName":"Ada O.","itemDescription":"50x metal business cards","destination":"Lagos"}'
+//   -d '{"customerName":"Ada O.","itemDescription":"50x metal business cards","destination":"London"}'
 export async function POST(request: NextRequest) {
   if (!isAdminRequest(request)) {
     return adminJson({ error: "Unauthorized" }, 401);

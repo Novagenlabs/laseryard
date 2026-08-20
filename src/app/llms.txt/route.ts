@@ -1,6 +1,6 @@
 export function GET() {
   const content = `# Laser Yard
-> Precision laser engraving studio headquartered in Lagos, Nigeria, serving clients worldwide.
+> Precision laser engraving studio serving clients worldwide.
 
 ## Products
 
@@ -20,13 +20,12 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 
 ## Key Information
 
-- **Headquarters**: Lagos, Nigeria
-- **Serving**: Nigeria, Ghana, United Kingdom, United States, UAE, EU, and 20+ countries worldwide
+- **Serving**: United Kingdom, United States, EU, UAE, Nigeria, Ghana, and 20+ countries worldwide
 - **Production time**: 10-14 business days standard, 5-7 days rush
 - **Minimum order**: 30 cards for metal business cards
 - **Payment**: 50% deposit to start, 50% before shipping
 - **Payment methods**: Bank transfer, mobile money (MTN MoMo, Airtel Money), international wire
-- **Shipping**: Lagos 24-48 hours, Nigeria 3-5 days, International 7-14 days
+- **Shipping**: Tracked worldwide delivery, 7-14 business days after design approval
 - **Design formats accepted**: AI, EPS, PDF (vector), SVG, PNG (300+ DPI)
 - **Contact**: WhatsApp (fastest), email hello@laseryard.com
 - **Business hours**: Mon-Fri 9am-6pm, Sat 10am-4pm
