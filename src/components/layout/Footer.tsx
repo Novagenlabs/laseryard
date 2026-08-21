@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { MessageCircle, Mail, MapPin } from "lucide-react";
-import { NAV_LINKS, WHATSAPP_NUMBER, COUNTRIES } from "@/lib/constants";
+import { MessageCircle, Mail, Truck } from "lucide-react";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
 
 const footerLinks = {
   company: [
@@ -18,14 +18,6 @@ const footerLinks = {
     { label: "Wood Engraving", href: "/products/wood-engraving" },
     { label: "Custom Engraving", href: "/custom-engraving" },
   ],
-  // The regions shown under "We Serve" — a subset of COUNTRIES; the
-  // remaining country pages stay live for SEO, just unlisted here.
-  regions: ["africa", "united-kingdom", "united-states", "uae", "eu"].flatMap(
-    (slug) => {
-      const c = COUNTRIES.find((x) => x.slug === slug);
-      return c ? [{ label: c.name, href: `/${c.slug}` }] : [];
-    }
-  ),
 };
 
 export function Footer() {
@@ -33,7 +25,7 @@ export function Footer() {
     <footer className="border-t border-border bg-card/50">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block">
@@ -73,8 +65,8 @@ export function Footer() {
                 <span>hello@laseryard.com</span>
               </a>
               <div className="flex items-center gap-3 text-muted-foreground">
-                <MapPin className="w-5 h-5" aria-hidden="true" />
-                <span>Serving clients worldwide</span>
+                <Truck className="w-5 h-5" aria-hidden="true" />
+                <span>Worldwide shipping</span>
               </div>
             </div>
           </div>
@@ -112,21 +104,6 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-semibold text-foreground mb-4">We Serve</h4>
-            <ul className="space-y-3">
-              {footerLinks.regions.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-gold transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
 
