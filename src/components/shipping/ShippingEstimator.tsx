@@ -212,6 +212,19 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
     }).format(usd);
   };
 
+  // United States leads the country list; everything else, Nigeria included,
+  // stays alphabetical (stable second sort just lifts the US to the top).
+  const isUnitedStates = (name: string) =>
+    /united states|^u\.?s\.?a?\.?$/i.test(name.trim());
+  const countryOptions = [
+    ...exportLocations.map((loc) => ({ value: String(loc.id), label: loc.name })),
+    { value: NIGERIA_VALUE, label: "Nigeria" },
+  ]
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .sort(
+      (a, b) => Number(isUnitedStates(b.label)) - Number(isUnitedStates(a.label))
+    );
+
   return (
     <div className="p-5 rounded-xl bg-card border border-border">
       <div className="flex items-center gap-2.5 mb-4">
@@ -233,10 +246,9 @@ export function ShippingEstimator({ onDeliveryChange }: ShippingEstimatorProps =
             className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-shadow"
           >
             <option value="">Select your country</option>
-            <option value={NIGERIA_VALUE}>Nigeria</option>
-            {exportLocations.map((loc) => (
-              <option key={loc.id} value={loc.id}>
-                {loc.name}
+            {countryOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
               </option>
             ))}
           </select>
