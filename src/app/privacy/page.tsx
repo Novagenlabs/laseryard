@@ -41,7 +41,7 @@ export default function PrivacyPage() {
             <div className="prose prose-neutral dark:prose-invert max-w-none [&_h2]:font-[family-name:var(--font-montserrat)] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_li]:text-muted-foreground [&_li]:leading-relaxed [&_ul]:my-3 [&_ul]:space-y-1">
               <p>
                 Laser Yard (&quot;we,&quot; &quot;us&quot;) is a laser engraving
-                studio headquartered in Lagos, Nigeria. This page explains what
+                studio serving clients worldwide. This page explains what
                 data we collect when you visit laseryard.com or order from us,
                 and what we do with it.
               </p>

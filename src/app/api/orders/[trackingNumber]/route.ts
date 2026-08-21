@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 // order page shows:
 //   -d '{"status":"shipped","carrier":"dhl","waybillNumber":"7614882903",
 //        "shipmentStatus":"On the way",
-//        "shipmentDetail":"Departed our Lagos studio, bound for London",
+//        "shipmentDetail":"Departed our studio, bound for London",
 //        "estimatedDelivery":"2026-07-29"}'
 export async function PATCH(request: NextRequest, context: RouteContext) {
   if (!isAdminRequest(request)) {

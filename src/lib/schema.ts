@@ -47,11 +47,6 @@ export function localBusinessSchema() {
     description: SITE_CONFIG.description,
     telephone: `+${WHATSAPP_NUMBER}`,
     email: "hello@laseryard.com",
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Lagos",
-      addressCountry: "NG",
-    },
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",

@@ -55,14 +55,14 @@ const SHIPPING_INFO: Record<
   { time: string; method: string; note: string }
 > = {
   africa: {
-    time: "24-48 hours in Lagos, 3-7 business days across the continent",
-    method: "Local dispatch in Nigeria, tracked courier elsewhere",
-    note: "Shipped from our Lagos studio — same-day rush available in Lagos",
+    time: "3-7 business days across the continent",
+    method: "Tracked courier, door-to-door",
+    note: "Customs-cleared delivery — rush options available on request",
   },
   nigeria: {
-    time: "24-48 hours in Lagos, 3-5 business days nationwide",
+    time: "3-5 business days nationwide",
     method: "Local courier and dispatch riders",
-    note: "Same-day delivery available in Lagos for rush orders",
+    note: "Rush delivery available on request",
   },
   ghana: {
     time: "5-7 business days",
@@ -77,12 +77,12 @@ const SHIPPING_INFO: Record<
   "united-states": {
     time: "7-14 business days",
     method: "DHL / FedEx tracked international shipping",
-    note: "Shipped from Lagos, tracked door-to-door",
+    note: "Tracked door-to-door delivery",
   },
   uae: {
     time: "5-7 business days",
     method: "DHL Express",
-    note: "Fast Middle East corridor from our Lagos studio",
+    note: "Fast DHL Express delivery to your door",
   },
   eu: {
     time: "7-10 business days",
@@ -96,13 +96,11 @@ const PAYMENT_INFO: Record<string, string[]> = {
     "Bank transfer (NGN or USD)",
     "Mobile money (MTN MoMo, Airtel Money)",
     "Card payments",
-    "Pay on delivery (Lagos only)",
   ],
   nigeria: [
     "Bank transfer (NGN)",
     "Mobile money",
     "Card payments",
-    "Pay on delivery (Lagos only)",
   ],
   ghana: [
     "Mobile money (MTN MoMo, Airtel Money)",

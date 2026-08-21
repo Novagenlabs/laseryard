@@ -12,7 +12,7 @@ import { breadcrumbSchema } from "@/lib/schema";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Laser Yard is a precision laser engraving studio headquartered in Lagos, serving clients worldwide. Our story, how we work, and what we stand for.",
+    "Laser Yard is a precision laser engraving studio serving clients worldwide. Our story, how we work, and what we stand for.",
   alternates: { canonical: "/about" },
 };
 
@@ -38,11 +38,11 @@ const values = [
 ];
 
 const locations = [
-  "Lagos, Nigeria",
-  "Accra, Ghana",
   "London, UK",
   "New York, US",
   "Dubai, UAE",
+  "Accra, Ghana",
+  "Berlin, Germany",
   "Johannesburg, SA",
 ];
 
@@ -102,8 +102,8 @@ export default function AboutPage() {
                 <div className="w-12 h-px bg-border mb-4" />
                 <p className="text-muted-foreground leading-relaxed">
                   To make laser engraving accessible to every business,
-                  anywhere. Whether you&apos;re a startup in Lagos or a corporation
-                  in London, you should be able to get your stuff engraved
+                  anywhere. Whether you&apos;re a one-person startup or a global
+                  corporation, you should be able to get your stuff engraved
                   properly, fast, and at a fair price.
                 </p>
               </div>
@@ -198,8 +198,8 @@ export default function AboutPage() {
               Serving Clients <span className="font-extrabold">Worldwide</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Headquartered in Lagos, Nigeria, we deliver precision laser engraving
-              services to clients around the globe.
+              From our studio to over 20 countries, we deliver precision laser
+              engraving services to clients around the globe.
             </p>
           </ScrollReveal>
 

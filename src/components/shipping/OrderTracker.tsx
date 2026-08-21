@@ -856,7 +856,7 @@ export function OrderDetails({
             <div className="flex flex-col gap-6 text-sm flex-1">
               {/* Shipment headline — only once the parcel is on its way.
                   These two fields describe the parcel in transit ("On the
-                  way", "Departed our Lagos studio"), so once it has arrived
+                  way", "Departed our studio"), so once it has arrived
                   they are stale by definition and we state the arrival
                   instead of whatever the last transit update said. */}
               {shipped && (order.shipmentStatus || delivered) && (

@@ -47,8 +47,8 @@ export default function TermsPage() {
 
               <h2>Who we are</h2>
               <p>
-                Laser Yard is a laser engraving studio based in Lagos, Nigeria.
-                We sell ready-made engraved products (metal business cards,
+                Laser Yard is a laser engraving studio serving clients
+                worldwide. We sell ready-made engraved products (metal business cards,
                 crystal awards, wood items) and offer custom engraving on items
                 you provide.
               </p>
@@ -102,9 +102,9 @@ export default function TermsPage() {
                 for an extra fee.
               </p>
               <p>
-                Delivery times depend on your location. Lagos: 24 to 48 hours.
-                Other Nigerian cities: 3 to 5 days. International: 7 to 14
-                business days. These are estimates, not guarantees. Customs
+                Delivery times depend on your location. Most orders arrive
+                within 7 to 14 business days after dispatch. These are
+                estimates, not guarantees. Customs
                 delays, weather, and carrier issues are outside our control.
               </p>
               <p>
@@ -183,7 +183,8 @@ export default function TermsPage() {
               <p>
                 These terms are governed by the laws of the Federal Republic of
                 Nigeria. Any disputes that cannot be resolved between us will
-                be handled in the courts of Lagos State.
+                be handled in the competent courts of the Federal Republic of
+                Nigeria.
               </p>
 
               <h2>Changes to these terms</h2>
