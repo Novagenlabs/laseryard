@@ -242,8 +242,8 @@ export function UnforgettableLanding() {
               Your next meeting starts differently
             </h2>
             <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-              Get in touch and we&apos;ll send a free design mockup and a
-              quote within the hour.
+              Get in touch and we&apos;ll send a quote and design options
+              within the hour.
             </p>
             <Link
               href="/products/metal-business-cards"

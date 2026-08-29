@@ -49,7 +49,7 @@ const faqCategories = [
       },
       {
         q: "Can you help design my card?",
-        a: "Absolutely! Our design team can create a custom design based on your requirements. Design services are available for an additional fee.",
+        a: "Absolutely! Design is included free with all 0.8mm card orders and with 0.4mm orders of 50 cards or more. For the 30-card 0.4mm pack, our design service is a flat $50 — or bring your own print-ready design at no extra cost.",
       },
       {
         q: "Can I include a QR code on my card?",

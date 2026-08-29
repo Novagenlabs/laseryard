@@ -264,7 +264,7 @@ export const FAQ_ITEMS = [
   {
     question: "How do I design my metal business cards?",
     answer:
-      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it for you. Just share your logo and details, and we'll create a production-ready layout.",
+      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it. Design is included free with 0.8mm orders and with 0.4mm orders of 50+ cards; for the 30-card 0.4mm pack the design service is a flat $50.",
   },
   {
     question: "How long does it take to get my cards?",
