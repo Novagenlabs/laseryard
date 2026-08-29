@@ -82,6 +82,21 @@ export default function TermsPage() {
                 refund in that case.
               </p>
 
+              <h2>Design services</h2>
+              <p>
+                Professional design is included at no charge with all 0.8mm
+                card orders and with 0.4mm card orders of 50 cards or more.
+                For the 30-card 0.4mm pack, our design service is available
+                for a flat fee of $50; alternatively, you can supply your own
+                print-ready design at no extra cost.
+              </p>
+              <p>
+                Design work, including digital proofs and mock-ups, begins
+                after an order is placed. We do not produce mock-ups or
+                previews before purchase; examples of our recent work are
+                available on our Instagram.
+              </p>
+
               <h2>Design approval</h2>
               <p>
                 For custom engraving, we send a digital proof before

@@ -29,7 +29,8 @@ PRICING GUIDANCE:
 - Do NOT quote exact prices -instead say "pricing starts from..." or direct them to WhatsApp for a custom quote
 - Stainless steel cards start from around $2.50 per card for bulk orders (500+)
 - Small orders (25-100) are priced higher per unit
-- Design setup fee may apply for complex custom work
+- Design service: included free with all 0.8mm card orders and with 0.4mm orders of 50+ cards; a flat $50 for the 30-card 0.4mm pack. Supplying your own print-ready design is always free
+- We do not send design mock-ups or previews before an order is placed — point people to Instagram @thelaseryard for examples of recent work; after ordering, a digital proof is shared for approval before production
 
 OTHER SERVICES:
 - Custom signage (indoor/outdoor, metal/acrylic)

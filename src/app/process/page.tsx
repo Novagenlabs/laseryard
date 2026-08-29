@@ -29,11 +29,11 @@ const steps = [
     icon: Upload,
     title: "Submit Your Design",
     description:
-      "Send us your design via WhatsApp or email. We accept AI, EPS, PDF (vector), and high-resolution PNG files. Don't have a design? Our team can help create one based on your requirements.",
+      "Send us your design via WhatsApp or email. We accept AI, EPS, PDF (vector), and high-resolution PNG files. Don't have a design? Our team can create one — free with 0.8mm orders and 0.4mm orders of 50+ cards, or a flat $50 on the 30-card 0.4mm pack.",
     details: [
       "Vector files preferred (AI, EPS, PDF)",
       "PNG at minimum 300 DPI",
-      "We can help with design if needed",
+      "Design service free on qualifying orders",
     ],
   },
   {
@@ -102,7 +102,7 @@ export default function ProcessPage() {
             steps: [
               {
                 name: "Submit Your Design",
-                text: "Send your design via WhatsApp or email. We accept AI, EPS, PDF (vector), SVG, and high-resolution PNG files. Our team can also help create a design.",
+                text: "Send your design via WhatsApp or email. We accept AI, EPS, PDF (vector), SVG, and high-resolution PNG files. Our team can also create the design — free with 0.8mm orders and 0.4mm orders of 50+ cards, or a flat $50 on the 30-card 0.4mm pack.",
               },
               {
                 name: "Review & Approve",

@@ -26,6 +26,25 @@ const AGENT_PRICES: Record<CardThickness, Record<number, number>> = {
   "0.8mm": { 30: 450, 50: 715, 100: 1350, 200: 2550 },
 };
 
+// Design policy (2026-08-29): design is included free with all 0.8mm orders
+// and with 0.4mm orders of 50+ cards. Only the 30-card 0.4mm pack pays a
+// flat design fee when the customer wants us to create the design.
+const DESIGN_FEE_USD = 50;
+
+function designIncluded(thickness: CardThickness, quantity: number): boolean {
+  return thickness === "0.8mm" || quantity >= 50;
+}
+
+function inclusionNote(
+  thickness: CardThickness,
+  quantity: number,
+  designService: boolean
+): string {
+  if (designIncluded(thickness, quantity)) return "design and shipping included";
+  if (designService) return `design service ($${DESIGN_FEE_USD}) and shipping included`;
+  return "shipping included, using your own print-ready design";
+}
+
 const THICKNESSES: CardThickness[] = ["0.4mm", "0.8mm"];
 // Countries we cannot ship to at all. Germany/EU became shippable with the
 // 2026-07-29 policy (0.4mm EU orders pay shipping separately) — keep this
@@ -58,6 +77,7 @@ export async function POST(request: NextRequest) {
       phone,
       email,
       card_details,
+      design_service,
     } = body;
 
     if (!country || typeof country !== "string") {
@@ -95,8 +115,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const wantsDesignService = design_service === true || design_service === "true";
+    const designFeeApplies =
+      wantsDesignService &&
+      !designIncluded(thickness as CardThickness, quantity as number);
     const amount =
-      AGENT_PRICES[thickness as CardThickness][quantity as CardQuantity];
+      AGENT_PRICES[thickness as CardThickness][quantity as CardQuantity] +
+      (designFeeApplies ? DESIGN_FEE_USD : 0);
+    const included = inclusionNote(
+      thickness as CardThickness,
+      quantity as number,
+      wantsDesignService
+    );
     const checkoutRef = crypto.randomUUID();
     let customerUrl = "";
 
@@ -118,6 +148,7 @@ export async function POST(request: NextRequest) {
         phone: phone || "",
         email: email || "",
         card_details: card_details || "",
+        design_service: designFeeApplies ? "paid" : designIncluded(thickness as CardThickness, quantity as number) ? "included" : "none",
       },
     });
 
@@ -132,7 +163,7 @@ export async function POST(request: NextRequest) {
       email.includes("@") &&
       process.env.RESEND_API_KEY
     ) {
-      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, design and shipping included`;
+      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, ${included}`;
       const { html, text } = renderBrandedEmail({
         preheader: "Your secure checkout link is inside.",
         heading: "Complete your order",
@@ -172,7 +203,7 @@ export async function POST(request: NextRequest) {
       order_reference: checkoutRef,
       email_sent: emailSent,
       price_usd: amount,
-      summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (design and shipping included)`,
+      summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (${included})`,
     });
   } catch (e) {
     console.error("Agent checkout creation error:", e);

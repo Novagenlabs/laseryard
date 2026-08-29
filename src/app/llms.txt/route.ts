@@ -27,6 +27,7 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 - **Payment methods**: Bank transfer, mobile money (MTN MoMo, Airtel Money), international wire
 - **Shipping**: Tracked worldwide delivery, 7-14 business days after design approval
 - **Design formats accepted**: AI, EPS, PDF (vector), SVG, PNG (300+ DPI)
+- **Design service**: free with 0.8mm orders and 0.4mm orders of 50+ cards; flat $50 for the 30-card 0.4mm pack (own print-ready design always free). Proofs are shared after ordering — no pre-purchase mock-ups
 - **Contact**: WhatsApp (fastest), email hello@laseryard.com
 - **Business hours**: Mon-Fri 9am-6pm, Sat 10am-4pm
 
