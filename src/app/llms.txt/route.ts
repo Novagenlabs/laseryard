@@ -5,7 +5,7 @@ export function GET() {
 ## Products
 
 ### Metal Business Cards
-Premium laser-engraved aluminum business cards. Available in 0.4mm and 0.8mm thickness. Finishes include matte black, glossy, and brushed aluminum. Minimum order: 30 cards. NFC-enabled options available.
+Premium laser-engraved anodized aluminum business cards, 0.8mm thick. Available in 11 colors: matte black, silver, gold, blue, red, green, forest green, purple, pink, cosmic orange, and brown. Minimum order: 15 cards. NFC-enabled options available.
 
 ### Crystal Awards
 3D laser-engraved crystal trophies and awards for corporate recognition, team events, and milestones. Multiple shapes available with custom text and logos.
@@ -22,12 +22,13 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 
 - **Serving**: United Kingdom, United States, EU, UAE, Nigeria, Ghana, and 20+ countries worldwide
 - **Production time**: 10-14 business days standard, 5-7 days rush
-- **Minimum order**: 30 cards for metal business cards
+- **Minimum order**: 15 cards for metal business cards
+- **Card pricing (all-in, worldwide shipping included)**: 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550
 - **Payment**: 50% deposit to start, 50% before shipping
 - **Payment methods**: Bank transfer, mobile money (MTN MoMo, Airtel Money), international wire
-- **Shipping**: Tracked worldwide delivery, 7-14 business days after design approval
+- **Shipping**: Included in every card price — tracked worldwide delivery, 7-14 business days after dispatch
 - **Design formats accepted**: AI, EPS, PDF (vector), SVG, PNG (300+ DPI)
-- **Design service**: free with 0.8mm orders and 0.4mm orders of 50+ cards; flat $50 for the 30-card 0.4mm pack (own print-ready design always free). Proofs are shared after ordering — no pre-purchase mock-ups
+- **Design service**: free with orders of 30+ cards; flat $50 for the 15-card pack (own print-ready design always free). Proofs are shared after ordering — no pre-purchase mock-ups
 - **Contact**: WhatsApp (fastest), email hello@laseryard.com
 - **Business hours**: Mon-Fri 9am-6pm, Sat 10am-4pm
 

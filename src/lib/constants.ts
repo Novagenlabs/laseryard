@@ -24,33 +24,46 @@ export const WHATSAPP_MESSAGES = {
 
 // Metal business card pricing.
 // Quantities outside this table (or other materials/finishes) get a custom quote on WhatsApp.
-export const CARD_QUANTITIES = [30, 50, 100, 200] as const;
+// 2026-09-07: 0.4mm retired — the lineup is 0.8mm only, with a 15-card entry pack.
+export const CARD_QUANTITIES = [15, 30, 50, 100, 200] as const;
 export type CardQuantity = (typeof CARD_QUANTITIES)[number];
-export type CardThickness = "0.4mm" | "0.8mm";
+export type CardThickness = "0.8mm";
 
-// Total price in USD per thickness and quantity.
-// Base: $200 (0.4mm) / $450 (0.8mm) per 30 cards; ~5% off per card at 50, ~10% at 100, ~15% at 200.
+// All-in delivered totals in USD — worldwide shipping is included in every
+// price (same numbers the WhatsApp agent quotes). The 15-card pack does not
+// include the design service (flat DESIGN_FEE_USD when we create the design);
+// orders of 30+ cards include design free.
 export const CARD_PRICING: Record<
   CardThickness,
   { label: string; prices: Record<CardQuantity, number> }
 > = {
-  "0.4mm": {
-    label: "Standard",
-    prices: { 30: 200, 50: 315, 100: 600, 200: 1135 },
-  },
   "0.8mm": {
     label: "Premium",
-    prices: { 30: 450, 50: 715, 100: 1350, 200: 2550 },
+    prices: { 15: 250, 30: 450, 50: 715, 100: 1350, 200: 2550 },
   },
 };
 
-// Limited-time marketing campaign: free delivery if the visitor orders within
-// `windowHours` of their first visit (per-visitor countdown, localStorage).
-// Flip `enabled` to start/stop the campaign.
-export const FREE_SHIPPING_CAMPAIGN = {
-  enabled: true,
-  windowHours: 48,
-};
+// Flat design-service fee (USD) on the 15-card pack; design is included free
+// with orders of 30 cards or more. Supplying a print-ready design is always free.
+export const DESIGN_FEE_USD = 50;
+export const designIncluded = (quantity: number) => quantity >= 30;
+
+// Anodized aluminum colors from our card stock supplier (0.8mm blanks).
+// `swatch` is the approximate anodized tone used for the site's color picker.
+export const CARD_COLORS = [
+  { id: "black", label: "Matte Black", swatch: "#1c1c1e" },
+  { id: "silver", label: "Silver", swatch: "#c9ccd1" },
+  { id: "gold", label: "Gold", swatch: "#c9a54b" },
+  { id: "blue", label: "Blue", swatch: "#1f5fa8" },
+  { id: "red", label: "Red", swatch: "#c0272d" },
+  { id: "green", label: "Green", swatch: "#2e9e4f" },
+  { id: "forest-green", label: "Forest Green", swatch: "#14532d" },
+  { id: "purple", label: "Purple", swatch: "#6b3fa0" },
+  { id: "pink", label: "Pink", swatch: "#e5679a" },
+  { id: "orange", label: "Cosmic Orange", swatch: "#e8641b" },
+  { id: "brown", label: "Brown", swatch: "#77543a" },
+] as const;
+export type CardColor = (typeof CARD_COLORS)[number];
 
 export const NAV_LINKS = [
   { href: "/products/metal-business-cards", label: "Metal Cards" },
@@ -66,7 +79,7 @@ export const PRODUCT_CATEGORIES = [
     name: "Metal Business Cards",
     description:
       "Laser-engraved aluminum cards. Heavy, cold to the touch, and impossible to throw away. The kind of card people ask about.",
-    features: ["Premium Aluminum", "0.4mm / 0.8mm Thickness", "Multiple Finishes"],
+    features: ["Premium Aluminum", "0.8mm Thick", "11 Anodized Colors"],
     href: "/products/metal-business-cards",
   },
   {
@@ -264,7 +277,7 @@ export const FAQ_ITEMS = [
   {
     question: "How do I design my metal business cards?",
     answer:
-      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it. Design is included free with 0.8mm orders and with 0.4mm orders of 50+ cards; for the 30-card 0.4mm pack the design service is a flat $50.",
+      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it. Design is included free with orders of 30 cards or more; for the 15-card starter pack the design service is a flat $50.",
   },
   {
     question: "How long does it take to get my cards?",
@@ -274,12 +287,12 @@ export const FAQ_ITEMS = [
   {
     question: "Are the cards really made of metal?",
     answer:
-      "Yes. Our cards are made from premium aluminum, available in 0.4mm or 0.8mm thick. They're heavy, cold to the touch, and built to last. The kind of card people keep instead of throwing away.",
+      "Yes. Our cards are premium anodized aluminum, 0.8mm thick, available in 11 colors. They're heavy, cold to the touch, and built to last. The kind of card people keep instead of throwing away.",
   },
   {
     question: "What is the minimum order quantity?",
     answer:
-      "Our minimum order is 30 cards. We offer volume discounts starting at 50+ cards. Contact us for bulk pricing on orders of 200+.",
+      "Our minimum order is 15 cards — $250 with worldwide shipping included. We offer volume discounts starting at 50+ cards. Contact us for bulk pricing on orders of 200+.",
   },
   {
     question: "Can I add NFC to my cards?",

@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!country) return {};
 
   const title = `Metal Business Cards in ${country.name} | Laser Yard`;
-  const description = `Premium laser-engraved metal business cards delivered to ${country.name}. Serving ${country.cities.join(", ")} and more. Matte black, brushed steel, NFC-enabled. Min. 30 cards.`;
+  const description = `Premium laser-engraved metal business cards delivered to ${country.name}. Serving ${country.cities.join(", ")} and more. 11 anodized colors, NFC-enabled. Min. 15 cards, shipping included.`;
 
   return {
     title,
@@ -217,8 +217,8 @@ export default async function LocationPage({ params }: Props) {
             {[
               {
                 icon: Layers,
-                title: "Aluminum & Stainless Steel",
-                desc: "0.4mm standard or 0.8mm premium thickness",
+                title: "Premium Anodized Aluminum",
+                desc: "0.8mm thick, available in 11 colors",
               },
               {
                 icon: Shield,
@@ -228,7 +228,7 @@ export default async function LocationPage({ params }: Props) {
               {
                 icon: CreditCard,
                 title: "Wallet-Ready Size",
-                desc: "Standard 85mm x 55mm, fits any card holder",
+                desc: "Standard 86mm x 54mm, fits any card holder",
               },
               {
                 icon: Package,

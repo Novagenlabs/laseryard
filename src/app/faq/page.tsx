@@ -24,7 +24,7 @@ const faqCategories = [
     questions: [
       {
         q: "What is the minimum order quantity?",
-        a: "Our minimum order is 30 cards. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
+        a: "Our minimum order is 15 cards — $250 with worldwide shipping included. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
       },
       {
         q: "How do I place an order?",
@@ -49,15 +49,15 @@ const faqCategories = [
       },
       {
         q: "Can you help design my card?",
-        a: "Absolutely! Design is included free with all 0.8mm card orders and with 0.4mm orders of 50 cards or more. For the 30-card 0.4mm pack, our design service is a flat $50 — or bring your own print-ready design at no extra cost.",
+        a: "Absolutely! Design is included free with orders of 30 cards or more. For the 15-card starter pack, our design service is a flat $50 — or bring your own print-ready design at no extra cost.",
       },
       {
         q: "Can I include a QR code on my card?",
         a: "Yes! QR codes work very well on metal cards. We recommend keeping them at least 15mm x 15mm for reliable scanning.",
       },
       {
-        q: "What's the difference between 0.4mm and 0.8mm thickness?",
-        a: "0.4mm cards are solid and durable, similar to a premium credit card. 0.8mm cards are heavy, rigid, and have a substantial executive feel. Most clients prefer 0.8mm for the impression it makes.",
+        q: "How thick are the cards, and what colors are available?",
+        a: "Every card is 0.8mm anodized aluminum — heavy, rigid, with a substantial executive feel. Choose from 11 colors: matte black, silver, gold, blue, red, green, forest green, purple, pink, cosmic orange, and brown.",
       },
     ],
   },
@@ -95,7 +95,7 @@ const faqCategories = [
       },
       {
         q: "How much does shipping cost?",
-        a: "Most quoted prices include worldwide shipping. Where shipping is extra (for example EU orders on 0.4mm cards), we confirm the exact cost before you pay. Contact us on WhatsApp for specifics.",
+        a: "Nothing — worldwide shipping is included in every price. The price you see is the all-in delivered total, wherever you are.",
       },
       {
         q: "Can I track my order?",

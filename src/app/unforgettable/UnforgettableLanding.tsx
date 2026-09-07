@@ -41,7 +41,7 @@ export function UnforgettableLanding() {
                   </Link>
                 </div>
                 <p className="text-[11px] text-muted-foreground/50 mt-4 text-center lg:text-left tracking-wide">
-                  Free design consultation · 10-14 day production · Min. 30 cards
+                  Free design consultation · 10-14 day production · Min. 15 cards
                 </p>
               </ScrollReveal>
             </div>
@@ -118,7 +118,7 @@ export function UnforgettableLanding() {
                     "Won't fade, bend, or tear",
                     "Custom QR codes that link anywhere",
                     "Full design flexibility, front and back",
-                    "Two thickness options: 0.4mm or 0.8mm",
+                    "Premium 0.8mm thickness in 11 anodized colors",
                   ].map((point) => (
                     <div key={point} className="flex items-center gap-3">
                       <span className="size-1 rounded-full bg-foreground/30 flex-shrink-0" />

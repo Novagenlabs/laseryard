@@ -129,7 +129,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         heading: "Aluminum: light and versatile",
-        body: "Aluminum cards are available in 0.4mm and 0.8mm thickness. The 0.4mm option is similar in thickness to a credit card. It's light enough to carry a stack of them without noticing. Aluminum takes matte black coating well, which is our most popular finish. The laser cuts through the black coating to reveal bright silver metal underneath, creating high contrast.",
+        body: "Our aluminum cards are 0.8mm thick — rigid and substantial without being heavy in the pocket. Anodized aluminum takes color beautifully: we stock 11 colors, and matte black is our most popular. The laser cuts through the anodized layer to reveal bright silver metal underneath, creating high contrast.",
       },
       {
         heading: "Stainless steel: heavy and bold",
@@ -141,11 +141,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         heading: "Cost difference",
-        body: "Stainless steel cards cost more than aluminum due to material and engraving time. Steel is harder, so the laser needs more passes to achieve the same depth. For most people, aluminum in 0.4mm or 0.8mm thickness hits the sweet spot of quality, weight, and price.",
+        body: "Stainless steel cards cost more than aluminum due to material and engraving time. Steel is harder, so the laser needs more passes to achieve the same depth. For most people, 0.8mm anodized aluminum hits the sweet spot of quality, weight, and price.",
       },
       {
         heading: "Our recommendation",
-        body: "If you want a matte black card with high-contrast engraving, go with aluminum. If you want maximum weight and a raw metal look, go with stainless steel. Not sure? Message us on WhatsApp with your logo and we'll mock up both options so you can compare.",
+        body: "If you want a matte black card with high-contrast engraving, go with aluminum. If you want maximum weight and a raw metal look, go with stainless steel. Not sure? Message us on WhatsApp and we'll help you pick — you can also see recent finished cards on our Instagram @thelaseryard.",
       },
     ],
   },

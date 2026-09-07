@@ -10,6 +10,7 @@ import {
   Crosshair,
   Shield,
   ArrowRight,
+  PenTool,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { cn } from "@/lib/utils";
@@ -23,32 +24,29 @@ import { WhopCheckout } from "@/components/payments/WhopCheckout";
 import {
   CARD_PRICING,
   CARD_QUANTITIES,
+  CARD_COLORS,
+  DESIGN_FEE_USD,
+  designIncluded,
   WHATSAPP_NUMBER,
   type CardQuantity,
-  type CardThickness,
+  type CardColor,
 } from "@/lib/constants";
-import { useFreeShipping } from "@/hooks/useFreeShipping";
 import { trackViewProduct } from "@/lib/analytics";
 
-const thicknessDescriptions: Record<CardThickness, string> = {
-  "0.4mm": "Solid & durable, similar to a premium credit card",
-  "0.8mm": "Heavy & rigid with a substantial executive feel",
-};
-
 const specs = [
-  { label: "Material", value: "Aluminum & Stainless Steel" },
-  { label: "Standard Size", value: "85mm × 55mm" },
-  { label: "Finishes", value: "Matte black, glossy, brushed steel" },
-  { label: "Customization", value: "Full custom design" },
-  { label: "Minimum Order", value: "30 cards" },
+  { label: "Material", value: "Premium Anodized Aluminum" },
+  { label: "Thickness", value: "0.8mm — heavy, rigid, executive feel" },
+  { label: "Standard Size", value: "86mm × 54mm" },
+  { label: "Colors", value: "11 anodized colors, matte finish" },
+  { label: "Minimum Order", value: "15 cards" },
   { label: "Production Time", value: "10-14 business days after approval" },
 ];
 
 const features = [
   {
     icon: Layers,
-    title: "Aluminum & Stainless Steel",
-    description: "Two material options for the look you want",
+    title: "Anodized Aluminum",
+    description: "0.8mm premium stock in 11 anodized colors",
   },
   {
     icon: Crosshair,
@@ -94,13 +92,11 @@ const formatUsd = (amount: number) =>
   }).format(amount);
 
 export function ProductPage() {
-  const [selectedThickness, setSelectedThickness] =
-    useState<CardThickness>("0.4mm");
-  const [selectedQuantity, setSelectedQuantity] = useState<CardQuantity>(30);
+  const [selectedColor, setSelectedColor] = useState<CardColor>(CARD_COLORS[0]);
+  const [selectedQuantity, setSelectedQuantity] = useState<CardQuantity>(15);
+  const [wantsDesignService, setWantsDesignService] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [delivery, setDelivery] = useState<DeliverySelection | null>(null);
-
-  const { active: freeShipping } = useFreeShipping();
 
   const handleDeliveryChange = useCallback(
     (d: DeliverySelection | null) => setDelivery(d),
@@ -108,13 +104,14 @@ export function ProductPage() {
   );
 
   useEffect(() => {
-    trackViewProduct("Metal Business Cards", CARD_PRICING["0.4mm"].prices[30]);
+    trackViewProduct("Metal Business Cards", CARD_PRICING["0.8mm"].prices[15]);
   }, []);
 
-  const pricing = CARD_PRICING[selectedThickness];
+  const pricing = CARD_PRICING["0.8mm"];
   const cardsSubtotal = pricing.prices[selectedQuantity];
-  const deliveryCharged = delivery && !freeShipping ? delivery.usd : 0;
-  const total = cardsSubtotal + deliveryCharged;
+  const freeDesign = designIncluded(selectedQuantity);
+  const designFee = !freeDesign && wantsDesignService ? DESIGN_FEE_USD : 0;
+  const total = cardsSubtotal + designFee;
 
   return (
     <>
@@ -174,55 +171,42 @@ export function ProductPage() {
                     Premium Metal Business Cards
                   </h1>
                   <p className="text-muted-foreground text-lg">
-                    Laser-engraved aluminum and stainless steel cards. Heavy,
-                    cold to the touch, and impossible to throw away.
+                    Laser-engraved 0.8mm anodized aluminum cards in 11 colors.
+                    Heavy, cold to the touch, and impossible to throw away.
+                    Every price includes worldwide shipping.
                   </p>
                 </div>
 
-                {/* Thickness Selector */}
+                {/* Color Selector */}
                 <div>
                   <label className="text-sm font-medium mb-3 block">
-                    Choose Your Thickness
+                    Choose Your Color
+                    <span className="text-muted-foreground font-normal">
+                      {" "}
+                      — {selectedColor.label}
+                    </span>
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(
-                      Object.entries(CARD_PRICING) as [
-                        CardThickness,
-                        (typeof CARD_PRICING)[CardThickness]
-                      ][]
-                    ).map(([key, opt]) => (
+                  <div className="flex flex-wrap gap-2">
+                    {CARD_COLORS.map((color) => (
                       <button
-                        key={key}
-                        onClick={() => setSelectedThickness(key)}
+                        key={color.id}
+                        onClick={() => setSelectedColor(color)}
+                        title={color.label}
+                        aria-label={`${color.label} card`}
+                        aria-pressed={selectedColor.id === color.id}
                         className={cn(
-                          "relative p-4 rounded-xl border-2 text-left transition-all",
-                          selectedThickness === key
+                          "flex items-center gap-2 pl-2 pr-3 py-2 rounded-full border-2 text-xs font-medium transition-all",
+                          selectedColor.id === color.id
                             ? "border-foreground bg-foreground/5"
                             : "border-border hover:border-foreground/30"
                         )}
                       >
-                        <div>
-                          <p className="font-semibold">{opt.label}</p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {key}
-                          </p>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          {thicknessDescriptions[key]}
-                        </p>
-                        <p className="text-sm font-semibold mt-2">
-                          From {formatUsd(opt.prices[30])}
-                          <span className="text-muted-foreground font-normal">
-                            {" "}
-                            / 30 cards
-                          </span>
-                        </p>
-
-                        {selectedThickness === key && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
-                            <Check className="w-3 h-3 text-background" />
-                          </div>
-                        )}
+                        <span
+                          className="w-4 h-4 rounded-full border border-black/20 dark:border-white/20 flex-shrink-0"
+                          style={{ backgroundColor: color.swatch }}
+                          aria-hidden="true"
+                        />
+                        {color.label}
                       </button>
                     ))}
                   </div>
@@ -233,7 +217,7 @@ export function ProductPage() {
                   <label className="text-sm font-medium mb-3 block">
                     Card Quantity
                   </label>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-5 gap-2 sm:gap-3">
                     {CARD_QUANTITIES.map((qty) => (
                       <button
                         key={qty}
@@ -246,11 +230,15 @@ export function ProductPage() {
                         )}
                       >
                         <p className="font-semibold">{qty}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {formatUsd(pricing.prices[qty])}
+                        </p>
                       </button>
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Need a different quantity, material, or finish?{" "}
+                    All prices include worldwide shipping. Need a different
+                    quantity or something custom?{" "}
                     <a
                       href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'd like a custom quote for metal business cards.")}`}
                       target="_blank"
@@ -263,6 +251,79 @@ export function ProductPage() {
                   </p>
                 </div>
 
+                {/* Design Service */}
+                <div>
+                  <label className="text-sm font-medium mb-3 block">
+                    Design
+                  </label>
+                  {freeDesign ? (
+                    <div className="flex items-center gap-2.5 p-4 rounded-xl border-2 border-border">
+                      <PenTool className="w-4 h-4 text-gold flex-shrink-0" />
+                      <p className="text-sm">
+                        Professional design service{" "}
+                        <span className="text-gold font-semibold">
+                          included free
+                        </span>{" "}
+                        — send us your logo, or bring your own print-ready
+                        design.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setWantsDesignService(false)}
+                        className={cn(
+                          "relative p-4 rounded-xl border-2 text-left transition-all",
+                          !wantsDesignService
+                            ? "border-foreground bg-foreground/5"
+                            : "border-border hover:border-foreground/30"
+                        )}
+                      >
+                        <p className="font-semibold text-sm">
+                          I have a print-ready design
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Upload your own artwork — no extra cost
+                        </p>
+                        {!wantsDesignService && (
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
+                            <Check className="w-3 h-3 text-background" />
+                          </div>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setWantsDesignService(true)}
+                        className={cn(
+                          "relative p-4 rounded-xl border-2 text-left transition-all",
+                          wantsDesignService
+                            ? "border-foreground bg-foreground/5"
+                            : "border-border hover:border-foreground/30"
+                        )}
+                      >
+                        <p className="font-semibold text-sm">
+                          Design it for me{" "}
+                          <span className="text-muted-foreground font-normal">
+                            +{formatUsd(DESIGN_FEE_USD)}
+                          </span>
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Our team creates your card from your logo or idea
+                        </p>
+                        {wantsDesignService && (
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
+                            <Check className="w-3 h-3 text-background" />
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  {!freeDesign && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Design is included free on orders of 30 cards or more.
+                    </p>
+                  )}
+                </div>
+
                 {/* Delivery */}
                 <ShippingEstimator onDeliveryChange={handleDeliveryChange} />
 
@@ -270,46 +331,39 @@ export function ProductPage() {
                 <div className="p-6 rounded-xl bg-card border border-border space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">
-                      {selectedQuantity} cards · {pricing.label} (
-                      {selectedThickness})
+                      {selectedQuantity} cards · {selectedColor.label} (0.8mm)
                     </span>
                     <span className="font-semibold">
                       {formatUsd(cardsSubtotal)}
                     </span>
                   </div>
+                  {designFee > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">
+                        Design service
+                      </span>
+                      <span className="font-semibold">
+                        {formatUsd(designFee)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">
                       {delivery
                         ? `Delivery to ${delivery.destination}`
-                        : "Delivery"}
+                        : "Worldwide delivery"}
                     </span>
-                    <span className="font-semibold">
-                      {delivery ? (
-                        freeShipping ? (
-                          <>
-                            <span className="line-through text-muted-foreground font-normal mr-2">
-                              {formatUsd(delivery.usd)}
-                            </span>
-                            <span className="text-gold">FREE</span>
-                          </>
-                        ) : (
-                          formatUsd(delivery.usd)
-                        )
-                      ) : (
-                        "—"
-                      )}
-                    </span>
+                    <span className="font-semibold text-gold">Included</span>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-border">
                     <span className="font-semibold">Total</span>
                     <span className="font-semibold text-lg">
-                      {delivery ? formatUsd(total) : formatUsd(cardsSubtotal)}
+                      {formatUsd(total)}
                     </span>
                   </div>
                   {!delivery && (
                     <p className="text-sm text-muted-foreground">
-                      Select your delivery destination above to see the full
-                      total and check out.
+                      Select your delivery destination above to check out.
                     </p>
                   )}
                 </div>
@@ -321,14 +375,18 @@ export function ProductPage() {
                       amount={total}
                       currency="usd"
                       metadata={{
-                        thickness: selectedThickness,
-                        tier: pricing.label,
+                        thickness: "0.8mm",
+                        color: selectedColor.label,
                         quantity: String(selectedQuantity),
                         cardsSubtotalUsd: String(cardsSubtotal),
+                        designService: freeDesign
+                          ? "included"
+                          : wantsDesignService
+                            ? "paid"
+                            : "none",
+                        designFeeUsd: String(designFee),
                         deliveryDestination: delivery.destination,
-                        deliveryUsd: String(deliveryCharged),
-                        standardDeliveryUsd: String(delivery.usd),
-                        freeShippingPromo: String(freeShipping),
+                        deliveryUsd: "0",
                         totalUsd: String(total),
                       }}
                       buttonText={`Order Now - ${formatUsd(total)}`}
@@ -342,7 +400,7 @@ export function ProductPage() {
                     </button>
                   )}
                   <a
-                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (${pricing.label}, ${selectedThickness}). Can you help me with pricing and the design process?`)}`}
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (0.8mm, ${selectedColor.label}). Can you help me with pricing and the design process?`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"

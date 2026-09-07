@@ -15,21 +15,19 @@ COMPANY INFO:
 - We serve clients globally -Africa, Europe, the Americas, Middle East, and Asia
 
 CORE PRODUCT -METAL BUSINESS CARDS:
-- Materials: Stainless steel (silver, gold, black, rose gold finishes)
-- Thickness options: 0.4mm (standard), 0.8mm (premium)
+- Material: Premium anodized aluminum, 0.8mm thick (heavy, rigid, executive feel)
+- Colors: 11 anodized colors — matte black, silver, gold, blue, red, green, forest green, purple, pink, cosmic orange, brown
 - Engraving: Laser-cut text, logos, QR codes, intricate patterns
-- Finish options: Matte, glossy, brushed
-- Standard size: 85mm × 55mm (same as traditional cards)
+- Finish: Matte anodized
+- Standard size: 86mm × 54mm (same as traditional cards)
 - Custom shapes and sizes available
-- Minimum order: 30 cards
-- Volume discounts: Orders of 500+ cards receive 10% discount
+- Minimum order: 15 cards
 
 PRICING GUIDANCE:
-- Pricing depends on material, thickness, finish, quantity, and design complexity
-- Do NOT quote exact prices -instead say "pricing starts from..." or direct them to WhatsApp for a custom quote
-- Stainless steel cards start from around $2.50 per card for bulk orders (500+)
-- Small orders (25-100) are priced higher per unit
-- Design service: included free with all 0.8mm card orders and with 0.4mm orders of 50+ cards; a flat $50 for the 30-card 0.4mm pack. Supplying your own print-ready design is always free
+- All card prices are all-in delivered totals — worldwide shipping is included, one price for everyone
+- Standard lineup (0.8mm): 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550
+- For other quantities, materials, or custom work, direct them to WhatsApp for a custom quote
+- Design service: included free with orders of 30+ cards; a flat $50 for the 15-card pack. Supplying your own print-ready design is always free
 - We do not send design mock-ups or previews before an order is placed — point people to Instagram @thelaseryard for examples of recent work; after ordering, a digital proof is shared for approval before production
 
 OTHER SERVICES:
