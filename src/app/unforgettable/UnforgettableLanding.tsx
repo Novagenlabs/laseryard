@@ -41,7 +41,7 @@ export function UnforgettableLanding() {
                   </Link>
                 </div>
                 <p className="text-[11px] text-muted-foreground/50 mt-4 text-center lg:text-left tracking-wide">
-                  Free design consultation · 10-14 day production · Min. 15 cards
+                  From $250 for 15 cards · Shipping included · 10-14 day production
                 </p>
               </ScrollReveal>
             </div>
@@ -71,7 +71,7 @@ export function UnforgettableLanding() {
               { value: "500+", label: "clients" },
               { value: "4.9", label: "rating" },
               { value: "10-14 days", label: "production" },
-              { value: "25", label: "card min." },
+              { value: "15", label: "card min." },
             ].map((s) => (
               <div key={s.label} className="flex items-baseline gap-2">
                 <span className="font-[family-name:var(--font-montserrat)] font-bold text-base text-foreground tabular-nums">
@@ -107,13 +107,13 @@ export function UnforgettableLanding() {
                 </h2>
                 <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-8">
                   Your logo, name, QR code, contact info. All engraved into
-                  brushed matte-black aluminum at micron-level accuracy. The
+                  0.8mm anodized aluminum at micron-level accuracy. The
                   result is a card that looks and feels nothing like paper.
                 </p>
                 <div className="space-y-3.5 text-sm">
                   {[
                     "Laser-cut engraving, micron-level precision",
-                    "Matte black, glossy, or brushed stainless steel",
+                    "11 anodized colors, from matte black to champagne gold",
                     "Credit-card sized, fits any wallet",
                     "Won't fade, bend, or tear",
                     "Custom QR codes that link anywhere",
@@ -155,7 +155,7 @@ export function UnforgettableLanding() {
             {
               num: "03",
               title: "Receive and impress",
-              desc: "Cards delivered to your door within 10-14 business days after approval, though they can be ready in as little as 5-7 days.",
+              desc: "Cards produced within 10-14 business days after approval (rush 2-3 days available) and delivered to your door, shipping included.",
             },
           ].map((step, i) => (
             <ScrollReveal key={step.num} delay={i * 0.08}>
@@ -242,8 +242,8 @@ export function UnforgettableLanding() {
               Your next meeting starts differently
             </h2>
             <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-              Get in touch and we&apos;ll send a quote and design options
-              within the hour.
+              Order online in minutes, or get in touch and we&apos;ll answer
+              any question within the hour.
             </p>
             <Link
               href="/products/metal-business-cards"

@@ -49,9 +49,8 @@ function inclusionNote(
 }
 
 const THICKNESSES: AgentThickness[] = ["0.4mm", "0.8mm"];
-// Countries we cannot ship to at all. Germany/EU became shippable with the
-// 2026-07-29 policy (0.4mm EU orders pay shipping separately) — keep this
-// list in sync with the agent prompt's SHIPPING section.
+// Countries we cannot ship to at all. Shipping is included worldwide since
+// 2026-09-07 — keep this list in sync with the agent prompt's SHIPPING section.
 const BLOCKED_COUNTRIES: string[] = [];
 
 // CHECKOUT_LINK_STYLE=site serves the Whop checkout embedded on our own
@@ -81,7 +80,12 @@ export async function POST(request: NextRequest) {
       email,
       card_details,
       design_service,
+      shipping_address,
     } = body;
+
+    // Full delivery address, collected in chat before the link is generated.
+    const shippingAddress =
+      typeof shipping_address === "string" ? shipping_address.trim().slice(0, 400) : "";
 
     if (!country || typeof country !== "string") {
       return NextResponse.json(
@@ -160,6 +164,7 @@ export async function POST(request: NextRequest) {
         phone: phone || "",
         email: email || "",
         card_details: card_details || "",
+        shipping_address: shippingAddress,
         design_service: designFeeApplies ? "paid" : designIncluded(thickness as AgentThickness, quantity as number) ? "included" : "none",
       },
     });

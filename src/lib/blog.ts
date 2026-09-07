@@ -74,8 +74,8 @@ export const BLOG_POSTS: BlogPost[] = [
         body: "Most NFC business cards are reprogrammable. That means if you change jobs, update your phone number, or redesign your digital profile, you don't need new cards. You just update the link the chip points to. The physical card stays the same. This is especially useful for people whose contact details change frequently.",
       },
       {
-        heading: "Getting started",
-        body: "At Laser Yard, we offer NFC-enabled metal business cards with your custom design laser-engraved on the front. You choose what the chip links to, and we handle the rest. The NFC chip is invisible from the outside. Your card looks like a standard metal business card until someone taps it.",
+        heading: "Where Laser Yard stands on NFC",
+        body: "We don't currently embed NFC chips — our cards are solid laser-engraved 0.8mm aluminum, and we'd rather not compromise that with a chip cavity. If you want the tap-to-share effect, we engrave a QR code that links to your website or digital business card. It works with every phone camera, needs no app, and it's part of the design at no extra cost. We keep an eye on NFC and will add it when we can do it without touching the feel of the card.",
       },
     ],
   },
@@ -176,7 +176,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         heading: "The math",
-        body: "Say a metal card order of 30 cards costs $150 (numbers vary by design). If even one of those cards leads to a single new client, the card paid for itself many times over. Compare that to $30 for 500 paper cards where maybe 5% get kept. The effective reach is similar, but the impression quality is on a completely different level.",
+        body: "Say a metal card order of 30 cards costs $450, shipping included. If even one of those cards leads to a single new client, the card paid for itself many times over. Compare that to $30 for 500 paper cards where maybe 5% get kept. The effective reach is similar, but the impression quality is on a completely different level.",
       },
       {
         heading: "The honest answer",

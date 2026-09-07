@@ -4,17 +4,21 @@ import {
   ensureOrderForCheckoutRef,
   notifyTeamOfPaidOrder,
   sendOrderConfirmationEmail,
+  shippingAddressFromPayment,
+  customerNameFromPayment,
   CheckoutMetadata,
 } from "@/lib/agent-orders";
 
 /**
  * Whop payment webhook: the source of truth for "the customer actually paid".
  *
- * On payment.succeeded for an agent-generated checkout (metadata.source ===
- * "yara-agent"), creates the order in Neon and emails the team. Idempotent
- * via the deterministic tracking number derived from metadata.checkout_ref,
- * so webhook retries and the agent's confirm_payment tool can overlap safely.
+ * On payment.succeeded for a checkout we generated (metadata.source is
+ * "yara-agent" for Yara's links or "website" for the product page), creates
+ * the order in Neon and emails the team + customer. Idempotent via the
+ * deterministic tracking number derived from metadata.checkout_ref, so
+ * webhook retries and the agent's confirm_payment tool can overlap safely.
  */
+const ORDER_SOURCES = new Set(["yara-agent", "website"]);
 export async function POST(request: NextRequest) {
   const key = process.env.WHOP_WEBHOOK_SECRET;
   if (!key) {
@@ -37,11 +41,17 @@ export async function POST(request: NextRequest) {
   try {
     if (event.type === "payment.succeeded") {
       const payment = event.data;
-      const metadata = (payment.metadata || {}) as CheckoutMetadata & {
-        source?: string;
+      const raw = (payment.metadata || {}) as CheckoutMetadata;
+      // The address the customer typed into Whop's checkout wins; anything
+      // collected earlier (chat, our form) is the fallback.
+      const metadata: CheckoutMetadata = {
+        ...raw,
+        customer_name: raw.customer_name || customerNameFromPayment(payment),
+        shipping_address:
+          shippingAddressFromPayment(payment) || raw.shipping_address,
       };
 
-      if (metadata.source === "yara-agent" && metadata.checkout_ref) {
+      if (metadata.source && ORDER_SOURCES.has(metadata.source) && metadata.checkout_ref) {
         const { order, created } = await ensureOrderForCheckoutRef(
           metadata.checkout_ref,
           metadata

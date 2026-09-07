@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 270" width="1720" height="1080">
+  <!-- Reference render of the "Alex Carter" sample card design used on the
+       product page (silver stock). Attach the PNG export of this file to
+       GPT Image 2 so every generated color photo reproduces the same layout. -->
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1f1f3"/>
+      <stop offset="0.45" stop-color="#d9dade"/>
+      <stop offset="1" stop-color="#a6a8ad"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <rect width="430" height="270" fill="#ffffff"/>
+  <g transform="rotate(-3 215 135)" filter="url(#shadow)">
+    <rect x="15" y="15" width="400" height="240" rx="16" fill="url(#body)" stroke="#6d6f74" stroke-opacity="0.6"/>
+    <rect x="15" y="15" width="400" height="240" rx="16" fill="url(#sheen)"/>
+    <g fill="#4b4e53" font-family="Montserrat, 'Helvetica Neue', Arial, sans-serif">
+      <circle cx="67" cy="72" r="19" fill="none" stroke="#4b4e53" stroke-width="2.5"/>
+      <text x="67" y="77" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="1">AC</text>
+      <text x="48" y="152" font-size="28" font-weight="600" letter-spacing="6">ALEX CARTER</text>
+      <text x="48" y="178" font-size="12" letter-spacing="4" fill-opacity="0.85">FOUNDER &amp; CEO</text>
+      <line x1="48" y1="197" x2="206" y2="197" stroke="#4b4e53" stroke-opacity="0.5"/>
+      <text x="48" y="220" font-size="11" letter-spacing="1.5" fill-opacity="0.8">+1 415 000 0000 · alexcarter.com</text>
+      <g stroke="#4b4e53" fill="none" stroke-width="2">
+        <rect x="332" y="176" width="46" height="46" rx="5"/>
+        <rect x="340" y="184" width="10" height="10"/>
+        <rect x="360" y="184" width="10" height="10"/>
+        <rect x="340" y="204" width="10" height="10"/>
+        <path d="M360 204 h10 M365 204 v10" stroke-width="2.5"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -27,13 +27,13 @@ const steps = [
   {
     number: "01",
     icon: Upload,
-    title: "Submit Your Design",
+    title: "Order & Send Your Design",
     description:
-      "Send us your design via WhatsApp or email. We accept AI, EPS, PDF (vector), and high-resolution PNG files. Don't have a design? Our team can create one — free with orders of 30+ cards, or a flat $50 on the 15-card pack.",
+      "Pick your color and quantity on the product page and check out — shipping is included in every price. Then send your design (AI, EPS, PDF vector, or high-resolution PNG) to sales@laseryard.com. Don't have one? Our team can create it — free with orders of 30+ cards, or a flat $50 on the 15-card pack.",
     details: [
       "Vector files preferred (AI, EPS, PDF)",
       "PNG at minimum 300 DPI",
-      "Design service free on qualifying orders",
+      "Design service free on orders of 30+ cards",
     ],
   },
   {
@@ -43,9 +43,9 @@ const steps = [
     description:
       "We'll send you a digital proof showing exactly how your project will look when engraved. Request any adjustments until you're 100% satisfied.",
     details: [
-      "Digital mockup within 24 hours",
+      "Digital proof within 1-3 business days of your order",
       "Unlimited revisions",
-      "Final approval via WhatsApp",
+      "One engraved sample card to approve before the batch",
     ],
   },
   {
@@ -56,7 +56,7 @@ const steps = [
       "Your project is laser-engraved using industrial-grade equipment. Every piece is individually inspected to ensure perfect quality.",
     details: [
       "10-14 business days standard",
-      "Can be ready in as little as 5-7 days",
+      "Rush production (2-3 business days) available",
       "Quality inspection on every piece",
     ],
   },
@@ -65,7 +65,7 @@ const steps = [
     icon: Package,
     title: "Delivery",
     description:
-      "Your finished products are carefully packaged and shipped to your location. Track your order and receive updates via WhatsApp.",
+      "Your finished products are carefully packaged and shipped to your location. Follow every stage at laseryard.com/track with the order number from your confirmation email.",
     details: [
       "Tracked door-to-door delivery",
       "Worldwide: 7-14 business days",
@@ -251,16 +251,16 @@ export default function ProcessPage() {
               Expected <span className="font-extrabold">Timeline</span>
             </h2>
             <p className="text-muted-foreground">
-              Standard orders typically complete within 12-18 business days
+              From proof approval to your door, most orders take 3-4 weeks
             </p>
           </ScrollReveal>
 
           <div className="grid sm:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
-              { phase: "Design Review", time: "1-2 days" },
+              { phase: "Proof & Approval", time: "1-3 days" },
               { phase: "Production", time: "10-14 days" },
               { phase: "Quality Check", time: "1 day" },
-              { phase: "Shipping", time: "1-5 days" },
+              { phase: "Tracked Delivery", time: "7-14 days" },
             ].map((item, index) => (
               <ScrollReveal key={item.phase} delay={index * 0.1}>
                 <div className="text-center p-6 rounded-xl bg-card border border-border">
@@ -284,13 +284,14 @@ export default function ProcessPage() {
                 Ready to Get <span className="font-extrabold">Started?</span>
               </h2>
               <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-                Send us your design via WhatsApp and we&apos;ll get back to you with
-                a proof within 24 hours.
+                Order online in minutes — shipping included — and send your
+                design once you&apos;ve checked out. Questions first? We&apos;re on
+                WhatsApp.
               </p>
               <WhatsAppCTA
-                buttonText="Send Your Design"
+                buttonText="Chat on WhatsApp"
                 size="lg"
-                message="Hi! I'd like to submit my design for laser engraving. How should I send it?"
+                message="Hi! I have a question before ordering my metal business cards."
                 trackingLabel="process-page"
               />
             </div>

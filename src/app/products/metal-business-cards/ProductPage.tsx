@@ -1,7 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ChevronRight,
   Check,
@@ -11,6 +18,7 @@ import {
   Shield,
   ArrowRight,
   PenTool,
+  Loader2,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { cn } from "@/lib/utils";
@@ -20,7 +28,10 @@ import {
   ShippingEstimator,
   type DeliverySelection,
 } from "@/components/shipping/ShippingEstimator";
-import { WhopCheckout } from "@/components/payments/WhopCheckout";
+import {
+  PENDING_CHECKOUT_KEY,
+  type PendingCheckout,
+} from "@/components/payments/CardsCheckout";
 import {
   CARD_PRICING,
   CARD_QUANTITIES,
@@ -31,7 +42,7 @@ import {
   type CardQuantity,
   type CardColor,
 } from "@/lib/constants";
-import { trackViewProduct } from "@/lib/analytics";
+import { trackBeginCheckout, trackViewProduct } from "@/lib/analytics";
 
 const specs = [
   { label: "Material", value: "Premium Anodized Aluminum" },
@@ -72,7 +83,7 @@ const galleryImages = [
   },
   {
     src: "/images/products/card_whitebackground_product_photo_1.png",
-    alt: "Brushed stainless steel metal business card",
+    alt: "Silver laser-engraved metal business card",
   },
   {
     src: "/images/products/card_whitebackground_product_photo_2.png",
@@ -84,6 +95,18 @@ const galleryImages = [
   },
 ];
 
+const inputCls =
+  "w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 transition-shadow";
+
+// We only ask for the email (Whop's API doesn't hand it back to us, and the
+// order confirmation needs it) plus an optional phone for the courier. Name
+// and delivery address are typed once, on Whop's checkout form, and reach
+// the order via the payment webhook. The email is prefilled into that form.
+const EMPTY_SHIPPING = {
+  email: "",
+  phone: "",
+};
+
 const formatUsd = (amount: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -91,12 +114,146 @@ const formatUsd = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount);
 
-export function ProductPage() {
+// Blend a hex color toward a target (0..1) — used to shade the anodized card.
+function mixHex(hex: string, target: string, ratio: number): string {
+  const h = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+  const [a, b] = [h(hex), h(target)];
+  return `#${a
+    .map((v, i) =>
+      Math.round(v + (b[i] - v) * ratio)
+        .toString(16)
+        .padStart(2, "0")
+    )
+    .join("")}`;
+}
+
+function luminance(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+// Generated product visual: a laser-engraved sample card in the selected
+// anodized color (our own render — no supplier imagery).
+function CardPreview({ color }: { color: CardColor }) {
+  const light = mixHex(color.swatch, "#ffffff", 0.38);
+  const dark = mixHex(color.swatch, "#000000", 0.32);
+  const edge = mixHex(color.swatch, "#000000", 0.5);
+  // The laser reveals silver on dark stock; on light stock the engraving
+  // reads darker — pick whichever contrasts with the card color.
+  const engrave = luminance(color.swatch) > 0.55 ? "#4b4e53" : "#d9dbde";
+  return (
+    <div className="w-full aspect-[4/3] flex items-center justify-center">
+      <svg
+        viewBox="0 0 430 270"
+        role="img"
+        aria-label={`${color.label} anodized metal business card preview`}
+        className="w-[80%] drop-shadow-xl"
+      >
+        <defs>
+          <linearGradient id={`body-${color.id}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor={light} />
+            <stop offset="0.45" stopColor={color.swatch} />
+            <stop offset="1" stopColor={dark} />
+          </linearGradient>
+          <linearGradient id={`sheen-${color.id}`} x1="0" y1="0" x2="0.7" y2="1">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
+            <stop offset="0.4" stopColor="#ffffff" stopOpacity="0.05" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <g transform="rotate(-3 215 135)">
+          <rect
+            x="15"
+            y="15"
+            width="400"
+            height="240"
+            rx="16"
+            fill={`url(#body-${color.id})`}
+            stroke={edge}
+            strokeOpacity="0.6"
+          />
+          <rect
+            x="15"
+            y="15"
+            width="400"
+            height="240"
+            rx="16"
+            fill={`url(#sheen-${color.id})`}
+          />
+          {/* The "Alex Carter" sample layout — the same design the
+              per-color product photos reproduce (tools/reference-card-design.svg) */}
+          <g fill={engrave} fontFamily="var(--font-montserrat), system-ui, sans-serif">
+            <circle
+              cx="67"
+              cy="72"
+              r="19"
+              fill="none"
+              stroke={engrave}
+              strokeWidth="2.5"
+            />
+            <text x="67" y="77" textAnchor="middle" fontSize="14" fontWeight="600" letterSpacing="1">
+              AC
+            </text>
+            <text x="48" y="152" fontSize="28" fontWeight="600" letterSpacing="6">
+              ALEX CARTER
+            </text>
+            <text x="48" y="178" fontSize="12" letterSpacing="4" fillOpacity="0.85">
+              FOUNDER &amp; CEO
+            </text>
+            <line x1="48" y1="197" x2="206" y2="197" stroke={engrave} strokeOpacity="0.5" />
+            <text x="48" y="220" fontSize="11" letterSpacing="1.5" fillOpacity="0.8">
+              +1 415 000 0000 · alexcarter.com
+            </text>
+            <g stroke={engrave} fill="none" strokeWidth="2">
+              <rect x="332" y="176" width="46" height="46" rx="5" />
+              <rect x="340" y="184" width="10" height="10" />
+              <rect x="360" y="184" width="10" height="10" />
+              <rect x="340" y="204" width="10" height="10" />
+              <path d="M360 204 h10 M365 204 v10" strokeWidth="2.5" />
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+// Per-color product photo (the fanned-stack shot) found under
+// public/images/products/colors/ at build time — page.tsx checks the
+// filesystem. A color without a photo shows the generated preview instead.
+export type ColorPhotos = Partial<Record<CardColor["id"], string>>;
+
+export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos }) {
   const [selectedColor, setSelectedColor] = useState<CardColor>(CARD_COLORS[0]);
   const [selectedQuantity, setSelectedQuantity] = useState<CardQuantity>(15);
   const [wantsDesignService, setWantsDesignService] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [delivery, setDelivery] = useState<DeliverySelection | null>(null);
+  const [ship, setShip] = useState(EMPTY_SHIPPING);
+  const setShipField =
+    (key: keyof typeof EMPTY_SHIPPING) => (e: ChangeEvent<HTMLInputElement>) =>
+      setShip((s) => ({ ...s, [key]: e.target.value }));
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+  const deliveryRef = useRef<HTMLDivElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+
+  // The sticky order bar only shows while the in-page checkout button is
+  // scrolled out of view — once the real button is visible, the bar slides
+  // away. Starts "visible" so the bar doesn't flash in before the first check.
+  const ctaRef = useRef<HTMLButtonElement>(null);
+  const [ctaVisible, setCtaVisible] = useState(true);
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setCtaVisible(entry.isIntersecting),
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleDeliveryChange = useCallback(
     (d: DeliverySelection | null) => setDelivery(d),
@@ -112,6 +269,93 @@ export function ProductPage() {
   const freeDesign = designIncluded(selectedQuantity);
   const designFee = !freeDesign && wantsDesignService ? DESIGN_FEE_USD : 0;
   const total = cardsSubtotal + designFee;
+  const designService: PendingCheckout["designService"] = freeDesign
+    ? "included"
+    : wantsDesignService
+      ? "paid"
+      : "none";
+
+  // Creates the server-priced Whop session, then hands off to the checkout
+  // page so the customer sees their summary next to Whop's form.
+  const proceedToCheckout = async () => {
+    setCheckoutError("");
+    if (!delivery) {
+      setCheckoutError("Select your delivery destination first.");
+      deliveryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (!ship.email.includes("@")) {
+      setCheckoutError("Add your email so we can send your order confirmation.");
+      emailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      emailRef.current?.focus();
+      return;
+    }
+    setCheckingOut(true);
+    trackBeginCheckout(total);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total,
+          currency: "usd",
+          metadata: {
+            thickness: "0.8mm",
+            color: selectedColor.label,
+            quantity: String(selectedQuantity),
+            designService,
+            deliveryDestination: delivery.destination,
+            email: ship.email,
+            phone: ship.phone,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error || !data.sessionId) {
+        setCheckoutError(data.error || "Could not start checkout. Please try again.");
+        return;
+      }
+      const pending: PendingCheckout = {
+        sessionId: data.sessionId,
+        purchaseUrl: data.purchaseUrl,
+        amount: typeof data.amount === "number" ? data.amount : total,
+        email: ship.email,
+        quantity: selectedQuantity,
+        color: selectedColor.label,
+        designService,
+        destination: delivery.destination,
+        createdAt: Date.now(),
+      };
+      try {
+        sessionStorage.setItem(PENDING_CHECKOUT_KEY, JSON.stringify(pending));
+      } catch {
+        setCheckoutError("Your browser blocked the checkout hand-off. Please enable site storage and try again.");
+        return;
+      }
+      router.push("/checkout/cards");
+    } catch {
+      setCheckoutError("Could not start checkout. Please try again.");
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
+  // Gallery: the selected color's stack photo leads (the generated preview
+  // stands in until a photo exists), then the studio photos.
+  const colorPhoto = colorPhotos[selectedColor.id];
+  const slides: Array<
+    { kind: "preview" } | { kind: "image"; src: string; alt: string }
+  > = [
+    colorPhoto
+      ? {
+          kind: "image",
+          src: colorPhoto,
+          alt: `Stack of ${selectedColor.label} 0.8mm metal business cards`,
+        }
+      : { kind: "preview" },
+    ...galleryImages.map((g) => ({ kind: "image" as const, ...g })),
+  ];
+  const active = slides[Math.min(activeImage, slides.length - 1)];
 
   return (
     <>
@@ -132,31 +376,45 @@ export function ProductPage() {
               <div className="space-y-4">
                 {/* Main Image */}
                 <div className="relative rounded-2xl bg-card border border-border overflow-hidden safari-fix-overflow">
-                  <img
-                    src={galleryImages[activeImage].src}
-                    alt={galleryImages[activeImage].alt}
-                    className="w-full"
-                  />
+                  {active.kind === "preview" ? (
+                    <CardPreview color={selectedColor} />
+                  ) : (
+                    <img src={active.src} alt={active.alt} className="w-full" />
+                  )}
                 </div>
 
                 {/* Thumbnails */}
-                <div className="grid grid-cols-4 gap-3">
-                  {galleryImages.map((image, index) => (
+                <div
+                  className={cn(
+                    "grid gap-3",
+                    slides.length > 5 ? "grid-cols-6" : "grid-cols-5"
+                  )}
+                >
+                  {slides.map((slide, index) => (
                     <button
-                      key={index}
+                      key={slide.kind === "preview" ? "preview" : slide.src}
                       onClick={() => setActiveImage(index)}
+                      aria-label={
+                        slide.kind === "preview"
+                          ? `${selectedColor.label} card preview`
+                          : slide.alt
+                      }
                       className={cn(
-                        "aspect-square rounded-lg border-2 transition-all bg-card overflow-hidden",
+                        "aspect-square rounded-lg border-2 transition-all bg-card overflow-hidden flex items-center justify-center",
                         activeImage === index
                           ? "border-foreground"
                           : "border-border hover:border-foreground/30"
                       )}
                     >
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className="w-full h-full object-cover"
-                      />
+                      {slide.kind === "preview" ? (
+                        <CardPreview color={selectedColor} />
+                      ) : (
+                        <img
+                          src={slide.src}
+                          alt={slide.alt}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -165,7 +423,7 @@ export function ProductPage() {
 
             {/* Product Info */}
             <ScrollReveal direction="right">
-              <div className="lg:sticky lg:top-32 space-y-8">
+              <div className="lg:sticky lg:top-32 space-y-8 lg:px-8">
                 <div>
                   <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-3">
                     Premium Metal Business Cards
@@ -186,28 +444,27 @@ export function ProductPage() {
                       — {selectedColor.label}
                     </span>
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-6 gap-2.5 w-fit">
                     {CARD_COLORS.map((color) => (
                       <button
                         key={color.id}
-                        onClick={() => setSelectedColor(color)}
+                        onClick={() => {
+                          setSelectedColor(color);
+                          setActiveImage(0);
+                        }}
                         title={color.label}
                         aria-label={`${color.label} card`}
                         aria-pressed={selectedColor.id === color.id}
                         className={cn(
-                          "flex items-center gap-2 pl-2 pr-3 py-2 rounded-full border-2 text-xs font-medium transition-all",
+                          "w-9 h-9 rounded-full transition-all duration-150",
                           selectedColor.id === color.id
-                            ? "border-foreground bg-foreground/5"
-                            : "border-border hover:border-foreground/30"
+                            ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
+                            : "ring-1 ring-black/15 dark:ring-white/20 hover:scale-110"
                         )}
-                      >
-                        <span
-                          className="w-4 h-4 rounded-full border border-black/20 dark:border-white/20 flex-shrink-0"
-                          style={{ backgroundColor: color.swatch }}
-                          aria-hidden="true"
-                        />
-                        {color.label}
-                      </button>
+                        style={{
+                          background: `linear-gradient(135deg, color-mix(in srgb, ${color.swatch}, white 40%), ${color.swatch} 45%, color-mix(in srgb, ${color.swatch}, black 30%))`,
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
@@ -230,9 +487,6 @@ export function ProductPage() {
                         )}
                       >
                         <p className="font-semibold">{qty}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {formatUsd(pricing.prices[qty])}
-                        </p>
                       </button>
                     ))}
                   </div>
@@ -269,63 +523,86 @@ export function ProductPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <>
                       <button
-                        onClick={() => setWantsDesignService(false)}
+                        onClick={() => setWantsDesignService(!wantsDesignService)}
                         className={cn(
-                          "relative p-4 rounded-xl border-2 text-left transition-all",
-                          !wantsDesignService
-                            ? "border-foreground bg-foreground/5"
-                            : "border-border hover:border-foreground/30"
-                        )}
-                      >
-                        <p className="font-semibold text-sm">
-                          I have a print-ready design
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Upload your own artwork — no extra cost
-                        </p>
-                        {!wantsDesignService && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
-                            <Check className="w-3 h-3 text-background" />
-                          </div>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => setWantsDesignService(true)}
-                        className={cn(
-                          "relative p-4 rounded-xl border-2 text-left transition-all",
+                          "w-full flex items-center justify-between p-4 rounded-xl border-2 text-left transition-all",
                           wantsDesignService
                             ? "border-foreground bg-foreground/5"
                             : "border-border hover:border-foreground/30"
                         )}
                       >
-                        <p className="font-semibold text-sm">
-                          Design it for me{" "}
-                          <span className="text-muted-foreground font-normal">
-                            +{formatUsd(DESIGN_FEE_USD)}
+                        <span className="flex items-center gap-2.5">
+                          <span
+                            className={cn(
+                              "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors",
+                              wantsDesignService
+                                ? "bg-foreground border-foreground"
+                                : "border-border"
+                            )}
+                          >
+                            {wantsDesignService && (
+                              <Check className="w-3.5 h-3.5 text-background" />
+                            )}
                           </span>
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Our team creates your card from your logo or idea
-                        </p>
-                        {wantsDesignService && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
-                            <Check className="w-3 h-3 text-background" />
-                          </div>
-                        )}
+                          <span className="text-sm font-medium">
+                            Add our design service
+                          </span>
+                        </span>
+                        <span className="text-sm font-semibold">
+                          +{formatUsd(DESIGN_FEE_USD)}
+                        </span>
                       </button>
-                    </div>
-                  )}
-                  {!freeDesign && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Design is included free on orders of 30 cards or more.
-                    </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Or{" "}
+                        <button
+                          onClick={() => setSelectedQuantity(30)}
+                          className="underline hover:text-foreground transition-colors"
+                        >
+                          go for 30+ cards
+                        </button>{" "}
+                        and design is included free.
+                      </p>
+                    </>
                   )}
                 </div>
 
                 {/* Delivery */}
-                <ShippingEstimator onDeliveryChange={handleDeliveryChange} />
+                <div ref={deliveryRef}>
+                  <ShippingEstimator onDeliveryChange={handleDeliveryChange} />
+                </div>
+
+                {/* Contact details */}
+                <div className="p-5 rounded-xl bg-card border border-border">
+                  <label className="text-sm font-medium mb-3 block">
+                    Your Email
+                  </label>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <input
+                      ref={emailRef}
+                      className={inputCls}
+                      type="email"
+                      placeholder="Email *"
+                      autoComplete="email"
+                      value={ship.email}
+                      onChange={setShipField("email")}
+                    />
+                    <input
+                      className={inputCls}
+                      type="tel"
+                      placeholder="Phone (optional, for the courier)"
+                      autoComplete="tel"
+                      value={ship.phone}
+                      onChange={setShipField("phone")}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    For your order confirmation and tracking link. Your name
+                    and delivery address are entered once, on the secure
+                    checkout page.
+                  </p>
+                </div>
 
                 {/* Order Summary */}
                 <div className="p-6 rounded-xl bg-card border border-border space-y-4">
@@ -370,34 +647,26 @@ export function ProductPage() {
 
                 {/* CTA */}
                 <div className="space-y-3">
-                  {delivery ? (
-                    <WhopCheckout
-                      amount={total}
-                      currency="usd"
-                      metadata={{
-                        thickness: "0.8mm",
-                        color: selectedColor.label,
-                        quantity: String(selectedQuantity),
-                        cardsSubtotalUsd: String(cardsSubtotal),
-                        designService: freeDesign
-                          ? "included"
-                          : wantsDesignService
-                            ? "paid"
-                            : "none",
-                        designFeeUsd: String(designFee),
-                        deliveryDestination: delivery.destination,
-                        deliveryUsd: "0",
-                        totalUsd: String(total),
-                      }}
-                      buttonText={`Order Now - ${formatUsd(total)}`}
-                    />
-                  ) : (
-                    <button
-                      disabled
-                      className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-medium text-base opacity-50 cursor-not-allowed"
-                    >
-                      Select delivery destination to order
-                    </button>
+                  <button
+                    ref={ctaRef}
+                    onClick={proceedToCheckout}
+                    disabled={checkingOut}
+                    className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity disabled:opacity-60"
+                  >
+                    {checkingOut ? (
+                      <>
+                        <Loader2 className="size-5 animate-spin" />
+                        Preparing…
+                      </>
+                    ) : (
+                      <>
+                        Proceed to checkout · {formatUsd(total)}
+                        <ArrowRight className="size-5" />
+                      </>
+                    )}
+                  </button>
+                  {checkoutError && (
+                    <p className="text-sm text-red-500">{checkoutError}</p>
                   )}
                   <a
                     href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (0.8mm, ${selectedColor.label}). Can you help me with pricing and the design process?`)}`}
@@ -465,6 +734,59 @@ export function ProductPage() {
 
       <FAQAccordion />
       <CTABanner />
+
+      {/* Sticky order bar: keeps the running total + checkout in reach while
+          the in-page button is scrolled out of view; slides away otherwise */}
+      <div className="h-28 sm:h-32" aria-hidden />
+      <div
+        aria-hidden={ctaVisible}
+        className={cn(
+          "fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md shadow-[0_-10px_40px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out",
+          ctaVisible ? "translate-y-full pointer-events-none" : "translate-y-0"
+        )}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex items-center justify-between gap-4 sm:gap-8">
+          <div className="min-w-0">
+            <p className="text-sm sm:text-base text-muted-foreground truncate">
+              {selectedQuantity} × {selectedColor.label} · 0.8mm ·{" "}
+              {designFee > 0
+                ? "design service"
+                : freeDesign
+                  ? "design included"
+                  : "your own design"}{" "}
+              · shipping included
+            </p>
+            <p className="leading-tight">
+              <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-muted-foreground mr-2">
+                Total
+              </span>
+              <span className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-3xl">
+                {formatUsd(total)}
+              </span>
+            </p>
+            {checkoutError && (
+              <p className="text-sm text-red-500 mt-1">{checkoutError}</p>
+            )}
+          </div>
+          <button
+            onClick={proceedToCheckout}
+            disabled={checkingOut}
+            className="flex-shrink-0 inline-flex items-center justify-center gap-2 py-4 px-6 sm:px-9 rounded-full bg-foreground text-background font-semibold text-base sm:text-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+          >
+            {checkingOut ? (
+              <>
+                <Loader2 className="size-5 animate-spin" />
+                Preparing…
+              </>
+            ) : (
+              <>
+                Proceed to checkout
+                <ArrowRight className="size-5" />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </>
   );
 }

@@ -37,8 +37,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { customerName, itemDescription, customerPhone, destination, designUrl, trackingNumber, note } =
-      body ?? {};
+    const {
+      customerName,
+      itemDescription,
+      customerPhone,
+      destination,
+      shippingAddress,
+      designUrl,
+      trackingNumber,
+      note,
+    } = body ?? {};
 
     if (!customerName || typeof customerName !== "string") {
       return adminJson({ error: "customerName is required" }, 400);
@@ -52,6 +60,7 @@ export async function POST(request: NextRequest) {
       itemDescription,
       customerPhone: typeof customerPhone === "string" ? customerPhone : undefined,
       destination: typeof destination === "string" ? destination : undefined,
+      shippingAddress: typeof shippingAddress === "string" ? shippingAddress : undefined,
       designUrl: typeof designUrl === "string" ? designUrl : undefined,
       trackingNumber: typeof trackingNumber === "string" ? trackingNumber : undefined,
       note: typeof note === "string" ? note : undefined,

@@ -32,8 +32,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
 // Admin: update an order. Two kinds of change, combinable in one call:
 //  - status (+ optional note) — appends a customer-visible timeline event
 //  - detail fields (customerName, customerPhone, itemDescription,
-//    destination, designUrl, carrier, waybillNumber, shipmentStatus,
-//    shipmentDetail, estimatedDelivery) — silent edits, no timeline event
+//    destination, shippingAddress, designUrl, carrier, waybillNumber,
+//    shipmentStatus, shipmentDetail, estimatedDelivery) — silent edits, no
+//    timeline event
 //
 // curl -X PATCH https://laseryard.com/api/orders/LY-XXXX-XXXX \
 //   -H "Authorization: Bearer $ORDERS_ADMIN_KEY" \
@@ -62,6 +63,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       customerPhone,
       itemDescription,
       destination,
+      shippingAddress,
       designUrl,
       carrier,
       waybillNumber,
@@ -75,6 +77,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       customerPhone,
       itemDescription,
       destination,
+      shippingAddress,
       designUrl,
       carrier,
       waybillNumber,

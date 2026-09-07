@@ -100,6 +100,7 @@
         <input id="fPhone" placeholder="Phone (optional)" />
         <input id="fItem" class="full" placeholder="Item description *" required />
         <input id="fDest" placeholder="Destination (optional)" />
+        <input id="fAddr" class="full" placeholder="Shipping address (optional)" />
         <input id="fDesign" placeholder="Design URL (optional, or pick a file below)" />
         <input id="fFile" class="full" type="file" accept=".svg,.png,.jpg,.jpeg,.webp" />
       </div>
@@ -269,6 +270,13 @@
       meta.className = "meta";
       meta.textContent = [o.customerName, o.destination, o.customerPhone].filter(Boolean).join(" · ");
       info.append(tnRow, item, meta);
+      if (o.shippingAddress) {
+        const addr = document.createElement("div");
+        addr.className = "meta";
+        addr.style.whiteSpace = "pre-line";
+        addr.textContent = o.shippingAddress;
+        info.append(addr);
+      }
 
       // Flag shipped orders still missing a waybill — that's the one the
       // customer is waiting on, and the page tells them it's coming.
@@ -564,6 +572,13 @@
     const ePhone = mk("Phone", o.customerPhone);
     const eItem = mk("Item description", o.itemDescription);
     const eDest = mk("Destination", o.destination);
+    // Full delivery address — multi-line, so a textarea rather than mk().
+    const eAddr = document.createElement("textarea");
+    eAddr.placeholder = "Shipping address (name, street, city, postal code, country)";
+    eAddr.value = o.shippingAddress || "";
+    eAddr.rows = 3;
+    eAddr.style.cssText =
+      "grid-column:1 / -1;font:inherit;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit;resize:vertical;";
     const eDesign = mk("Design URL (clear to remove)", o.designUrl);
     const eFile = document.createElement("input");
     eFile.type = "file";
@@ -613,7 +628,7 @@
     save.style.gridColumn = "1 / -1";
     save.style.justifySelf = "start";
     form.append(
-      eName, ePhone, eItem, eDest, eDesign, eFile,
+      eName, ePhone, eItem, eDest, eAddr, eDesign, eFile,
       shipHead, eCarrier, eWaybill, eShipStatus, eEta, eShipDetail,
       save
     );
@@ -635,6 +650,7 @@
             customerPhone: ePhone.value.trim(),
             itemDescription: eItem.value.trim(),
             destination: eDest.value.trim(),
+            shippingAddress: eAddr.value.trim(),
             designUrl,
             carrier: eCarrier.value,
             waybillNumber: eWaybill.value.trim(),
@@ -698,6 +714,7 @@
           itemDescription: $("fItem").value.trim(),
           customerPhone: $("fPhone").value.trim() || undefined,
           destination: $("fDest").value.trim() || undefined,
+          shippingAddress: $("fAddr").value.trim() || undefined,
           designUrl,
         }),
       });

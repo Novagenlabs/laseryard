@@ -48,20 +48,24 @@ export const CARD_PRICING: Record<
 export const DESIGN_FEE_USD = 50;
 export const designIncluded = (quantity: number) => quantity >= 30;
 
-// Anodized aluminum colors from our card stock supplier (0.8mm blanks).
-// `swatch` is the approximate anodized tone used for the site's color picker.
+// Anodized aluminum colors from our card stock supplier (0.8mm blanks; the
+// supplier's "Deep Forest Green" is a muted sage, its "gold" a pale champagne).
+// `swatch` is sampled from the product photo shown for that color, so the
+// picker matches what the customer sees. Photos live at
+// public/images/products/colors/<id>.webp (the fanned-stack shot) — the
+// product page picks them up automatically.
 export const CARD_COLORS = [
-  { id: "black", label: "Matte Black", swatch: "#1c1c1e" },
-  { id: "silver", label: "Silver", swatch: "#c9ccd1" },
-  { id: "gold", label: "Gold", swatch: "#c9a54b" },
-  { id: "blue", label: "Blue", swatch: "#1f5fa8" },
-  { id: "red", label: "Red", swatch: "#c0272d" },
-  { id: "green", label: "Green", swatch: "#2e9e4f" },
-  { id: "forest-green", label: "Forest Green", swatch: "#14532d" },
-  { id: "purple", label: "Purple", swatch: "#6b3fa0" },
-  { id: "pink", label: "Pink", swatch: "#e5679a" },
-  { id: "orange", label: "Cosmic Orange", swatch: "#e8641b" },
-  { id: "brown", label: "Brown", swatch: "#77543a" },
+  { id: "black", label: "Matte Black", swatch: "#323234" },
+  { id: "silver", label: "Silver", swatch: "#d2d1d5" },
+  { id: "gold", label: "Champagne Gold", swatch: "#dbc6a0" },
+  { id: "blue", label: "Blue", swatch: "#025fc6" },
+  { id: "red", label: "Red", swatch: "#a02230" },
+  { id: "green", label: "Green", swatch: "#8eb779" },
+  { id: "forest-green", label: "Sage Green", swatch: "#a1ab9e" },
+  { id: "purple", label: "Purple", swatch: "#a0448f" },
+  { id: "pink", label: "Blush Pink", swatch: "#e9cfcd" },
+  { id: "orange", label: "Cosmic Orange", swatch: "#f7a84c" },
+  { id: "brown", label: "Brown", swatch: "#7d593f" },
 ] as const;
 export type CardColor = (typeof CARD_COLORS)[number];
 
@@ -78,7 +82,7 @@ export const PRODUCT_CATEGORIES = [
     slug: "metal-business-cards",
     name: "Metal Business Cards",
     description:
-      "Laser-engraved aluminum cards. Heavy, cold to the touch, and impossible to throw away. The kind of card people ask about.",
+      "Laser-engraved 0.8mm anodized aluminum cards in 11 colors. Heavy, cold to the touch, and impossible to throw away. From $250 for 15 cards, shipping included.",
     features: ["Premium Aluminum", "0.8mm Thick", "11 Anodized Colors"],
     href: "/products/metal-business-cards",
   },
@@ -173,8 +177,8 @@ export const FEATURES = [
     icon: "PenTool",
   },
   {
-    title: "Fast Turnaround",
-    description: "Most projects completed within 5-7 business days",
+    title: "Reliable Turnaround",
+    description: "10-14 business days standard, rush production available",
     icon: "Clock",
   },
   {
@@ -282,7 +286,7 @@ export const FAQ_ITEMS = [
   {
     question: "How long does it take to get my cards?",
     answer:
-      "Standard production is 10-14 business days after you approve your proof, though cards can be ready in as little as 5-7 days. We ship worldwide.",
+      "Standard production is 10-14 business days after you approve your proof; rush production (2-3 business days) is available for an extra fee. Tracked worldwide delivery, included in the price, takes 7-14 business days after dispatch.",
   },
   {
     question: "Are the cards really made of metal?",
@@ -292,12 +296,12 @@ export const FAQ_ITEMS = [
   {
     question: "What is the minimum order quantity?",
     answer:
-      "Our minimum order is 15 cards — $250 with worldwide shipping included. We offer volume discounts starting at 50+ cards. Contact us for bulk pricing on orders of 200+.",
+      "Our minimum order is 15 cards — $250 with worldwide shipping included. Pack prices scale from there (30 cards $450, up to 200 cards $2,550). Need more than 200? Contact us for a custom quote.",
   },
   {
     question: "Can I add NFC to my cards?",
     answer:
-      "Yes! We offer custom NFC-enabled metal cards. Tap your card against any smartphone to instantly share your contact info, website, or digital business card. No app required.",
+      "Not at the moment — our cards are solid laser-engraved aluminum with no NFC chip. If you want a tap-to-share experience, we can engrave a QR code that links to your website or digital business card; it works with every phone camera, no app required.",
   },
 ];
 

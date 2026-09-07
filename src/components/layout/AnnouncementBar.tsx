@@ -24,12 +24,12 @@ export function AnnouncementBar() {
       <div className="hidden sm:flex items-center gap-4 text-sm">
         <span className="inline-flex items-center gap-1.5 text-foreground">
           <Truck className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
-          Free Worldwide Shipping
+          Worldwide Shipping Included
         </span>
         <span className="text-muted-foreground">|</span>
         <span className="inline-flex items-center gap-1.5 text-foreground">
           <Zap className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
-          5-7 Day Turnaround
+          Rush Production Available
         </span>
       </div>
 
@@ -37,12 +37,12 @@ export function AnnouncementBar() {
       <div className="flex sm:hidden items-center gap-3 text-xs">
         <span className="inline-flex items-center gap-1 text-foreground">
           <Truck className="w-3 h-3 text-gold" aria-hidden="true" />
-          Free Shipping
+          Shipping Included
         </span>
         <span className="text-muted-foreground">|</span>
         <span className="inline-flex items-center gap-1 text-foreground">
           <Zap className="w-3 h-3 text-gold" aria-hidden="true" />
-          5-7 Day Turnaround
+          Rush Available
         </span>
       </div>
 

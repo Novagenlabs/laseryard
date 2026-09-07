@@ -5,12 +5,12 @@ import Link from "next/link";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 
 const features = [
-  { title: "Matte black, glossy & brushed steel", subtitle: "Three finishes to match your style." },
-  { title: "Aluminum & stainless steel", subtitle: "Real metal you can feel." },
-  { title: "Optional NFC chip", subtitle: "Modern, not mandatory." },
-  { title: "Fast production", subtitle: "5-7 business days standard." },
+  { title: "11 anodized colors", subtitle: "Matte black to champagne gold." },
+  { title: "0.8mm anodized aluminum", subtitle: "Real metal you can feel." },
+  { title: "From $250 for 15 cards", subtitle: "One price, no surprises." },
+  { title: "10-14 day production", subtitle: "Rush production available." },
   { title: "Laser-engraved", subtitle: "Consistent quality every time." },
-  { title: "Ships worldwide", subtitle: "Free shipping on select orders." },
+  { title: "Ships worldwide", subtitle: "Shipping included in every price." },
 ];
 
 export function MetalCardFeatures() {
@@ -30,7 +30,7 @@ export function MetalCardFeatures() {
                   />
                   <img
                     src="/images/products/card_whitebackground_product_photo_1.png"
-                    alt="Brushed stainless steel metal business card"
+                    alt="Silver anodized aluminum metal business card"
                     className="absolute -bottom-6 -left-4 w-3/5 rounded-lg shadow-lg"
                   />
                 </div>
