@@ -61,10 +61,10 @@ function HeroMobile() {
 
         {/* CTA */}
         <motion.div {...fadeSlide(0.2)} className="mt-6 max-w-sm mx-auto">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <Link
               href="/products/metal-business-cards"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-4 rounded-full bg-foreground text-background font-semibold text-sm hover:opacity-90 transition-opacity"
+              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
             >
               Order Now
               <ArrowRight className="w-4 h-4" />
@@ -73,7 +73,7 @@ function HeroMobile() {
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-sm hover:bg-foreground/5 transition-colors"
+              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
             >
               Get Custom Quote
               <ArrowRight className="w-4 h-4" />
