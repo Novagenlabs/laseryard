@@ -24,19 +24,27 @@ const faqCategories = [
     questions: [
       {
         q: "What is the minimum order quantity?",
-        a: "Our minimum order is 30 cards. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
+        a: "Our minimum order is 15 cards — $250 with worldwide shipping included. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
       },
       {
         q: "How do I place an order?",
-        a: "Simply contact us via WhatsApp with your design (or design requirements). We'll provide a quote, create a proof for your approval, and proceed with production once you're satisfied.",
+        a: "Order on laseryard.com: pick your color and quantity, add your email, and check out securely — you enter your name and delivery address on the checkout form. Prefer to chat? Message us on WhatsApp and we'll set it up for you.",
       },
       {
-        q: "Can I order a sample before placing a bulk order?",
-        a: "Yes! We offer sample packs for serious inquiries. Contact us on WhatsApp to discuss sample options and pricing.",
+        q: "What happens after I pay?",
+        a: "You get a confirmation email with your order number and tracking link right away. Send your logo and card details to sales@laseryard.com (or let our design team create the design), approve the digital proof and the engraved sample card, and production begins — 10-14 business days, then tracked delivery.",
+      },
+      {
+        q: "Where do I enter my delivery address?",
+        a: "On the secure checkout form, right after you add your email on the product page. Your confirmation email repeats the address so you can double-check it.",
+      },
+      {
+        q: "Can I see a sample before I order?",
+        a: "We don't produce samples or mock-ups before an order is placed. After you order, you approve a digital proof, and we engrave your design on one card and share it before producing the full batch. For recent finished cards, see our Instagram @thelaseryard.",
       },
       {
         q: "Do you offer rush orders?",
-        a: "Yes, we offer priority production for an additional fee. Rush orders can be completed in 2-3 business days instead of the standard 5-7 days.",
+        a: "Yes, we offer priority production for an additional fee. Rush orders can be completed in 2-3 business days instead of the standard 10-14 business days.",
       },
     ],
   },
@@ -49,15 +57,15 @@ const faqCategories = [
       },
       {
         q: "Can you help design my card?",
-        a: "Absolutely! Our design team can create a custom design based on your requirements. Design services are available for an additional fee.",
+        a: "Absolutely! Design is included free with orders of 30 cards or more. For the 15-card starter pack, our design service is a flat $50 — or bring your own print-ready design at no extra cost.",
       },
       {
         q: "Can I include a QR code on my card?",
         a: "Yes! QR codes work very well on metal cards. We recommend keeping them at least 15mm x 15mm for reliable scanning.",
       },
       {
-        q: "What's the difference between 0.4mm and 0.8mm thickness?",
-        a: "0.4mm cards are solid and durable, similar to a premium credit card. 0.8mm cards are heavy, rigid, and have a substantial executive feel. Most clients prefer 0.8mm for the impression it makes.",
+        q: "How thick are the cards, and what colors are available?",
+        a: "Every card is 0.8mm anodized aluminum — heavy, rigid, with a substantial executive feel. Choose from 11 colors: matte black, silver, champagne gold, blue, red, green, sage green, purple, blush pink, cosmic orange, and brown.",
       },
     ],
   },
@@ -66,11 +74,11 @@ const faqCategories = [
     questions: [
       {
         q: "How long does production take?",
-        a: "Standard production is 10-14 business days after design approval, though cards can be ready in as little as 5-7 days.",
+        a: "Standard production is 10-14 business days after you approve your proof. Rush production (2-3 business days) is available for an extra fee.",
       },
       {
         q: "What material are the cards made from?",
-        a: "Our cards are made from premium aluminum alloy. They're durable, lightweight, and won't rust, bend, or fade over time.",
+        a: "Premium 0.8mm anodized aluminum with a matte finish, available in 11 colors. Rigid and durable — they won't rust, bend, or fade over time.",
       },
       {
         q: "How is the design engraved?",
@@ -87,7 +95,7 @@ const faqCategories = [
     questions: [
       {
         q: "Where do you ship to?",
-        a: "We ship worldwide! Orders typically arrive within 7-14 business days after design approval, tracked door-to-door.",
+        a: "We ship worldwide, with shipping included in every price. Orders typically arrive within 7-14 business days after dispatch, tracked door-to-door.",
       },
       {
         q: "How long does delivery take?",
@@ -95,11 +103,11 @@ const faqCategories = [
       },
       {
         q: "How much does shipping cost?",
-        a: "Most quoted prices include worldwide shipping. Where shipping is extra (for example EU orders on 0.4mm cards), we confirm the exact cost before you pay. Contact us on WhatsApp for specifics.",
+        a: "Nothing — worldwide shipping is included in every price. The price you see is the all-in delivered total, wherever you are.",
       },
       {
         q: "Can I track my order?",
-        a: "Yes! We provide tracking information via WhatsApp once your order ships. You'll receive updates at each stage of delivery.",
+        a: "Yes! Your confirmation email includes your order number (LY-XXXX-XXXX) and a tracking link — follow every stage at laseryard.com/track. We also update you on WhatsApp if you ordered there.",
       },
     ],
   },
@@ -108,15 +116,15 @@ const faqCategories = [
     questions: [
       {
         q: "What payment methods do you accept?",
-        a: "We accept bank transfers, mobile money (MTN MoMo, Airtel Money), and international wire transfers. Contact us to discuss the best payment method for your location.",
+        a: "Card payment at checkout through our secure Whop checkout — all major cards. For custom projects such as crystal awards or engraving your own items, the team shares payment options with your quote.",
       },
       {
         q: "When is payment due?",
-        a: "We require 50% deposit to begin production, with the remaining 50% due before shipping. For orders under 50 cards, full payment may be required upfront.",
+        a: "Card packs are paid in full at checkout. For custom projects we take a 50% deposit to begin production, with the balance due before shipping.",
       },
       {
         q: "Do you offer volume discounts?",
-        a: "Yes! Orders of 500+ cards automatically receive a 10% discount. Contact us for custom pricing on larger orders.",
+        a: "The pack prices already scale: 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550 — all with worldwide shipping included. Need more than 200? Contact us for a custom quote.",
       },
     ],
   },

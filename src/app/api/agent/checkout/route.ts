@@ -6,30 +6,51 @@ import {
   resolveEmailRecipient,
   ccFor,
 } from "@/lib/email-template";
-import {
-  CARD_QUANTITIES,
-  CardThickness,
-  CardQuantity,
-} from "@/lib/constants";
+import { CARD_QUANTITIES } from "@/lib/constants";
 
 /**
  * Checkout link generator for the Yara ElevenLabs agent.
  *
- * Prices are the agent's all-in, delivered totals (design + shipping
- * included) — the same for every customer, computed server-side, so the
- * agent can never quote or charge an arbitrary amount. These are the
- * agent-channel prices and may differ from the website's card-only prices.
+ * Prices are all-in, delivered totals (worldwide shipping included) — the
+ * same for every customer, computed server-side, so the agent can never
+ * quote or charge an arbitrary amount. Since 2026-09-07 these match the
+ * website's prices exactly.
  */
 
-const AGENT_PRICES: Record<CardThickness, Record<number, number>> = {
+// 0.4mm was retired from the lineup on 2026-09-07. It stays accepted here
+// (at its old prices) only so checkout links from the LIVE agent keep
+// working until its prompt stops offering 0.4mm — remove the row after the
+// live-agent push.
+type AgentThickness = "0.4mm" | "0.8mm";
+
+const AGENT_PRICES: Record<AgentThickness, Record<number, number>> = {
   "0.4mm": { 30: 250, 50: 365, 100: 650, 200: 1185 },
-  "0.8mm": { 30: 450, 50: 715, 100: 1350, 200: 2550 },
+  "0.8mm": { 15: 250, 30: 450, 50: 715, 100: 1350, 200: 2550 },
 };
 
-const THICKNESSES: CardThickness[] = ["0.4mm", "0.8mm"];
-// Countries we cannot ship to at all. Germany/EU became shippable with the
-// 2026-07-29 policy (0.4mm EU orders pay shipping separately) — keep this
-// list in sync with the agent prompt's SHIPPING section.
+// Design policy (2026-09-07): design is included free with orders of 30
+// cards or more. Only the 15-card pack pays a flat design fee when the
+// customer wants us to create the design. (Legacy 0.4mm keeps its 2026-08-29
+// rule: free at 50+, fee on the 30-card pack.)
+const DESIGN_FEE_USD = 50;
+
+function designIncluded(thickness: AgentThickness, quantity: number): boolean {
+  return thickness === "0.8mm" ? quantity >= 30 : quantity >= 50;
+}
+
+function inclusionNote(
+  thickness: AgentThickness,
+  quantity: number,
+  designService: boolean
+): string {
+  if (designIncluded(thickness, quantity)) return "design and shipping included";
+  if (designService) return `design service ($${DESIGN_FEE_USD}) and shipping included`;
+  return "shipping included, using your own print-ready design";
+}
+
+const THICKNESSES: AgentThickness[] = ["0.4mm", "0.8mm"];
+// Countries we cannot ship to at all. Shipping is included worldwide since
+// 2026-09-07 — keep this list in sync with the agent prompt's SHIPPING section.
 const BLOCKED_COUNTRIES: string[] = [];
 
 // CHECKOUT_LINK_STYLE=site serves the Whop checkout embedded on our own
@@ -58,7 +79,13 @@ export async function POST(request: NextRequest) {
       phone,
       email,
       card_details,
+      design_service,
+      shipping_address,
     } = body;
+
+    // Full delivery address, collected in chat before the link is generated.
+    const shippingAddress =
+      typeof shipping_address === "string" ? shipping_address.trim().slice(0, 400) : "";
 
     if (!country || typeof country !== "string") {
       return NextResponse.json(
@@ -95,8 +122,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const amount =
-      AGENT_PRICES[thickness as CardThickness][quantity as CardQuantity];
+    const basePrice = AGENT_PRICES[thickness as AgentThickness][quantity as number];
+    if (basePrice === undefined) {
+      // e.g. the 15-card tier only exists for 0.8mm.
+      return NextResponse.json(
+        {
+          error: `The ${quantity}-card option isn't available in ${thickness}. Offer the 0.8mm lineup instead.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const wantsDesignService = design_service === true || design_service === "true";
+    const designFeeApplies =
+      wantsDesignService &&
+      !designIncluded(thickness as AgentThickness, quantity as number);
+    const amount = basePrice + (designFeeApplies ? DESIGN_FEE_USD : 0);
+    const included = inclusionNote(
+      thickness as AgentThickness,
+      quantity as number,
+      wantsDesignService
+    );
     const checkoutRef = crypto.randomUUID();
     let customerUrl = "";
 
@@ -118,6 +164,8 @@ export async function POST(request: NextRequest) {
         phone: phone || "",
         email: email || "",
         card_details: card_details || "",
+        shipping_address: shippingAddress,
+        design_service: designFeeApplies ? "paid" : designIncluded(thickness as AgentThickness, quantity as number) ? "included" : "none",
       },
     });
 
@@ -132,7 +180,7 @@ export async function POST(request: NextRequest) {
       email.includes("@") &&
       process.env.RESEND_API_KEY
     ) {
-      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, design and shipping included`;
+      const summaryLine = `${quantity}x ${thickness} metal business cards — $${amount}, ${included}`;
       const { html, text } = renderBrandedEmail({
         preheader: "Your secure checkout link is inside.",
         heading: "Complete your order",
@@ -172,7 +220,7 @@ export async function POST(request: NextRequest) {
       order_reference: checkoutRef,
       email_sent: emailSent,
       price_usd: amount,
-      summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (design and shipping included)`,
+      summary: `${quantity}x ${thickness} metal cards to ${country} — $${amount} (${included})`,
     });
   } catch (e) {
     console.error("Agent checkout creation error:", e);

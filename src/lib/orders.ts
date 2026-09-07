@@ -1,6 +1,18 @@
 import { getDb } from "@/lib/db";
 import type { Carrier } from "@/lib/carriers";
 
+// shipping_address arrived after launch (2026-09); ensure it lazily, the same
+// way order-notifications.ts handles customer_email, so older databases work
+// without running the setup script first.
+let shippingColumnEnsured: Promise<unknown> | null = null;
+function ensureShippingAddressColumn() {
+  if (!shippingColumnEnsured) {
+    const sql = getDb();
+    shippingColumnEnsured = sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_address TEXT`;
+  }
+  return shippingColumnEnsured;
+}
+
 export const ORDER_STATUSES = [
   "received",
   "processing",
@@ -46,6 +58,9 @@ export type Order = {
   customerPhone: string | null;
   itemDescription: string;
   destination: string | null;
+  // Full delivery address as the customer gave it (multi-line). Private to
+  // us — the public tracking page never shows it.
+  shippingAddress: string | null;
   designUrl: string | null;
   status: OrderStatus;
   // Shipment details, all maintained by us — no carrier API involved.
@@ -102,6 +117,7 @@ function rowToOrder(row: any): Order {
     customerPhone: row.customer_phone,
     itemDescription: row.item_description,
     destination: row.destination,
+    shippingAddress: row.shipping_address ?? null,
     designUrl: row.design_url,
     status: row.status,
     carrier: row.carrier ?? null,
@@ -128,6 +144,7 @@ function rowToEvent(row: any): OrderEvent {
 export async function getOrderWithEvents(
   trackingNumber: string
 ): Promise<{ order: Order; events: OrderEvent[] } | null> {
+  await ensureShippingAddressColumn();
   const sql = getDb();
   const tn = normalizeTrackingNumber(trackingNumber);
 
@@ -219,6 +236,7 @@ export async function getFeedbackByOrderIds(
 }
 
 export async function listOrders(limit = 100): Promise<Order[]> {
+  await ensureShippingAddressColumn();
   const sql = getDb();
   const rows = await sql`
     SELECT * FROM orders ORDER BY created_at DESC LIMIT ${limit}
@@ -231,18 +249,20 @@ export async function createOrder(input: {
   itemDescription: string;
   customerPhone?: string;
   destination?: string;
+  shippingAddress?: string;
   designUrl?: string;
   trackingNumber?: string;
   note?: string;
 }): Promise<Order> {
+  await ensureShippingAddressColumn();
   const sql = getDb();
   const tn = input.trackingNumber
     ? normalizeTrackingNumber(input.trackingNumber)
     : generateTrackingNumber();
 
   const rows = await sql`
-    INSERT INTO orders (tracking_number, customer_name, customer_phone, item_description, destination, design_url)
-    VALUES (${tn}, ${input.customerName}, ${input.customerPhone ?? null}, ${input.itemDescription}, ${input.destination ?? null}, ${input.designUrl ?? null})
+    INSERT INTO orders (tracking_number, customer_name, customer_phone, item_description, destination, shipping_address, design_url)
+    VALUES (${tn}, ${input.customerName}, ${input.customerPhone ?? null}, ${input.itemDescription}, ${input.destination ?? null}, ${input.shippingAddress?.trim() || null}, ${input.designUrl ?? null})
     RETURNING *
   `;
   const order = rowToOrder(rows[0]);
@@ -264,6 +284,7 @@ export async function updateOrderDetails(
     customerPhone?: string;
     itemDescription?: string;
     destination?: string;
+    shippingAddress?: string;
     designUrl?: string;
     carrier?: string;
     waybillNumber?: string;
@@ -272,6 +293,7 @@ export async function updateOrderDetails(
     estimatedDelivery?: string;
   }
 ): Promise<Order | null> {
+  await ensureShippingAddressColumn();
   const sql = getDb();
   const tn = normalizeTrackingNumber(trackingNumber);
 
@@ -292,6 +314,10 @@ export async function updateOrderDetails(
       fields.destination === undefined
         ? cur.destination
         : fields.destination || null,
+    shippingAddress:
+      fields.shippingAddress === undefined
+        ? cur.shippingAddress
+        : fields.shippingAddress.trim() || null,
     designUrl:
       fields.designUrl === undefined ? cur.designUrl : fields.designUrl || null,
     carrier:
@@ -322,6 +348,7 @@ export async function updateOrderDetails(
       customer_phone = ${merged.customerPhone},
       item_description = ${merged.itemDescription},
       destination = ${merged.destination},
+      shipping_address = ${merged.shippingAddress},
       design_url = ${merged.designUrl},
       carrier = ${merged.carrier},
       waybill_number = ${merged.waybillNumber},

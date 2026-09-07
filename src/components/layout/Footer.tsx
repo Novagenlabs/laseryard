@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageCircle, Mail, Truck } from "lucide-react";
+import { MessageCircle, Mail, Truck, Instagram } from "lucide-react";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
 const footerLinks = {
@@ -64,9 +64,18 @@ export function Footer() {
                 <Mail className="w-5 h-5" aria-hidden="true" />
                 <span>hello@laseryard.com</span>
               </a>
+              <a
+                href="https://www.instagram.com/thelaseryard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-muted-foreground hover:text-gold transition-colors focus-visible:text-gold focus-visible:outline-none"
+              >
+                <Instagram className="w-5 h-5" aria-hidden="true" />
+                <span>@thelaseryard — see recent cards</span>
+              </a>
               <div className="flex items-center gap-3 text-muted-foreground">
                 <Truck className="w-5 h-5" aria-hidden="true" />
-                <span>Worldwide shipping</span>
+                <span>Worldwide shipping included</span>
               </div>
             </div>
           </div>

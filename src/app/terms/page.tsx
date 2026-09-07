@@ -28,7 +28,7 @@ export default function TermsPage() {
             </h1>
             <div className="w-16 h-px bg-border mb-4" />
             <p className="text-muted-foreground text-sm">
-              Last updated: March 20, 2026
+              Last updated: September 7, 2026
             </p>
           </ScrollReveal>
         </div>
@@ -68,8 +68,9 @@ export default function TermsPage() {
               <h2>Pricing and payment</h2>
               <p>
                 Prices on the website are listed in the currency shown at the
-                time of purchase. Shipping costs are calculated at checkout and
-                vary by destination.
+                time of purchase. Card prices are all-in, delivered totals:
+                worldwide shipping is included, so the price shown is the
+                price you pay.
               </p>
               <p>
                 For custom orders, we require a 50% deposit before production
@@ -80,6 +81,20 @@ export default function TermsPage() {
                 If a price is listed incorrectly due to a technical error, we
                 will contact you before proceeding. You can cancel for a full
                 refund in that case.
+              </p>
+
+              <h2>Design services</h2>
+              <p>
+                Professional design is included at no charge with card orders
+                of 30 cards or more. For the 15-card pack, our design service
+                is available for a flat fee of $50; alternatively, you can
+                supply your own print-ready design at no extra cost.
+              </p>
+              <p>
+                Design work, including digital proofs and mock-ups, begins
+                after an order is placed. We do not produce mock-ups or
+                previews before purchase; examples of our recent work are
+                available on our Instagram.
               </p>
 
               <h2>Design approval</h2>
@@ -147,7 +162,7 @@ export default function TermsPage() {
               <h2>Website use</h2>
               <p>
                 You can browse the website, place orders, and use the tools we
-                provide (like the shipping calculator). Do
+                provide. Do
                 not scrape the site, overload it with automated requests, or
                 use it for anything illegal.
               </p>

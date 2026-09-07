@@ -24,33 +24,50 @@ export const WHATSAPP_MESSAGES = {
 
 // Metal business card pricing.
 // Quantities outside this table (or other materials/finishes) get a custom quote on WhatsApp.
-export const CARD_QUANTITIES = [30, 50, 100, 200] as const;
+// 2026-09-07: 0.4mm retired — the lineup is 0.8mm only, with a 15-card entry pack.
+export const CARD_QUANTITIES = [15, 30, 50, 100, 200] as const;
 export type CardQuantity = (typeof CARD_QUANTITIES)[number];
-export type CardThickness = "0.4mm" | "0.8mm";
+export type CardThickness = "0.8mm";
 
-// Total price in USD per thickness and quantity.
-// Base: $200 (0.4mm) / $450 (0.8mm) per 30 cards; ~5% off per card at 50, ~10% at 100, ~15% at 200.
+// All-in delivered totals in USD — worldwide shipping is included in every
+// price (same numbers the WhatsApp agent quotes). The 15-card pack does not
+// include the design service (flat DESIGN_FEE_USD when we create the design);
+// orders of 30+ cards include design free.
 export const CARD_PRICING: Record<
   CardThickness,
   { label: string; prices: Record<CardQuantity, number> }
 > = {
-  "0.4mm": {
-    label: "Standard",
-    prices: { 30: 200, 50: 315, 100: 600, 200: 1135 },
-  },
   "0.8mm": {
     label: "Premium",
-    prices: { 30: 450, 50: 715, 100: 1350, 200: 2550 },
+    prices: { 15: 250, 30: 450, 50: 715, 100: 1350, 200: 2550 },
   },
 };
 
-// Limited-time marketing campaign: free delivery if the visitor orders within
-// `windowHours` of their first visit (per-visitor countdown, localStorage).
-// Flip `enabled` to start/stop the campaign.
-export const FREE_SHIPPING_CAMPAIGN = {
-  enabled: true,
-  windowHours: 48,
-};
+// Flat design-service fee (USD) on the 15-card pack; design is included free
+// with orders of 30 cards or more. Supplying a print-ready design is always free.
+export const DESIGN_FEE_USD = 50;
+export const designIncluded = (quantity: number) => quantity >= 30;
+
+// Anodized aluminum colors from our card stock supplier (0.8mm blanks; the
+// supplier's "Deep Forest Green" is a muted sage, its "gold" a pale champagne).
+// `swatch` is sampled from the product photo shown for that color, so the
+// picker matches what the customer sees. Photos live at
+// public/images/products/colors/<id>.webp (the fanned-stack shot) — the
+// product page picks them up automatically.
+export const CARD_COLORS = [
+  { id: "black", label: "Matte Black", swatch: "#323234" },
+  { id: "silver", label: "Silver", swatch: "#d2d1d5" },
+  { id: "gold", label: "Champagne Gold", swatch: "#dbc6a0" },
+  { id: "blue", label: "Blue", swatch: "#025fc6" },
+  { id: "red", label: "Red", swatch: "#a02230" },
+  { id: "green", label: "Green", swatch: "#8eb779" },
+  { id: "forest-green", label: "Sage Green", swatch: "#a1ab9e" },
+  { id: "purple", label: "Purple", swatch: "#a0448f" },
+  { id: "pink", label: "Blush Pink", swatch: "#e9cfcd" },
+  { id: "orange", label: "Cosmic Orange", swatch: "#f7a84c" },
+  { id: "brown", label: "Brown", swatch: "#7d593f" },
+] as const;
+export type CardColor = (typeof CARD_COLORS)[number];
 
 export const NAV_LINKS = [
   { href: "/products/metal-business-cards", label: "Metal Cards" },
@@ -65,8 +82,8 @@ export const PRODUCT_CATEGORIES = [
     slug: "metal-business-cards",
     name: "Metal Business Cards",
     description:
-      "Laser-engraved aluminum cards. Heavy, cold to the touch, and impossible to throw away. The kind of card people ask about.",
-    features: ["Premium Aluminum", "0.4mm / 0.8mm Thickness", "Multiple Finishes"],
+      "Laser-engraved 0.8mm anodized aluminum cards in 11 colors. Heavy, cold to the touch, and impossible to throw away. From $250 for 15 cards, shipping included.",
+    features: ["Premium Aluminum", "0.8mm Thick", "11 Anodized Colors"],
     href: "/products/metal-business-cards",
   },
   {
@@ -160,8 +177,8 @@ export const FEATURES = [
     icon: "PenTool",
   },
   {
-    title: "Fast Turnaround",
-    description: "Most projects completed within 5-7 business days",
+    title: "Reliable Turnaround",
+    description: "10-14 business days standard, rush production available",
     icon: "Clock",
   },
   {
@@ -264,27 +281,27 @@ export const FAQ_ITEMS = [
   {
     question: "How do I design my metal business cards?",
     answer:
-      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it for you. Just share your logo and details, and we'll create a production-ready layout.",
+      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it. Design is included free with orders of 30 cards or more; for the 15-card starter pack the design service is a flat $50.",
   },
   {
     question: "How long does it take to get my cards?",
     answer:
-      "Standard production is 10-14 business days after you approve your proof, though cards can be ready in as little as 5-7 days. We ship worldwide.",
+      "Standard production is 10-14 business days after you approve your proof; rush production (2-3 business days) is available for an extra fee. Tracked worldwide delivery, included in the price, takes 7-14 business days after dispatch.",
   },
   {
     question: "Are the cards really made of metal?",
     answer:
-      "Yes. Our cards are made from premium aluminum, available in 0.4mm or 0.8mm thick. They're heavy, cold to the touch, and built to last. The kind of card people keep instead of throwing away.",
+      "Yes. Our cards are premium anodized aluminum, 0.8mm thick, available in 11 colors. They're heavy, cold to the touch, and built to last. The kind of card people keep instead of throwing away.",
   },
   {
     question: "What is the minimum order quantity?",
     answer:
-      "Our minimum order is 30 cards. We offer volume discounts starting at 50+ cards. Contact us for bulk pricing on orders of 200+.",
+      "Our minimum order is 15 cards — $250 with worldwide shipping included. Pack prices scale from there (30 cards $450, up to 200 cards $2,550). Need more than 200? Contact us for a custom quote.",
   },
   {
     question: "Can I add NFC to my cards?",
     answer:
-      "Yes! We offer custom NFC-enabled metal cards. Tap your card against any smartphone to instantly share your contact info, website, or digital business card. No app required.",
+      "Not at the moment — our cards are solid laser-engraved aluminum with no NFC chip. If you want a tap-to-share experience, we can engrave a QR code that links to your website or digital business card; it works with every phone camera, no app required.",
   },
 ];
 

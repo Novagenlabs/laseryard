@@ -63,7 +63,8 @@ export function processDesign(
   canvas.height = opts.outputHeight;
   const ctx = canvas.getContext("2d")!;
 
-  // Draw image scaled to fit card proportions (85mm x 55mm)
+  // Draw image scaled to fit card proportions (86mm x 54mm stock; the
+  // ratio below is close enough for proofs)
   const imgAspect = img.width / img.height;
   const cardAspect = opts.outputWidth / opts.outputHeight;
 

@@ -3,6 +3,7 @@ import {
   TESTIMONIAL_STATS,
   COUNTRIES,
   WHATSAPP_NUMBER,
+  CARD_PRICING,
 } from "@/lib/constants";
 
 const BASE_URL = SITE_CONFIG.url;
@@ -32,7 +33,7 @@ export function organizationSchema() {
       "@type": "Country",
       name: c.name,
     })),
-    sameAs: [],
+    sameAs: ["https://www.instagram.com/thelaseryard"],
   };
 }
 
@@ -130,7 +131,36 @@ export function productSchema(opts: {
   image: string;
   material?: string;
   url: string;
+  // Metal card pages carry the pack price range + included shipping so the
+  // product is eligible for price rich results.
+  metalCards?: boolean;
 }) {
+  const cardPrices = Object.values(CARD_PRICING["0.8mm"].prices);
+  const offers = opts.metalCards
+    ? {
+        "@type": "AggregateOffer",
+        lowPrice: Math.min(...cardPrices),
+        highPrice: Math.max(...cardPrices),
+        priceCurrency: "USD",
+        offerCount: cardPrices.length,
+        availability: "https://schema.org/InStock",
+        url: `${BASE_URL}${opts.url}`,
+        shippingDetails: {
+          "@type": "OfferShippingDetails",
+          shippingRate: {
+            "@type": "MonetaryAmount",
+            value: 0,
+            currency: "USD",
+          },
+          shippingDestination: { "@type": "DefinedRegion" },
+        },
+      }
+    : {
+        "@type": "Offer",
+        availability: "https://schema.org/InStock",
+        priceCurrency: "USD",
+        url: `${BASE_URL}${opts.url}`,
+      };
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -149,12 +179,7 @@ export function productSchema(opts: {
       reviewCount: TESTIMONIAL_STATS.totalClients,
       bestRating: 5,
     },
-    offers: {
-      "@type": "Offer",
-      availability: "https://schema.org/InStock",
-      priceCurrency: "USD",
-      url: `${BASE_URL}${opts.url}`,
-    },
+    offers,
   };
 }
 

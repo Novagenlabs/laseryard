@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!country) return {};
 
   const title = `Metal Business Cards in ${country.name} | Laser Yard`;
-  const description = `Premium laser-engraved metal business cards delivered to ${country.name}. Serving ${country.cities.join(", ")} and more. Matte black, brushed steel, NFC-enabled. Min. 30 cards.`;
+  const description = `Premium laser-engraved metal business cards delivered to ${country.name}. Serving ${country.cities.join(", ")} and more. 11 anodized colors. From $250 for 15 cards, shipping included.`;
 
   return {
     title,
@@ -91,43 +91,18 @@ const SHIPPING_INFO: Record<
   },
 };
 
-const PAYMENT_INFO: Record<string, string[]> = {
-  africa: [
-    "Bank transfer (NGN or USD)",
-    "Mobile money (MTN MoMo, Airtel Money)",
-    "Card payments",
-  ],
-  nigeria: [
-    "Bank transfer (NGN)",
-    "Mobile money",
-    "Card payments",
-  ],
-  ghana: [
-    "Mobile money (MTN MoMo, Airtel Money)",
-    "Bank transfer (GHS or USD)",
-    "Card payments",
-  ],
-  "united-kingdom": [
-    "International bank transfer (GBP)",
-    "Wire transfer",
-    "Card payments",
-  ],
-  "united-states": [
-    "International wire transfer (USD)",
-    "Card payments",
-    "Zelle",
-  ],
-  uae: [
-    "International bank transfer (AED or USD)",
-    "Wire transfer",
-    "Card payments",
-  ],
-  eu: [
-    "SEPA bank transfer (EUR)",
-    "International wire transfer",
-    "Card payments",
-  ],
-};
+// Card packs are paid by card at the secure checkout everywhere; custom
+// projects get their payment options with the quote.
+const PAYMENT_METHODS = [
+  "Secure card checkout on laseryard.com (all major cards)",
+  "Priced in USD — worldwide shipping included",
+  "Custom projects: payment options shared with your quote",
+];
+const PAYMENT_INFO: Record<string, string[]> = Object.fromEntries(
+  ["africa", "nigeria", "ghana", "united-kingdom", "united-states", "uae", "eu"].map(
+    (slug) => [slug, PAYMENT_METHODS]
+  )
+);
 
 export default async function LocationPage({ params }: Props) {
   const { location } = await params;
@@ -140,9 +115,10 @@ export default async function LocationPage({ params }: Props) {
   const schemas = [
     productSchema({
       name: `Metal Business Cards - ${country.name}`,
-      description: `Premium laser-engraved metal business cards delivered to ${country.name}. Available in aluminum and stainless steel, matte black, glossy, and brushed finishes.`,
+      description: `Premium laser-engraved metal business cards delivered to ${country.name}. 0.8mm anodized aluminum in 11 matte colors, from $250 for 15 cards with shipping included.`,
       image: `${SITE_CONFIG.url}/og-image.jpg`,
       url: `${SITE_CONFIG.url}/${country.slug}`,
+      metalCards: true,
     }),
     breadcrumbSchema([
       { name: "Home", url: SITE_CONFIG.url },
@@ -176,9 +152,10 @@ export default async function LocationPage({ params }: Props) {
                 Metal Business Cards in {country.name}
               </h1>
               <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed mb-4">
-                Premium laser-engraved aluminum and stainless steel business
-                cards, delivered to {country.name}. Heavy, cold to the touch,
-                and impossible to throw away.
+                Premium laser-engraved 0.8mm anodized aluminum business cards
+                in 11 colors, delivered to {country.name} with shipping
+                included. Heavy, cold to the touch, and impossible to throw
+                away — from $250 for 15 cards.
               </p>
               <p className="text-muted-foreground">
                 We serve {country.cities.join(", ")}, and everywhere in between.
@@ -217,8 +194,8 @@ export default async function LocationPage({ params }: Props) {
             {[
               {
                 icon: Layers,
-                title: "Aluminum & Stainless Steel",
-                desc: "0.4mm standard or 0.8mm premium thickness",
+                title: "Premium Anodized Aluminum",
+                desc: "0.8mm thick, available in 11 colors",
               },
               {
                 icon: Shield,
@@ -228,7 +205,7 @@ export default async function LocationPage({ params }: Props) {
               {
                 icon: CreditCard,
                 title: "Wallet-Ready Size",
-                desc: "Standard 85mm x 55mm, fits any card holder",
+                desc: "Standard 86mm x 54mm, fits any card holder",
               },
               {
                 icon: Package,
@@ -310,8 +287,9 @@ export default async function LocationPage({ params }: Props) {
                   ))}
                 </ul>
                 <p className="mt-6 text-sm text-muted-foreground">
-                  50% deposit to start, 50% before shipping. All prices quoted
-                  in {country.currency}.
+                  Card packs are paid in full at checkout, priced in USD with
+                  shipping to {country.name} included. Custom projects: 50%
+                  deposit to start, balance before shipping.
                 </p>
               </div>
             </ScrollReveal>
@@ -331,8 +309,8 @@ export default async function LocationPage({ params }: Props) {
             {[
               {
                 step: "01",
-                title: "Send Your Design",
-                desc: "Message us on WhatsApp with your logo and details, or upload your design when you order.",
+                title: "Order & Send Your Design",
+                desc: "Pick your color and quantity and check out online, then send your logo and details to sales@laseryard.com — or let our team design it.",
               },
               {
                 step: "02",
@@ -342,7 +320,7 @@ export default async function LocationPage({ params }: Props) {
               {
                 step: "03",
                 title: "We Engrave",
-                desc: "Production takes 10-14 business days. Rush orders available in 5-7 days.",
+                desc: "Production takes 10-14 business days after you approve your proof. Rush production (2-3 business days) available for an extra fee.",
               },
               {
                 step: "04",

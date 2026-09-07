@@ -21,7 +21,7 @@ const steps = [
     number: "03",
     title: "Produced Fast. Delivered Ready.",
     description:
-      "Your cards are precision laser-engraved, inspected, and shipped. Production takes 10-14 days after design is approved, though cards can be ready in as little as 5-7 days.",
+      "Your cards are precision laser-engraved, inspected, and shipped — shipping included. Production takes 10-14 business days after you approve your proof; rush production (2-3 business days) is available for an extra fee.",
   },
 ];
 

@@ -88,6 +88,9 @@ await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipment_status text`;
 await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipment_detail text`;
 await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS estimated_delivery date`;
 
+// Full delivery address (multi-line text), collected at checkout since 2026-09.
+await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_address text`;
+
 // Earlier installs of this feature used carrier_tracking_number and cached
 // DHL API payloads. Carry those waybills over, then drop the dead cache.
 // Guarded: on a database that never had that column the UPDATE would throw

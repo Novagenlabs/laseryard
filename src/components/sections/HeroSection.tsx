@@ -60,23 +60,28 @@ function HeroMobile() {
         </motion.p>
 
         {/* CTA */}
-        <motion.div {...fadeSlide(0.2)} className="mt-6 flex flex-col items-center gap-3">
-          <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
-          >
-            Get a Quote
-            <ArrowRight className="w-4 h-4" />
-          </a>
-          <Link
-            href="/products/metal-business-cards"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            or design your card first
-            <ArrowRight className="w-3 h-3" />
-          </Link>
+        <motion.div {...fadeSlide(0.2)} className="mt-6 max-w-sm mx-auto">
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/products/metal-business-cards"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-4 rounded-full bg-foreground text-background font-semibold text-sm hover:opacity-90 transition-opacity"
+            >
+              Order Now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-sm hover:bg-foreground/5 transition-colors"
+            >
+              Get Custom Quote
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground text-center">
+            From $250 · Shipping included · 11 colors
+          </p>
         </motion.div>
 
         {/* Social Proof - compact */}
@@ -162,24 +167,29 @@ function HeroDesktop() {
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="mt-10 flex items-center gap-6"
+              className="mt-10"
             >
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center gap-2 w-[277px] px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
-              >
-                Get a Quote
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <Link
-                href="/products/metal-business-cards"
-                className="group inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Design your card
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link
+                  href="/products/metal-business-cards"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
+                >
+                  Order Now
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+                >
+                  Get Custom Quote
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">
+                From $250 · Shipping included · 11 colors · ready in 10-14 days
+              </p>
             </motion.div>
           </div>
 

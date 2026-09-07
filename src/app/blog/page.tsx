@@ -10,7 +10,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Blog | Laser Yard",
   description:
-    "Guides, tips, and insights on metal business cards, laser engraving, NFC technology, and making a lasting impression.",
+    "Guides, tips, and insights on metal business cards, laser engraving, and making a lasting impression.",
   alternates: { canonical: "https://laseryard.com/blog" },
 };
 

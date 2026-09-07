@@ -5,7 +5,7 @@ export function GET() {
 ## Products
 
 ### Metal Business Cards
-Premium laser-engraved aluminum business cards. Available in 0.4mm and 0.8mm thickness. Finishes include matte black, glossy, and brushed aluminum. Minimum order: 30 cards. NFC-enabled options available.
+Premium laser-engraved anodized aluminum business cards, 0.8mm thick, 86mm x 54mm, matte finish. Available in 11 colors: matte black, silver, champagne gold, blue, red, green, sage green, purple, blush pink, cosmic orange, and brown. Minimum order: 15 cards. Examples of finished cards: Instagram @thelaseryard.
 
 ### Crystal Awards
 3D laser-engraved crystal trophies and awards for corporate recognition, team events, and milestones. Multiple shapes available with custom text and logos.
@@ -21,13 +21,17 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 ## Key Information
 
 - **Serving**: United Kingdom, United States, EU, UAE, Nigeria, Ghana, and 20+ countries worldwide
-- **Production time**: 10-14 business days standard, 5-7 days rush
-- **Minimum order**: 30 cards for metal business cards
-- **Payment**: 50% deposit to start, 50% before shipping
-- **Payment methods**: Bank transfer, mobile money (MTN MoMo, Airtel Money), international wire
-- **Shipping**: Tracked worldwide delivery, 7-14 business days after design approval
+- **Production time**: 10-14 business days standard after proof approval; rush production 2-3 business days for an extra fee
+- **Ordering (metal cards)**: on laseryard.com/products/metal-business-cards — choose color + quantity, add email, pay by card at the secure checkout (name + delivery address entered on the checkout form); confirmation email includes the order number (LY-XXXX-XXXX) and tracking link
+- **After ordering**: send the design to sales@laseryard.com (or the design team creates it); approve a digital proof and one engraved sample card before the full batch is produced
+- **Order tracking**: https://laseryard.com/track?order=LY-XXXX-XXXX
+- **Minimum order**: 15 cards for metal business cards
+- **Card pricing (all-in, worldwide shipping included)**: 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550
+- **Payment**: card packs paid in full at checkout via Whop (all major cards); custom projects 50% deposit to start, balance before shipping
+- **Shipping**: Included in every card price — tracked worldwide delivery, 7-14 business days after dispatch
 - **Design formats accepted**: AI, EPS, PDF (vector), SVG, PNG (300+ DPI)
-- **Contact**: WhatsApp (fastest), email hello@laseryard.com
+- **Design service**: free with orders of 30+ cards; flat $50 for the 15-card pack (own print-ready design always free). Proofs are shared after ordering — no pre-purchase mock-ups
+- **Contact**: WhatsApp (fastest), email hello@laseryard.com; design files to sales@laseryard.com; Instagram @thelaseryard
 - **Business hours**: Mon-Fri 9am-6pm, Sat 10am-4pm
 
 ## Pages
@@ -42,7 +46,6 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 - FAQ: https://laseryard.com/faq
 - About Us: https://laseryard.com/about
 - Contact: https://laseryard.com/contact
-- BE UNFORGETTABLE (Metal Cards Landing): https://laseryard.com/unforgettable
 - Track Your Order: https://laseryard.com/track
 
 ## Location Pages

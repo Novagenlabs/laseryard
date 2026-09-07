@@ -6,6 +6,8 @@ import {
   ensureOrderForCheckoutRef,
   notifyTeamOfPaidOrder,
   sendOrderConfirmationEmail,
+  shippingAddressFromPayment,
+  customerNameFromPayment,
   CheckoutMetadata,
 } from "@/lib/agent-orders";
 import { getOrderWithEvents } from "@/lib/orders";
@@ -72,7 +74,14 @@ export async function POST(request: NextRequest) {
         metadata.checkout_ref === ref &&
         payment.substatus === "succeeded"
       ) {
-        matched = metadata;
+        // Prefer the address Whop collected at checkout over anything from chat.
+        matched = {
+          ...metadata,
+          customer_name:
+            metadata.customer_name || customerNameFromPayment(payment),
+          shipping_address:
+            shippingAddressFromPayment(payment) || metadata.shipping_address,
+        };
         break;
       }
       if (scanned >= MAX_PAYMENTS_SCANNED) break;
