@@ -6,49 +6,33 @@ import {
   resolveEmailRecipient,
   ccFor,
 } from "@/lib/email-template";
-import { CARD_QUANTITIES } from "@/lib/constants";
+import {
+  CARD_PRICING,
+  CARD_QUANTITIES,
+  DESIGN_FEE_USD,
+  designIncluded,
+  type CardQuantity,
+  type CardThickness,
+} from "@/lib/constants";
 
 /**
  * Checkout link generator for the Yara ElevenLabs agent.
  *
- * Prices are all-in, delivered totals (worldwide shipping included) — the
- * same for every customer, computed server-side, so the agent can never
- * quote or charge an arbitrary amount. Since 2026-09-07 these match the
- * website's prices exactly.
+ * Prices come from the same lineup as the website (constants.ts): all-in,
+ * delivered totals with worldwide shipping included, computed server-side
+ * so the agent can never quote or charge an arbitrary amount. Design is
+ * included free from 30 cards; the 15-card pack pays a flat fee when the
+ * customer wants us to create the design.
  */
 
-// 0.4mm was retired from the lineup on 2026-09-07. It stays accepted here
-// (at its old prices) only so checkout links from the LIVE agent keep
-// working until its prompt stops offering 0.4mm — remove the row after the
-// live-agent push.
-type AgentThickness = "0.4mm" | "0.8mm";
-
-const AGENT_PRICES: Record<AgentThickness, Record<number, number>> = {
-  "0.4mm": { 30: 250, 50: 365, 100: 650, 200: 1185 },
-  "0.8mm": { 15: 250, 30: 450, 50: 715, 100: 1350, 200: 2550 },
-};
-
-// Design policy (2026-09-07): design is included free with orders of 30
-// cards or more. Only the 15-card pack pays a flat design fee when the
-// customer wants us to create the design. (Legacy 0.4mm keeps its 2026-08-29
-// rule: free at 50+, fee on the 30-card pack.)
-const DESIGN_FEE_USD = 50;
-
-function designIncluded(thickness: AgentThickness, quantity: number): boolean {
-  return thickness === "0.8mm" ? quantity >= 30 : quantity >= 50;
-}
-
-function inclusionNote(
-  thickness: AgentThickness,
-  quantity: number,
-  designService: boolean
-): string {
-  if (designIncluded(thickness, quantity)) return "design and shipping included";
+function inclusionNote(quantity: number, designService: boolean): string {
+  if (designIncluded(quantity)) return "design and shipping included";
   if (designService) return `design service ($${DESIGN_FEE_USD}) and shipping included`;
   return "shipping included, using your own print-ready design";
 }
 
-const THICKNESSES: AgentThickness[] = ["0.4mm", "0.8mm"];
+// 0.4mm was retired 2026-09-07; the live agent no longer offers it.
+const THICKNESSES: CardThickness[] = ["0.8mm"];
 // Countries we cannot ship to at all. Shipping is included worldwide since
 // 2026-09-07 — keep this list in sync with the agent prompt's SHIPPING section.
 const BLOCKED_COUNTRIES: string[] = [];
@@ -122,27 +106,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const basePrice = AGENT_PRICES[thickness as AgentThickness][quantity as number];
-    if (basePrice === undefined) {
-      // e.g. the 15-card tier only exists for 0.8mm.
-      return NextResponse.json(
-        {
-          error: `The ${quantity}-card option isn't available in ${thickness}. Offer the 0.8mm lineup instead.`,
-        },
-        { status: 400 }
-      );
-    }
-
+    const basePrice = CARD_PRICING["0.8mm"].prices[quantity as CardQuantity];
     const wantsDesignService = design_service === true || design_service === "true";
     const designFeeApplies =
-      wantsDesignService &&
-      !designIncluded(thickness as AgentThickness, quantity as number);
+      wantsDesignService && !designIncluded(quantity as number);
     const amount = basePrice + (designFeeApplies ? DESIGN_FEE_USD : 0);
-    const included = inclusionNote(
-      thickness as AgentThickness,
-      quantity as number,
-      wantsDesignService
-    );
+    const included = inclusionNote(quantity as number, wantsDesignService);
     const checkoutRef = crypto.randomUUID();
     let customerUrl = "";
 
@@ -165,7 +134,7 @@ export async function POST(request: NextRequest) {
         email: email || "",
         card_details: card_details || "",
         shipping_address: shippingAddress,
-        design_service: designFeeApplies ? "paid" : designIncluded(thickness as AgentThickness, quantity as number) ? "included" : "none",
+        design_service: designFeeApplies ? "paid" : designIncluded(quantity as number) ? "included" : "none",
       },
     });
 
