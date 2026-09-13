@@ -235,6 +235,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
       setShip((s) => ({ ...s, [key]: e.target.value }));
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [descExpanded, setDescExpanded] = useState(false);
   const deliveryRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -367,6 +368,41 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
   ];
   const active = slides[Math.min(activeImage, slides.length - 1)];
 
+  // One set of swatches, two layouts: a single scrollable row right under
+  // the photo on phones (switching colors and seeing the change share the
+  // screen), and the two-row grid in the order panel on desktop.
+  const renderSwatches = (layout: "row" | "grid") => (
+    <div
+      className={
+        layout === "row"
+          ? "flex gap-2.5 overflow-x-auto py-2 px-1 -mx-1 snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          : "grid grid-cols-6 gap-3 sm:gap-2.5 w-fit"
+      }
+    >
+      {CARD_COLORS.map((color) => (
+        <button
+          key={color.id}
+          onClick={() => {
+            setSelectedColor(color);
+            setActiveImage(0);
+          }}
+          title={color.label}
+          aria-label={`${color.label} card`}
+          aria-pressed={selectedColor.id === color.id}
+          className={cn(
+            "flex-shrink-0 snap-start w-10 h-10 sm:w-9 sm:h-9 rounded-full transition-all duration-150",
+            selectedColor.id === color.id
+              ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
+              : "ring-1 ring-black/15 dark:ring-white/20 hover:scale-110"
+          )}
+          style={{
+            background: `linear-gradient(135deg, color-mix(in srgb, ${color.swatch}, white 40%), ${color.swatch} 45%, color-mix(in srgb, ${color.swatch}, black 30%))`,
+          }}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <>
       <section className="pt-32 lg:pt-40 pb-16">
@@ -391,6 +427,18 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                   ) : (
                     <img src={active.src} alt={active.alt} className="w-full" />
                   )}
+                </div>
+
+                {/* Color row (phones): switch colors right under the photo */}
+                <div className="lg:hidden">
+                  <p className="text-xs font-medium mb-1">
+                    Color
+                    <span className="text-muted-foreground font-normal">
+                      {" "}
+                      — {selectedColor.label}
+                    </span>
+                  </p>
+                  {renderSwatches("row")}
                 </div>
 
                 {/* Thumbnails */}
@@ -438,15 +486,27 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                   <h1 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3">
                     Premium Metal Business Cards
                   </h1>
-                  <p className="text-muted-foreground text-base sm:text-lg">
+                  <p
+                    className={cn(
+                      "text-muted-foreground text-base sm:text-lg",
+                      !descExpanded && "line-clamp-1 lg:line-clamp-none"
+                    )}
+                  >
                     Laser-engraved 0.8mm anodized aluminum cards in 11 colors.
                     Heavy, cold to the touch, and impossible to throw away.
                     Every price includes worldwide shipping.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => setDescExpanded((v) => !v)}
+                    className="lg:hidden mt-1 text-sm text-muted-foreground underline hover:text-foreground transition-colors"
+                  >
+                    {descExpanded ? "See less" : "See more"}
+                  </button>
                 </div>
 
-                {/* Color Selector */}
-                <div>
+                {/* Color Selector (desktop — phones have the row under the photo) */}
+                <div className="hidden lg:block">
                   <label className="text-sm font-medium mb-3 block">
                     Choose Your Color
                     <span className="text-muted-foreground font-normal">
@@ -454,29 +514,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                       — {selectedColor.label}
                     </span>
                   </label>
-                  <div className="grid grid-cols-6 gap-3 sm:gap-2.5 w-fit">
-                    {CARD_COLORS.map((color) => (
-                      <button
-                        key={color.id}
-                        onClick={() => {
-                          setSelectedColor(color);
-                          setActiveImage(0);
-                        }}
-                        title={color.label}
-                        aria-label={`${color.label} card`}
-                        aria-pressed={selectedColor.id === color.id}
-                        className={cn(
-                          "w-10 h-10 sm:w-9 sm:h-9 rounded-full transition-all duration-150",
-                          selectedColor.id === color.id
-                            ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
-                            : "ring-1 ring-black/15 dark:ring-white/20 hover:scale-110"
-                        )}
-                        style={{
-                          background: `linear-gradient(135deg, color-mix(in srgb, ${color.swatch}, white 40%), ${color.swatch} 45%, color-mix(in srgb, ${color.swatch}, black 30%))`,
-                        }}
-                      />
-                    ))}
-                  </div>
+                  {renderSwatches("grid")}
                 </div>
 
                 {/* Quantity Selector */}
