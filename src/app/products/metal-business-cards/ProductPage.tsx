@@ -255,6 +255,16 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
     return () => observer.disconnect();
   }, []);
 
+  // Tell the floating chat buttons how much of the bottom edge the order bar
+  // occupies, so they float above it instead of covering "Proceed to checkout".
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = document.documentElement;
+    const offset = ctaVisible ? 0 : (barRef.current?.offsetHeight ?? 0);
+    root.style.setProperty("--order-bar-offset", `${offset}px`);
+    return () => root.style.setProperty("--order-bar-offset", "0px");
+  }, [ctaVisible]);
+
   const handleDeliveryChange = useCallback(
     (d: DeliverySelection | null) => setDelivery(d),
     []
@@ -359,10 +369,10 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
 
   return (
     <>
-      <section className="pt-40 pb-16">
+      <section className="pt-32 lg:pt-40 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-5 lg:mb-8">
             <Link href="/" className="hover:text-foreground transition-colors">
               Home
             </Link>
@@ -425,10 +435,10 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
             <ScrollReveal direction="right">
               <div className="lg:sticky lg:top-32 space-y-8 lg:px-8">
                 <div>
-                  <h1 className="font-[family-name:var(--font-montserrat)] text-3xl sm:text-4xl font-bold tracking-tight mb-3">
+                  <h1 className="font-[family-name:var(--font-montserrat)] text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3">
                     Premium Metal Business Cards
                   </h1>
-                  <p className="text-muted-foreground text-lg">
+                  <p className="text-muted-foreground text-base sm:text-lg">
                     Laser-engraved 0.8mm anodized aluminum cards in 11 colors.
                     Heavy, cold to the touch, and impossible to throw away.
                     Every price includes worldwide shipping.
@@ -444,7 +454,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                       — {selectedColor.label}
                     </span>
                   </label>
-                  <div className="grid grid-cols-6 gap-2.5 w-fit">
+                  <div className="grid grid-cols-6 gap-3 sm:gap-2.5 w-fit">
                     {CARD_COLORS.map((color) => (
                       <button
                         key={color.id}
@@ -456,7 +466,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                         aria-label={`${color.label} card`}
                         aria-pressed={selectedColor.id === color.id}
                         className={cn(
-                          "w-9 h-9 rounded-full transition-all duration-150",
+                          "w-10 h-10 sm:w-9 sm:h-9 rounded-full transition-all duration-150",
                           selectedColor.id === color.id
                             ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
                             : "ring-1 ring-black/15 dark:ring-white/20 hover:scale-110"
@@ -480,13 +490,13 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                         key={qty}
                         onClick={() => setSelectedQuantity(qty)}
                         className={cn(
-                          "relative p-3 rounded-xl border-2 text-center transition-all",
+                          "relative px-1 py-3 sm:p-3 rounded-xl border-2 text-center transition-all",
                           selectedQuantity === qty
                             ? "border-foreground bg-foreground/5"
                             : "border-border hover:border-foreground/30"
                         )}
                       >
-                        <p className="font-semibold">{qty}</p>
+                        <p className="font-semibold text-sm sm:text-base">{qty}</p>
                       </button>
                     ))}
                   </div>
@@ -739,15 +749,16 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
           the in-page button is scrolled out of view; slides away otherwise */}
       <div className="h-28 sm:h-32" aria-hidden />
       <div
+        ref={barRef}
         aria-hidden={ctaVisible}
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md shadow-[0_-10px_40px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out",
           ctaVisible ? "translate-y-full pointer-events-none" : "translate-y-0"
         )}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex items-center justify-between gap-4 sm:gap-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 sm:py-5 flex items-center justify-between gap-3 sm:gap-8">
           <div className="min-w-0">
-            <p className="text-sm sm:text-base text-muted-foreground truncate">
+            <p className="text-xs sm:text-base text-muted-foreground truncate">
               {selectedQuantity} × {selectedColor.label} · 0.8mm ·{" "}
               {designFee > 0
                 ? "design service"
@@ -771,7 +782,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
           <button
             onClick={proceedToCheckout}
             disabled={checkingOut}
-            className="flex-shrink-0 inline-flex items-center justify-center gap-2 py-4 px-6 sm:px-9 rounded-full bg-foreground text-background font-semibold text-base sm:text-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+            className="flex-shrink-0 inline-flex items-center justify-center gap-2 py-3.5 sm:py-4 px-5 sm:px-9 rounded-full bg-foreground text-background font-semibold text-sm sm:text-lg hover:opacity-90 transition-opacity disabled:opacity-60"
           >
             {checkingOut ? (
               <>
@@ -780,7 +791,8 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
               </>
             ) : (
               <>
-                Proceed to checkout
+                <span className="sm:hidden">Checkout</span>
+                <span className="hidden sm:inline">Proceed to checkout</span>
                 <ArrowRight className="size-5" />
               </>
             )}

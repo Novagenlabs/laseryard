@@ -145,7 +145,12 @@ export function ChatAssistant() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)]">
+    <div
+      className="fixed right-6 z-50 pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)] transition-[bottom] duration-300 ease-out"
+      // Sits above the product page's sticky order bar when that bar is
+      // showing (the page sets --order-bar-offset), otherwise 1.5rem up.
+      style={{ bottom: "calc(1.5rem + var(--order-bar-offset, 0px))" }}
+    >
       {/* Chat Panel */}
       <AnimatePresence>
         {isOpen && (
