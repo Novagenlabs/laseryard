@@ -2,26 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { X, Zap, Truck } from "lucide-react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
+// Desktop only: on phones the bar ate a strip of a small screen and, once
+// dismissed, left a gap under the header — so it neither renders nor
+// reserves height there (the header reads --announcement-height).
 export function AnnouncementBar() {
   const [isVisible, setIsVisible] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
+    const mobile = isMobile || window.innerWidth < 768;
     document.documentElement.style.setProperty(
       "--announcement-height",
-      isVisible ? "36px" : "0px"
+      isVisible && !mobile ? "36px" : "0px"
     );
     return () => {
       document.documentElement.style.setProperty("--announcement-height", "0px");
     };
-  }, [isVisible]);
+  }, [isVisible, isMobile]);
 
-  if (!isVisible) return null;
+  if (!isVisible || isMobile) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] h-9 bg-background/95 backdrop-blur-md border-b border-gold/30 flex items-center justify-center px-4">
-      {/* Desktop */}
-      <div className="hidden sm:flex items-center gap-4 text-sm">
+    <div className="fixed top-0 left-0 right-0 z-[60] h-9 bg-background/95 backdrop-blur-md border-b border-gold/30 hidden md:flex items-center justify-center px-4">
+      <div className="flex items-center gap-4 text-sm">
         <span className="inline-flex items-center gap-1.5 text-foreground">
           <Truck className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
           Worldwide Shipping Included
@@ -30,19 +35,6 @@ export function AnnouncementBar() {
         <span className="inline-flex items-center gap-1.5 text-foreground">
           <Zap className="w-3.5 h-3.5 text-gold" aria-hidden="true" />
           Rush Production Available
-        </span>
-      </div>
-
-      {/* Mobile */}
-      <div className="flex sm:hidden items-center gap-3 text-xs">
-        <span className="inline-flex items-center gap-1 text-foreground">
-          <Truck className="w-3 h-3 text-gold" aria-hidden="true" />
-          Shipping Included
-        </span>
-        <span className="text-muted-foreground">|</span>
-        <span className="inline-flex items-center gap-1 text-foreground">
-          <Zap className="w-3 h-3 text-gold" aria-hidden="true" />
-          Rush Available
         </span>
       </div>
 
