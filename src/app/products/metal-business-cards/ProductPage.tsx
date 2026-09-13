@@ -409,7 +409,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
 
   return (
     <>
-      <section className="pt-32 lg:pt-40 pb-16 overflow-x-clip">
+      <section className="pt-28 lg:pt-40 pb-16 overflow-x-clip">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 min-w-0">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-5 lg:mb-8">
