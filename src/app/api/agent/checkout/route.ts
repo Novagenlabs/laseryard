@@ -10,6 +10,7 @@ import {
   CARD_PRICING,
   CARD_QUANTITIES,
   DESIGN_FEE_USD,
+  SITE_CONFIG,
   designIncluded,
   type CardQuantity,
   type CardThickness,
@@ -37,15 +38,15 @@ const THICKNESSES: CardThickness[] = ["0.8mm"];
 // 2026-09-07 — keep this list in sync with the agent prompt's SHIPPING section.
 const BLOCKED_COUNTRIES: string[] = [];
 
-// CHECKOUT_LINK_STYLE=site serves the Whop checkout embedded on our own
-// domain (laseryard.com/checkout) — customers asked to "pay on the website".
-// Default stays "whop" (the hosted purchase_url) until the page is proven.
-function customerCheckoutUrl(purchaseUrl: string): string {
-  if ((process.env.CHECKOUT_LINK_STYLE || "whop") !== "site") return purchaseUrl;
-  const plan = purchaseUrl.match(/plan_[A-Za-z0-9]+/)?.[0];
-  if (!plan) return purchaseUrl;
-  const session = purchaseUrl.match(/ch_[A-Za-z0-9]+/)?.[0];
-  return `https://laseryard.com/checkout?plan=${plan}${session ? `&session=${session}` : ""}`;
+// Customers pay on our own domain: laseryard.com/checkout embeds the Whop
+// checkout for the session we just created (Whop's hosted purchase_url no
+// longer carries a plan id, so the session id is the handle). Set
+// CHECKOUT_LINK_STYLE=whop to fall back to Whop's hosted page.
+function customerCheckoutUrl(sessionId: string, purchaseUrl: string): string {
+  if (process.env.CHECKOUT_LINK_STYLE === "whop" || !/^ch_[A-Za-z0-9]+$/.test(sessionId)) {
+    return purchaseUrl;
+  }
+  return `${SITE_CONFIG.url}/checkout?session=${sessionId}`;
 }
 
 export async function POST(request: NextRequest) {
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    customerUrl = customerCheckoutUrl(config.purchase_url ?? "");
+    customerUrl = customerCheckoutUrl(config.id, config.purchase_url ?? "");
 
     // Email the checkout link too when we know their address — better
     // conversion than a link buried in chat history.
