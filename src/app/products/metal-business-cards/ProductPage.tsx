@@ -368,45 +368,49 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
   ];
   const active = slides[Math.min(activeImage, slides.length - 1)];
 
-  // One set of swatches, two layouts: a single scrollable row right under
-  // the photo on phones (switching colors and seeing the change share the
-  // screen), and the two-row grid in the order panel on desktop.
-  const renderSwatches = (layout: "row" | "grid") => (
-    <div
-      className={
-        layout === "row"
-          ? "flex gap-2.5 overflow-x-auto py-2 px-1 -mx-1 snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          : "grid grid-cols-6 gap-3 sm:gap-2.5 w-fit"
-      }
-    >
-      {CARD_COLORS.map((color) => (
-        <button
-          key={color.id}
-          onClick={() => {
-            setSelectedColor(color);
-            setActiveImage(0);
-          }}
-          title={color.label}
-          aria-label={`${color.label} card`}
-          aria-pressed={selectedColor.id === color.id}
-          className={cn(
-            "flex-shrink-0 snap-start w-10 h-10 sm:w-9 sm:h-9 rounded-full transition-all duration-150",
-            selectedColor.id === color.id
-              ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
-              : "ring-1 ring-black/15 dark:ring-white/20 hover:scale-110"
-          )}
-          style={{
-            background: `linear-gradient(135deg, color-mix(in srgb, ${color.swatch}, white 40%), ${color.swatch} 45%, color-mix(in srgb, ${color.swatch}, black 30%))`,
-          }}
-        />
-      ))}
+  // Swatch grid used under the photo on phones and in the order panel on
+  // desktop. Each button is a 44px touch target (the Apple HIG / Material
+  // minimum) around a 32px dot, so 6 per row fit on the narrowest phones
+  // without any horizontal overflow.
+  const renderSwatches = () => (
+    <div className="grid grid-cols-6 gap-1 w-fit max-w-full">
+      {CARD_COLORS.map((color) => {
+        const selected = selectedColor.id === color.id;
+        return (
+          <button
+            key={color.id}
+            type="button"
+            onClick={() => {
+              setSelectedColor(color);
+              setActiveImage(0);
+            }}
+            title={color.label}
+            aria-label={`${color.label} card`}
+            aria-pressed={selected}
+            className="w-11 h-11 flex items-center justify-center rounded-full group"
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "block w-8 h-8 rounded-full transition-transform duration-150",
+                selected
+                  ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110"
+                  : "ring-1 ring-black/15 dark:ring-white/20 group-hover:scale-110"
+              )}
+              style={{
+                background: `linear-gradient(135deg, color-mix(in srgb, ${color.swatch}, white 40%), ${color.swatch} 45%, color-mix(in srgb, ${color.swatch}, black 30%))`,
+              }}
+            />
+          </button>
+        );
+      })}
     </div>
   );
 
   return (
     <>
-      <section className="pt-32 lg:pt-40 pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="pt-32 lg:pt-40 pb-16 overflow-x-clip">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 min-w-0">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-5 lg:mb-8">
             <Link href="/" className="hover:text-foreground transition-colors">
@@ -418,8 +422,8 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
 
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Product Gallery */}
-            <ScrollReveal direction="left">
-              <div className="space-y-4">
+            <ScrollReveal direction="left" className="min-w-0">
+              <div className="space-y-4 min-w-0">
                 {/* Main Image */}
                 <div className="relative rounded-2xl bg-card border border-border overflow-hidden safari-fix-overflow">
                   {active.kind === "preview" ? (
@@ -438,7 +442,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                       — {selectedColor.label}
                     </span>
                   </p>
-                  {renderSwatches("row")}
+                  {renderSwatches()}
                 </div>
 
                 {/* Thumbnails */}
@@ -514,7 +518,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                       — {selectedColor.label}
                     </span>
                   </label>
-                  {renderSwatches("grid")}
+                  {renderSwatches()}
                 </div>
 
                 {/* Quantity Selector */}
