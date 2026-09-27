@@ -30,8 +30,8 @@ function HeroMobile() {
   });
 
   return (
-    <section className="relative min-h-[90dvh] flex items-center bg-background overflow-hidden">
-      <div className="w-full px-4 sm:px-6 pb-12 pt-28">
+    <section className="relative bg-background overflow-hidden">
+      <div className="w-full px-4 sm:px-6 pb-10 pt-24">
         {/* Card Image - show first on mobile */}
         <motion.div {...fadeSlide(0.05)} className="mb-8">
           <img
@@ -112,8 +112,8 @@ function HeroDesktop() {
   useEffect(() => { requestAnimationFrame(() => setReady(true)); }, []);
 
   return (
-    <section className="relative min-h-[100dvh] flex items-center bg-background overflow-hidden">
-      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+    <section className="relative bg-background overflow-hidden">
+      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-36 pb-16 lg:pt-40 lg:pb-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left - Text Content */}
           <div className="max-w-xl">
