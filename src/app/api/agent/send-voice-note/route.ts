@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     if (isVoiceCall(body?.text_only)) {
       return NextResponse.json(
-        { sent: false, note: "This is a voice call — just say it out loud; voice notes are for text chats only." },
+        { sent: false, note: "VOICE CALL: voice notes do not exist on calls. Do NOT mention a voice note. Say the same reassurance out loud now, warmly, then ask your question." },
         { status: 200 }
       );
     }
