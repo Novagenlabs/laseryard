@@ -24,7 +24,7 @@ const GRAPH = "https://graph.facebook.com/v22.0";
 const DEFAULT_VOICE_ID = "oT5lntmfa8t37GiBBd3k"; // Stephanie — the live agent's voice
 // Delivery: lower stability = more emotive, less "read aloud" (0.3 ≈ ElevenLabs'
 // "creative" preset, 0.5 "natural"). VOICE_NOTE_STABILITY overrides per deploy.
-const DEFAULT_STABILITY = 0.3;
+const DEFAULT_STABILITY = 0.5;
 const DEFAULT_SIMILARITY = 0.75;
 const MAX_CHARS = 600; // ~45 seconds spoken
 const MAX_NOTES_PER_CONVERSATION = 2;
