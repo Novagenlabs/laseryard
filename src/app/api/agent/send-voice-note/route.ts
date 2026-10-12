@@ -47,7 +47,10 @@ async function synthesize(text: string): Promise<Buffer> {
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) throw new Error("ELEVENLABS_API_KEY not set");
   const voiceId = process.env.VOICE_NOTE_VOICE_ID || DEFAULT_VOICE_ID;
-  const models = [process.env.VOICE_NOTE_MODEL_ID || "eleven_v3", "eleven_flash_v2_5"];
+  // Notes aren't real-time, so take the highest-quality model (Eleven v4, the
+  // same generation the agent speaks with on calls via v4 Turbo); fall back
+  // down the ladder if a model is unavailable.
+  const models = [process.env.VOICE_NOTE_MODEL_ID || "eleven_v4", "eleven_v4_turbo", "eleven_flash_v2_5"];
   let lastError = "";
   for (const model of models) {
     const res = await fetch(
