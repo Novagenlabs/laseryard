@@ -72,22 +72,23 @@ async function synthesize(text: string): Promise<Buffer> {
 
 // Which business number this conversation is on (live vs staging) — read from
 // the conversation itself so staging tests send from the staging number.
+// NOTE: the conversation's metadata.text_only reads false while a session is
+// still open (it only settles once the session closes), so it must NOT be
+// used to detect voice calls here — the tool passes system__is_text_only.
 async function resolveSender(
   conversationId: string | undefined,
   explicit: string | undefined
-): Promise<{ senderId: string; customer?: string; isVoiceCall?: boolean }> {
+): Promise<{ senderId: string; customer?: string }> {
   if (explicit && /^\d{6,}$/.test(explicit)) return { senderId: explicit };
   if (conversationId && /^conv_[A-Za-z0-9]+$/.test(conversationId)) {
     try {
       const res = await xiFetch(`/conversations/${conversationId}`);
       if (res.ok) {
         const data = await res.json();
-        const md = data?.metadata || {};
-        const wa = md.whatsapp || {};
+        const wa = data?.metadata?.whatsapp || {};
         return {
           senderId: wa.whatsapp_phone_number_id || WA_PHONE_NUMBER_ID,
           customer: wa.whatsapp_user_id,
-          isVoiceCall: md.text_only === false,
         };
       }
     } catch (e) {
@@ -95,6 +96,13 @@ async function resolveSender(
     }
   }
   return { senderId: WA_PHONE_NUMBER_ID };
+}
+
+// The agent's own channel flag (system__is_text_only), bound on the tool.
+function isVoiceCall(flag: unknown): boolean {
+  if (typeof flag === "boolean") return flag === false;
+  if (typeof flag === "string") return /^(false|no|0)$/i.test(flag.trim());
+  return false;
 }
 
 export async function POST(request: NextRequest) {
@@ -132,16 +140,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const resolved = await resolveSender(
-      conversationId,
-      typeof body?.whatsapp_phone_number_id === "string" ? body.whatsapp_phone_number_id : undefined
-    );
-    if (resolved.isVoiceCall) {
+    if (isVoiceCall(body?.text_only)) {
       return NextResponse.json(
         { sent: false, note: "This is a voice call — just say it out loud; voice notes are for text chats only." },
         { status: 200 }
       );
     }
+    const resolved = await resolveSender(
+      conversationId,
+      typeof body?.whatsapp_phone_number_id === "string" ? body.whatsapp_phone_number_id : undefined
+    );
     const customer =
       normalizeWhatsappNumber(body?.whatsapp_user_id) ||
       normalizeWhatsappNumber(resolved.customer || "");
