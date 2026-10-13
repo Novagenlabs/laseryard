@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sent: true,
       approx_seconds: seconds,
-      note: "Voice note delivered to the customer. Do NOT repeat what it says in text. If you must reply in text at all, keep it to one short line (e.g. '🎙️ Sent you a quick voice note') — or send nothing and wait for them.",
+      note: "Voice note delivered to the customer. Send NOTHING in text now: call skip_turn and wait for their reply. No caption, no 'sent you a voice note', no repeat of what it says.",
     });
   } catch (e) {
     console.error("send-voice-note error:", e);
