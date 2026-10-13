@@ -164,8 +164,15 @@ export async function POST(request: NextRequest) {
     }
 
     if (isVoiceCall(body?.text_only)) {
+      // On a call the words the agent composed are still the right words —
+      // hand them straight back so it simply says them (the agent's own TTS
+      // performs the audio tags).
       return NextResponse.json(
-        { sent: false, note: "VOICE CALL: voice notes do not exist on calls. Do NOT mention a voice note. Say the same reassurance out loud now, warmly, then ask your question." },
+        {
+          sent: false,
+          say_this_now: message,
+          note: "VOICE CALL: voice notes do not exist on calls and nothing was sent. Do NOT mention a voice note. Say the words in say_this_now out loud right now, warmly, then wait for the caller.",
+        },
         { status: 200 }
       );
     }
