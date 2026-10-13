@@ -22,6 +22,10 @@ import { normalizeWhatsappNumber } from "@/lib/bridge";
 
 const GRAPH = "https://graph.facebook.com/v22.0";
 const DEFAULT_VOICE_ID = "oT5lntmfa8t37GiBBd3k"; // Stephanie — the live agent's voice
+// Delivery: lower stability = more emotive, less "read aloud" (0.3 ≈ ElevenLabs'
+// "creative" preset, 0.5 "natural"). VOICE_NOTE_STABILITY overrides per deploy.
+const DEFAULT_STABILITY = 0.5;
+const DEFAULT_SIMILARITY = 0.75;
 const MAX_CHARS = 600; // ~45 seconds spoken
 const MAX_NOTES_PER_CONVERSATION = 2;
 const NOTE_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -43,11 +47,30 @@ function recordNote(key: string) {
 const TEXT_FALLBACK =
   "Reply to the customer in TEXT instead, as you normally would.";
 
+function envNumber(name: string, fallback: number): number {
+  const n = Number(process.env[name]);
+  return Number.isFinite(n) && n >= 0 && n <= 1 ? n : fallback;
+}
+
+// Audio tags such as [exhales] or [curious] are performed by the v3/v4 models
+// but READ ALOUD by Flash, so strip them before falling back that far.
+function textForModel(text: string, model: string): string {
+  if (/^eleven_v[34]/.test(model)) return text;
+  return text.replace(/\[[^\]\n]{1,30}\]/g, "").replace(/\s{2,}/g, " ").trim();
+}
+
 async function synthesize(text: string): Promise<Buffer> {
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) throw new Error("ELEVENLABS_API_KEY not set");
   const voiceId = process.env.VOICE_NOTE_VOICE_ID || DEFAULT_VOICE_ID;
-  const models = [process.env.VOICE_NOTE_MODEL_ID || "eleven_v3", "eleven_flash_v2_5"];
+  // Notes aren't real-time, so take the highest-quality model (Eleven v4, the
+  // same generation the agent speaks with on calls via v4 Turbo); fall back
+  // down the ladder if a model is unavailable.
+  const models = [process.env.VOICE_NOTE_MODEL_ID || "eleven_v4", "eleven_v4_turbo", "eleven_flash_v2_5"];
+  const voiceSettings = {
+    stability: envNumber("VOICE_NOTE_STABILITY", DEFAULT_STABILITY),
+    similarity_boost: envNumber("VOICE_NOTE_SIMILARITY", DEFAULT_SIMILARITY),
+  };
   let lastError = "";
   for (const model of models) {
     const res = await fetch(
@@ -55,7 +78,7 @@ async function synthesize(text: string): Promise<Buffer> {
       {
         method: "POST",
         headers: { "xi-api-key": key, "Content-Type": "application/json" },
-        body: JSON.stringify({ text, model_id: model }),
+        body: JSON.stringify({ text: textForModel(text, model), model_id: model, voice_settings: voiceSettings }),
       }
     );
     if (res.ok) {
@@ -141,8 +164,15 @@ export async function POST(request: NextRequest) {
     }
 
     if (isVoiceCall(body?.text_only)) {
+      // On a call the words the agent composed are still the right words —
+      // hand them straight back so it simply says them (the agent's own TTS
+      // performs the audio tags).
       return NextResponse.json(
-        { sent: false, note: "This is a voice call — just say it out loud; voice notes are for text chats only." },
+        {
+          sent: false,
+          say_this_now: message,
+          note: "VOICE CALL: voice notes do not exist on calls and nothing was sent. Do NOT mention a voice note. Say the words in say_this_now out loud right now, warmly, then wait for the caller.",
+        },
         { status: 200 }
       );
     }
@@ -218,7 +248,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sent: true,
       approx_seconds: seconds,
-      note: "Voice note delivered to the customer. Do NOT repeat what it says in text. If you must reply in text at all, keep it to one short line (e.g. '🎙️ Sent you a quick voice note') — or send nothing and wait for them.",
+      note: "Voice note delivered to the customer. Send NOTHING in text now: call skip_turn and wait for their reply. No caption, no 'sent you a voice note', no repeat of what it says.",
     });
   } catch (e) {
     console.error("send-voice-note error:", e);
