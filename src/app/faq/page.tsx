@@ -24,7 +24,7 @@ const faqCategories = [
     questions: [
       {
         q: "What is the minimum order quantity?",
-        a: "Our minimum order is 15 cards — $250 with worldwide shipping included. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
+        a: "Our minimum order is 15 cards, with worldwide shipping included in every pack price. This allows us to maintain quality while making premium metal cards accessible to individuals and small businesses.",
       },
       {
         q: "How do I place an order?",
@@ -57,7 +57,7 @@ const faqCategories = [
       },
       {
         q: "Can you help design my card?",
-        a: "Absolutely! Design is included free with orders of 30 cards or more. For the 15-card starter pack, our design service is a flat $50 — or bring your own print-ready design at no extra cost.",
+        a: "Absolutely! Design is included free with orders of 30 cards or more. For the 15-card starter pack there is a small flat design fee — or bring your own print-ready design at no extra cost.",
       },
       {
         q: "Can I include a QR code on my card?",
@@ -124,7 +124,7 @@ const faqCategories = [
       },
       {
         q: "Do you offer volume discounts?",
-        a: "The pack prices already scale: 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550 — all with worldwide shipping included. Need more than 200? Contact us for a custom quote.",
+        a: "Yes — the per-card price drops as the pack grows, across 15, 30, 50, 100 and 200 cards, all with worldwide shipping included. Message us on WhatsApp for a quote, or pick a pack on the product page. Need more than 200? Contact us for a custom quote.",
       },
     ],
   },

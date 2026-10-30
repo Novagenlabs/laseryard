@@ -82,7 +82,7 @@ export const PRODUCT_CATEGORIES = [
     slug: "metal-business-cards",
     name: "Metal Business Cards",
     description:
-      "Laser-engraved 0.8mm anodized aluminum cards in 11 colors. Heavy, cold to the touch, and impossible to throw away. From $250 for 15 cards, shipping included.",
+      "Laser-engraved 0.8mm anodized aluminum cards in 11 colors. Heavy, cold to the touch, and impossible to throw away. Packs from 15 cards, shipping included.",
     features: ["Premium Aluminum", "0.8mm Thick", "11 Anodized Colors"],
     href: "/products/metal-business-cards",
   },
@@ -281,7 +281,7 @@ export const FAQ_ITEMS = [
   {
     question: "How do I design my metal business cards?",
     answer:
-      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it. Design is included free with orders of 30 cards or more; for the 15-card starter pack the design service is a flat $50.",
+      "You have two options: upload your own design (PDF or high-resolution PNG) when you order, or let our design team handle it. Design is included free with orders of 30 cards or more; for the 15-card starter pack there is a small flat design fee.",
   },
   {
     question: "How long does it take to get my cards?",
@@ -296,7 +296,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is the minimum order quantity?",
     answer:
-      "Our minimum order is 15 cards — $250 with worldwide shipping included. Pack prices scale from there (30 cards $450, up to 200 cards $2,550). Need more than 200? Contact us for a custom quote.",
+      "Our minimum order is 15 cards, with worldwide shipping included in every pack price. Packs go up to 200 cards and the per-card price drops as you go — message us on WhatsApp for a quote. Need more than 200? Contact us for a custom quote.",
   },
   {
     question: "Can I add NFC to my cards?",

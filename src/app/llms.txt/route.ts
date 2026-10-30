@@ -30,7 +30,7 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 - **Payment**: card packs paid in full at checkout via Whop (all major cards); custom projects 50% deposit to start, balance before shipping
 - **Shipping**: Included in every card price — tracked worldwide delivery, 7-14 business days after dispatch
 - **Design formats accepted**: AI, EPS, PDF (vector), SVG, PNG (300+ DPI)
-- **Design service**: free with orders of 30+ cards; flat $50 for the 15-card pack (own print-ready design always free). Proofs are shared after ordering — no pre-purchase mock-ups
+- **Design service**: free with orders of 30+ cards; a small flat fee for the 15-card pack (own print-ready design always free). Proofs are shared after ordering — no pre-purchase mock-ups
 - **Contact**: WhatsApp (fastest), email hello@laseryard.com; design files to sales@laseryard.com; Instagram @thelaseryard
 - **Business hours**: Mon-Fri 9am-6pm, Sat 10am-4pm
 

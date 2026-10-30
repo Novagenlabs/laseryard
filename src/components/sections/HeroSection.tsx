@@ -111,7 +111,7 @@ function HeroDesktop() {
 
   return (
     <section className="relative bg-background overflow-hidden">
-      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-36 pb-16 lg:pt-40 lg:pb-20">
+      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-28 pb-16 lg:pt-28 lg:pb-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-start">
           {/* Left - Text Content */}
           <div className="max-w-xl">
