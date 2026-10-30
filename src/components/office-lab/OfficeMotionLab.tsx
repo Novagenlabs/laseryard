@@ -30,11 +30,11 @@ export default function OfficeMotionLab() {
     {
       look: { type: "select", options: lookOptions },
       camera: {
-        fov: [28, 18, 60, 1],
-        orbit: [30, -90, 90, 1],
-        height: [1.14, 0.82, 1.9, 0.01],
-        distance: [1.15, 0.5, 3.5, 0.01],
-        aim: [-0.02, -0.15, 0.3, 0.01],
+        fov: [32, 18, 60, 1],
+        orbit: [26, -90, 90, 1],
+        height: [1.0, 0.82, 1.9, 0.01],
+        distance: [1.45, 0.5, 3.5, 0.01],
+        aim: [0.07, -0.15, 0.3, 0.01],
         drift: true,
       },
       box: {

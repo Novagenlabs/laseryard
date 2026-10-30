@@ -148,10 +148,10 @@ export function MadMenRoom({ sunIntensity, sunColor, blinds, lamp = 0.5 }: RoomL
 export function JetsRoom({ sunIntensity, sunColor }: RoomLightProps) {
   const jets = useMemo(
     () => [
-      { p: [-6, 0, -9] as const, r: 0.45, s: 0.9 },
-      { p: [3.5, 0, -12] as const, r: -0.6, s: 1.1 },
-      { p: [12, 0, -17] as const, r: 0.15, s: 1.4 },
-      { p: [-16, 0, -21] as const, r: 1.0, s: 1.3 },
+      { p: [-9, 0, -15] as const, r: 0.45, s: 0.8 },
+      { p: [5, 0, -18] as const, r: -0.6, s: 1.0 },
+      { p: [15, 0, -24] as const, r: 0.15, s: 1.2 },
+      { p: [-18, 0, -28] as const, r: 1.0, s: 1.1 },
     ],
     []
   );
