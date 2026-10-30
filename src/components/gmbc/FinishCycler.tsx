@@ -71,12 +71,11 @@ export function FinishCycler() {
             The card cycles through every finish on its own. Tap one to hold it.
           </p>
         </div>
-        <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 lg:grid-cols-4" role="list">
+        <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 lg:grid-cols-4" role="group" aria-label="Finishes">
           {CARD_COLORS.map((c, i) => (
             <button
               key={c.id}
               type="button"
-              role="listitem"
               onClick={() => hold(i)}
               aria-pressed={i === index}
               className="flex flex-col items-center gap-2 text-center"
