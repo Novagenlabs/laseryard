@@ -96,9 +96,31 @@ export default function GmbcHome() {
       </header>
 
       <main id="top">
-        {/* Hero */}
-        <section className="flex flex-col gap-10 px-5 pb-16 pt-14 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-20 lg:pb-24 lg:pt-[104px]">
-          <div className="flex max-w-[620px] flex-col items-start gap-6 lg:gap-7">
+        {/* Hero: full-bleed photograph, text on a gradient so it stays legible */}
+        <section className="relative flex min-h-[640px] items-end overflow-hidden sm:min-h-[700px] lg:min-h-[780px] lg:items-center">
+          <Image
+            src="/images/gmbc/hero-handoff-black.png"
+            alt="A hand passing a matte black laser-engraved metal business card to another person"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[70%_center]"
+          />
+          {/* Left-to-right wash for the copy, bottom wash so the strip below lands on black */}
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.88) 32%, rgba(10,10,10,0.45) 58%, rgba(10,10,10,0.08) 100%)",
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-40"
+            style={{ background: "linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.9) 100%)" }}
+          />
+          <div className="relative flex max-w-[760px] flex-col items-start gap-6 px-5 pb-16 pt-14 sm:px-8 lg:gap-7 lg:px-20 lg:py-[104px]">
             <Eyebrow>Laser-engraved metal business cards</Eyebrow>
             <h1 className="text-[44px] font-medium leading-[1.02] tracking-[-0.045em] sm:text-[60px] lg:text-[76px]">
               The business card people keep.
@@ -120,16 +142,6 @@ export default function GmbcHome() {
                 Quotes in minutes on WhatsApp · Nothing is engraved until you approve a sample card
               </span>
             </div>
-          </div>
-          <div className="relative aspect-[3/2] w-full overflow-hidden lg:w-[596px] lg:shrink-0" style={{ background: "var(--g-surface)" }}>
-            <Image
-              src="/images/gmbc/hero-handoff-black.png"
-              alt="A hand passing a matte black laser-engraved metal business card to another person"
-              fill
-              priority
-              sizes="(min-width: 1024px) 596px, 100vw"
-              className="object-cover"
-            />
           </div>
         </section>
 
