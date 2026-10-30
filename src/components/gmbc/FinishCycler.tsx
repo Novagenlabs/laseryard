@@ -52,8 +52,8 @@ export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
             <CardStage3D finish={current} onReady={() => setReady(true)} />
           </div>
           <span
-            className="g-label pointer-events-none absolute right-5 top-4 transition-opacity duration-700 lg:right-6"
-            style={{ color: "var(--g-muted)", opacity: ready ? 1 : 0 }}
+            className="g-label pointer-events-none absolute right-4 top-4 rounded-sm px-2 py-1 transition-opacity duration-700 lg:right-5"
+            style={{ color: "var(--g-text)", background: "rgba(10,10,10,0.55)", opacity: ready ? 1 : 0 }}
           >
             Drag to turn
           </span>
