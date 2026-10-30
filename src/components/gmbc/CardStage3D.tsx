@@ -572,8 +572,8 @@ function makeLeatherTexture() {
   return tex;
 }
 
-const OFFICE_PANO = "/images/gmbc/office-pano.jpg";
-const OFFICE_YAW = 1.19; // faces the desk: the box sits on it, the room rises behind
+const OFFICE_PANO = "/images/gmbc/office-nyc-pano.jpg";
+const OFFICE_YAW = 1.38; // faces the desk and the Empire State Building beyond it
 
 function MaglevBox({ float }: { float: FloatRef }) {
   const ring = useRef<THREE.MeshStandardMaterial>(null);
@@ -834,7 +834,7 @@ function Scene({ finish }: { finish: StageFinish }) {
         files={OFFICE_PANO}
         background="only"
         backgroundBlurriness={0.06}
-        backgroundIntensity={0.55}
+        backgroundIntensity={0.75}
         backgroundRotation={[0, OFFICE_YAW, 0]}
       />
       <Card finish={finish} interact={interact} float={float} />
@@ -855,12 +855,12 @@ function Scene({ finish }: { finish: StageFinish }) {
         <Lightformer intensity={0.5} position={[0, 0.5, 7]} rotation-y={Math.PI} scale={[10, 5, 1]} />
       </Environment>
       <OrbitControls
-        target={[0, 3.0, 0]}
+        target={[0, 2.3, 0]}
         enablePan={false}
         enableZoom={false}
         // A narrow orbit keeps the box seated on the desk in the panorama behind it.
-        minPolarAngle={1.18}
-        maxPolarAngle={1.33}
+        minPolarAngle={1.3}
+        maxPolarAngle={1.42}
         minAzimuthAngle={-0.25}
         maxAzimuthAngle={0.35}
         enableDamping
@@ -895,7 +895,7 @@ export function CardStage3D({ finish, onReady }: { finish: StageFinish; onReady?
     <div ref={wrap} className="h-full w-full">
       <Canvas
         frameloop={onScreen ? "always" : "demand"}
-        camera={{ position: [0.6, 7.0, 12.2], fov: 36 }}
+        camera={{ position: [0.6, 4.9, 12.2], fov: 36 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
