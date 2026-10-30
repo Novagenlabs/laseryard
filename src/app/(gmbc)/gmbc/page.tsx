@@ -290,7 +290,7 @@ export default function GmbcHome() {
           <div className="flex max-w-[420px] flex-col gap-5">
             <Wordmark />
             <p className="text-[15px] leading-6" style={{ color: "var(--g-muted)" }}>
-              Laser-engraved metal business cards, made to order and shipped worldwide.
+              You matter, get Metal
             </p>
           </div>
           <div className="flex gap-16 lg:gap-24">
