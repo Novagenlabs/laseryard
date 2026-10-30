@@ -129,57 +129,55 @@ function centered(ctx: CanvasRenderingContext2D, text: string, y: number, spacin
   drawSpaced(ctx, text, ART_W / 2 - measureSpaced(ctx, text, spacing) / 2, y, spacing);
 }
 
-function hexagon(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+const ARABIC_FONT = "'Geeza Pro', 'Noto Naskh Arabic', 'Segoe UI', Arial, sans-serif";
+
+/** Two squares, one turned 45°: the eight-point star of Islamic geometry. */
+function eightPointStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.save();
+  ctx.translate(cx, cy);
   ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const a = Math.PI / 6 + (i * Math.PI) / 3;
-    const x = cx + r * Math.cos(a);
-    const y = cy + r * Math.sin(a);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.closePath();
+  ctx.rect(-r, -r, 2 * r, 2 * r);
+  ctx.stroke();
+  ctx.rotate(Math.PI / 4);
+  ctx.beginPath();
+  ctx.rect(-r, -r, 2 * r, 2 * r);
+  ctx.stroke();
+  ctx.restore();
 }
 
-/** A QR-like block: three finder squares and seeded modules. */
-function qrBlock(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-  const n = 21;
-  const m = size / n;
-  let seed = 7;
-  const rnd = () => {
-    seed = (seed * 16807) % 2147483647;
-    return seed / 2147483647;
-  };
-  const finder = (fx: number, fy: number) => {
-    for (let j = 0; j < 7; j++) {
-      for (let i = 0; i < 7; i++) {
-        const ring = Math.max(Math.abs(i - 3), Math.abs(j - 3));
-        if (ring === 3 || ring <= 1) ctx.fillRect(x + (fx + i) * m, y + (fy + j) * m, m, m);
-      }
-    }
-  };
-  finder(0, 0);
-  finder(n - 7, 0);
-  finder(0, n - 7);
-  for (let j = 0; j < n; j++) {
-    for (let i = 0; i < n; i++) {
-      const inTL = i < 8 && j < 8;
-      const inTR = i >= n - 8 && j < 8;
-      const inBL = i < 8 && j >= n - 8;
-      if (inTL || inTR || inBL) continue;
-      if (rnd() > 0.55) ctx.fillRect(x + i * m, y + j * m, m, m);
-    }
-  }
+/** An engineer's reticle: circle, four ticks, centre point. */
+function reticle(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 1.3, cy);
+  ctx.lineTo(cx - r * 0.55, cy);
+  ctx.moveTo(cx + r * 0.55, cy);
+  ctx.lineTo(cx + r * 1.3, cy);
+  ctx.moveTo(cx, cy - r * 1.3);
+  ctx.lineTo(cx, cy - r * 0.55);
+  ctx.moveTo(cx, cy + r * 0.55);
+  ctx.lineTo(cx, cy + r * 1.3);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+  ctx.fill();
 }
 
+function ring(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+/** Sample cards for the markets we sell into: the US, Germany, the Gulf and France. */
 const DESIGNS: Design[] = [
   {
-    name: "Alex Carter",
+    name: "Alex Carter · New York",
     front: (ctx) => {
       ctx.lineWidth = 9;
-      ctx.beginPath();
-      ctx.arc(312, 392, 112, 0, Math.PI * 2);
-      ctx.stroke();
+      ring(ctx, 312, 392, 112);
       ctx.font = `500 96px ${FONT}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -191,7 +189,7 @@ const DESIGNS: Design[] = [
       ctx.font = `400 60px ${FONT}`;
       drawSpaced(ctx, "FOUNDER & CEO", 200, 850, 24);
       ctx.font = `400 54px ${FONT}`;
-      drawSpaced(ctx, "+1 415 000 0000   ·   ALEXCARTER.COM", 200, 1110, 9);
+      drawSpaced(ctx, "+1 212 000 0000   ·   CARTERHOLDINGS.COM", 200, 1110, 9);
       const size = 86;
       const gap = 22;
       const ox = ART_W - 200 - size * 2 - gap;
@@ -212,123 +210,149 @@ const DESIGNS: Design[] = [
     },
     back: (ctx) => {
       ctx.lineWidth = 9;
-      ctx.beginPath();
-      ctx.arc(ART_W / 2, ART_H / 2 - 40, 230, 0, Math.PI * 2);
-      ctx.stroke();
+      ring(ctx, ART_W / 2, ART_H / 2 - 40, 230);
       ctx.font = `500 200px ${FONT}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("AC", ART_W / 2, ART_H / 2 - 30);
       ctx.font = `400 50px ${FONT}`;
-      centered(ctx, "CARTER HOLDINGS", ART_H / 2 + 330, 22);
+      centered(ctx, "CARTER HOLDINGS   ·   NEW YORK", ART_H / 2 + 330, 22);
     },
   },
   {
-    name: "Nova",
+    name: "Lukas Brandt · München",
     front: (ctx) => {
-      ctx.font = `300 250px ${FONT}`;
-      centered(ctx, "NOVA", ART_H / 2 + 50, 110);
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.moveTo(ART_W / 2 - 280, ART_H / 2 + 150);
-      ctx.lineTo(ART_W / 2 + 280, ART_H / 2 + 150);
-      ctx.stroke();
-      ctx.font = `400 52px ${FONT}`;
-      centered(ctx, "ARCHITECTURE STUDIO", ART_H / 2 + 250, 26);
+      ctx.font = `400 46px ${FONT}`;
+      drawSpaced(ctx, "DIPL.-ING.", 200, 470, 14);
+      ctx.font = `500 130px ${FONT}`;
+      drawSpaced(ctx, "LUKAS BRANDT", 196, 600, 26);
+      ctx.font = `400 54px ${FONT}`;
+      drawSpaced(ctx, "GESCHÄFTSFÜHRER", 200, 690, 22);
+      ctx.font = `400 48px ${FONT}`;
+      drawSpaced(ctx, "BRANDT MASCHINENBAU GMBH   ·   MÜNCHEN", 200, 1040, 8);
+      drawSpaced(ctx, "+49 89 1234 5678   ·   BRANDT-MB.DE", 200, 1120, 8);
+      ctx.lineWidth = 8;
+      reticle(ctx, 1760, 400, 110);
     },
     back: (ctx) => {
+      ctx.font = `700 230px ${FONT}`;
+      centered(ctx, "BRANDT", ART_H / 2 + 60, 40);
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(ART_W / 2 - 420, ART_H / 2 + 150);
+      ctx.lineTo(ART_W / 2 + 420, ART_H / 2 + 150);
+      ctx.stroke();
       ctx.font = `400 50px ${FONT}`;
-      centered(ctx, "NOVA-STUDIO.COM", ART_H / 2 + 18, 22);
-      ctx.font = `300 44px ${FONT}`;
-      centered(ctx, "LONDON   ·   LAGOS", ART_H / 2 + 110, 16);
-      ctx.lineWidth = 5;
-      const L = 70;
-      for (const [sx, sy] of [
-        [1, 1],
-        [-1, 1],
-        [1, -1],
-        [-1, -1],
-      ] as const) {
-        const x = ART_W / 2 + sx * 800;
-        const y = ART_H / 2 + sy * 450;
-        ctx.beginPath();
-        ctx.moveTo(x - sx * L, y);
-        ctx.lineTo(x, y);
-        ctx.lineTo(x, y - sy * L);
-        ctx.stroke();
-      }
+      centered(ctx, "MASCHINENBAU   ·   SEIT 1962", ART_H / 2 + 240, 20);
     },
   },
   {
-    name: "Amara Okafor",
+    name: "Khalid Al-Mansouri · Dubai",
     front: (ctx) => {
       ctx.font = `500 104px ${FONT}`;
-      drawSpaced(ctx, "DR. AMARA OKAFOR", 196, 560, 18);
+      drawSpaced(ctx, "KHALID AL-MANSOURI", 196, 640, 18);
       ctx.font = `400 54px ${FONT}`;
-      drawSpaced(ctx, "DENTAL SURGEON", 200, 660, 22);
+      drawSpaced(ctx, "MANAGING PARTNER", 200, 730, 22);
       ctx.font = `400 48px ${FONT}`;
-      drawSpaced(ctx, "+44 20 7946 0000", 200, 1040, 8);
-      drawSpaced(ctx, "OKAFORDENTAL.CO.UK", 200, 1120, 8);
-      ctx.lineWidth = 10;
-      hexagon(ctx, 1740, 360, 130);
-      ctx.stroke();
-      ctx.font = `500 90px ${FONT}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("AO", 1740, 366);
+      drawSpaced(ctx, "AL MANSOURI CAPITAL   ·   DUBAI", 200, 1040, 8);
+      drawSpaced(ctx, "+971 4 000 0000   ·   ALMANSOURI.AE", 200, 1120, 8);
+      // The Arabic name is one run so the letters join.
+      ctx.save();
+      ctx.font = `500 84px ${ARABIC_FONT}`;
+      ctx.direction = "rtl";
+      ctx.textAlign = "right";
+      ctx.fillText("خالد المنصوري", ART_W - 200, 400);
+      ctx.restore();
+      ctx.lineWidth = 7;
+      eightPointStar(ctx, 1760, 980, 70);
     },
     back: (ctx) => {
-      ctx.lineWidth = 10;
-      hexagon(ctx, ART_W / 2, ART_H / 2, 320);
-      ctx.stroke();
-      ctx.lineWidth = 5;
-      hexagon(ctx, ART_W / 2, ART_H / 2, 240);
-      ctx.stroke();
-      ctx.font = `500 150px ${FONT}`;
+      ctx.lineWidth = 8;
+      eightPointStar(ctx, ART_W / 2, ART_H / 2 - 40, 210);
+      ctx.lineWidth = 4;
+      eightPointStar(ctx, ART_W / 2, ART_H / 2 - 40, 130);
+      ctx.save();
+      ctx.font = `500 74px ${ARABIC_FONT}`;
+      ctx.direction = "rtl";
       ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("AO", ART_W / 2, ART_H / 2 + 8);
+      ctx.fillText("المنصوري كابيتال", ART_W / 2, ART_H / 2 + 340);
+      ctx.restore();
     },
   },
   {
-    name: "Meridian",
+    name: "Élodie Marchand · Paris",
     front: (ctx) => {
-      ctx.font = `700 190px ${FONT}`;
-      drawSpaced(ctx, "MERIDIAN", 190, 520, 12);
-      ctx.font = `400 58px ${FONT}`;
-      drawSpaced(ctx, "COFFEE ROASTERS", 196, 620, 30);
-      ctx.font = `400 46px ${FONT}`;
-      drawSpaced(ctx, "EST. 2019   ·   PORTLAND, OR", 196, 1110, 8);
-      qrBlock(ctx, 1560, 790, 300);
+      ctx.font = `300 120px ${FONT}`;
+      drawSpaced(ctx, "ÉLODIE MARCHAND", 196, 620, 30);
+      ctx.font = `400 54px ${FONT}`;
+      drawSpaced(ctx, "DIRECTRICE ARTISTIQUE", 200, 710, 22);
+      ctx.font = `400 48px ${FONT}`;
+      drawSpaced(ctx, "MAISON MARCHAND   ·   PARIS", 200, 1040, 8);
+      drawSpaced(ctx, "+33 1 42 00 00 00   ·   MAISONMARCHAND.FR", 200, 1120, 8);
+      ctx.lineWidth = 5;
+      ring(ctx, 1760, 360, 120);
+      ring(ctx, 1760, 360, 100);
+      ctx.font = `300 96px ${FONT}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("MM", 1760, 366);
     },
     back: (ctx) => {
-      const cx = ART_W / 2;
-      const cy = ART_H / 2 + 20;
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 330, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(cx - 400, cy);
-      ctx.lineTo(cx + 400, cy);
-      ctx.moveTo(cx, cy - 400);
-      ctx.lineTo(cx, cy + 400);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - 300);
-      ctx.lineTo(cx - 40, cy - 180);
-      ctx.lineTo(cx + 40, cy - 180);
-      ctx.closePath();
-      ctx.fill();
-      ctx.font = `500 70px ${FONT}`;
+      ctx.lineWidth = 5;
+      ring(ctx, ART_W / 2, ART_H / 2 - 30, 300);
+      ring(ctx, ART_W / 2, ART_H / 2 - 30, 276);
+      ctx.font = `300 230px ${FONT}`;
       ctx.textAlign = "center";
-      ctx.fillText("N", cx, cy - 440);
+      ctx.textBaseline = "middle";
+      ctx.fillText("MM", ART_W / 2, ART_H / 2 - 20);
+      ctx.font = `400 46px ${FONT}`;
+      centered(ctx, "PARIS   ·   DEPUIS 1998", ART_H / 2 + 400, 20);
     },
   },
 ];
 
-const SPIN = 0.45; // radians per second: one full turn, one design, about every 14 s
+/**
+ * Choreography. The card holds a three-quarter pose long enough to read, turns
+ * half a circle on a strong S-curve, settles with a tiny overshoot, holds the
+ * back, and turns again. One cycle shows one design on both faces.
+ */
+const BEATS = { front: 3.8, turn: 1.4, back: 2.2 } as const;
+const CYCLE = BEATS.front + BEATS.turn + BEATS.back + BEATS.turn;
+const POSE_YAW = -0.28;
+type Phase = "front" | "turn1" | "back" | "turn2";
+
+/** CSS-style cubic bezier easing (Newton–Raphson on the x axis). */
+function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
+  const ax = 3 * x1 - 3 * x2 + 1;
+  const bx = 3 * x2 - 6 * x1;
+  const cx = 3 * x1;
+  const ay = 3 * y1 - 3 * y2 + 1;
+  const by = 3 * y2 - 6 * y1;
+  const cy = 3 * y1;
+  const sampleX = (t: number) => ((ax * t + bx) * t + cx) * t;
+  const sampleY = (t: number) => ((ay * t + by) * t + cy) * t;
+  const slopeX = (t: number) => (3 * ax * t + 2 * bx) * t + cx;
+  return (x: number) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 6; i++) {
+      const dx = sampleX(t) - x;
+      const d = slopeX(t);
+      if (Math.abs(dx) < 1e-5 || d === 0) break;
+      t = Math.min(1, Math.max(0, t - dx / d));
+    }
+    return sampleY(t);
+  };
+}
+// Strong ease-in-out for on-screen movement.
+const easeTurn = cubicBezier(0.77, 0, 0.175, 1);
+
+type InteractRef = { current: { active: boolean; resumeAt: number } };
+type FloatRef = { current: { lift: number } };
+const _normal = new THREE.Vector3();
+const _toCam = new THREE.Vector3();
+
 
 // The maglev display doubles as the cards' storage box: a leather base and lid,
 // a gunmetal levitation disc on top, and the card floating above it.
@@ -364,7 +388,17 @@ function makeLeatherTexture() {
   return tex;
 }
 
-function MaglevBox() {
+const OFFICE_PANO = "/images/gmbc/office-pano.jpg";
+const OFFICE_YAW = -2.45; // turns the desk and lamp behind the card
+
+function MaglevBox({ float }: { float: FloatRef }) {
+  const ring = useRef<THREE.MeshStandardMaterial>(null);
+  const lamp = useRef<THREE.PointLight>(null);
+  useFrame(() => {
+    const l = float.current.lift;
+    if (ring.current) ring.current.emissiveIntensity = 0.85 + 0.35 * l;
+    if (lamp.current) lamp.current.intensity = 0.9 + 0.4 * l;
+  });
   const leather = useMemo(() => {
     const grain = makeLeatherTexture();
     return new THREE.MeshPhysicalMaterial({
@@ -399,14 +433,14 @@ function MaglevBox() {
       </mesh>
       <mesh position={[0, DISC_TOP + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.46, 0.5, 96]} />
-        <meshStandardMaterial color="#d1c8af" emissive="#d1c8af" emissiveIntensity={0.9} roughness={0.4} metalness={0.2} />
+        <meshStandardMaterial ref={ring} color="#d1c8af" emissive="#d1c8af" emissiveIntensity={0.9} roughness={0.4} metalness={0.2} />
       </mesh>
-      <pointLight position={[0, DISC_TOP + 0.25, 0]} intensity={0.9} distance={2.6} decay={2} color="#d1c8af" />
+      <pointLight ref={lamp} position={[0, DISC_TOP + 0.25, 0]} intensity={0.9} distance={2.6} decay={2} color="#d1c8af" />
     </group>
   );
 }
 
-function Card({ finish }: { finish: StageFinish }) {
+function Card({ finish, interact, float }: { finish: StageFinish; interact: InteractRef; float: FloatRef }) {
   const sway = useRef<THREE.Group>(null);
   const body = useMemo(() => {
     const grain = makeMatteGrainTexture();
@@ -438,7 +472,7 @@ function Card({ finish }: { finish: StageFinish }) {
       });
     return { front: mk(designTextures[0].front), back: mk(designTextures[0].back) };
   }, [designTextures]);
-  const designState = useRef({ index: 0, pendingFront: false, pendingBack: false, lastYaw: 0 });
+  const designState = useRef({ index: 0, next: 0, pendingFront: false, pendingBack: false, phase: "front" as Phase, time: 0 });
   const showDesign = (side: "front" | "back", index: number) => {
     const mat = engrave[side];
     const tex = designTextures[index][side];
@@ -511,34 +545,85 @@ function Card({ finish }: { finish: StageFinish }) {
     body.roughness += (t.roughness - body.roughness) * k;
     engrave.front.color.lerp(t.engrave, k);
     engrave.back.color.lerp(t.engrave, k);
-    if (sway.current && reduceMotion) {
-      sway.current.rotation.set(-0.06, -0.3, 0);
-      sway.current.position.y = CARD_Y;
-    } else if (sway.current) {
-      const e = state.clock.elapsedTime;
-      // Levitating: a slow full turn so both faces show, with a gentle float.
-      const yaw = (e * SPIN) % (Math.PI * 2);
-      const st = designState.current;
-      if (yaw < st.lastYaw) {
-        // A full turn is done: queue the next design for both faces.
-        st.index = (st.index + 1) % DESIGNS.length;
+
+    const g = sway.current;
+    if (!g) return;
+    const e = state.clock.elapsedTime;
+    if (reduceMotion) {
+      g.rotation.set(-0.06, POSE_YAW, 0);
+      g.position.y = CARD_Y;
+      float.current.lift = 0;
+      return;
+    }
+
+    // The choreography clock runs only while nobody is dragging the view, and
+    // resumes a beat after they let go, so grabbing the card never fights it.
+    const st = designState.current;
+    const io = interact.current;
+    if (!io.active && performance.now() > io.resumeAt) st.time += Math.min(dt, 0.1);
+    const u = st.time % CYCLE;
+    let phase: Phase;
+    let yaw = POSE_YAW;
+    let turnEnv = 0; // 0 → 1 → 0 across a turn
+    let sinceTurn = Infinity;
+    if (u < BEATS.front) {
+      phase = "front";
+      sinceTurn = u;
+    } else if (u < BEATS.front + BEATS.turn) {
+      phase = "turn1";
+      const p = (u - BEATS.front) / BEATS.turn;
+      yaw = POSE_YAW + Math.PI * easeTurn(p);
+      turnEnv = Math.sin(Math.PI * p);
+    } else if (u < BEATS.front + BEATS.turn + BEATS.back) {
+      phase = "back";
+      yaw = POSE_YAW + Math.PI;
+      sinceTurn = u - BEATS.front - BEATS.turn;
+    } else {
+      phase = "turn2";
+      const p = (u - BEATS.front - BEATS.turn - BEATS.back) / BEATS.turn;
+      yaw = POSE_YAW + Math.PI + Math.PI * easeTurn(p);
+      turnEnv = Math.sin(Math.PI * p);
+    }
+
+    // Phase edges queue the design swaps: the next front goes on as the card
+    // leaves the back pose; its back follows once the card faces front again.
+    if (phase !== st.phase) {
+      if (phase === "turn2") {
+        st.next = (st.index + 1) % DESIGNS.length;
         st.pendingFront = true;
+      } else if (phase === "front") {
+        st.index = st.next;
         st.pendingBack = true;
       }
-      st.lastYaw = yaw;
-      // Each face swaps only while it is turned away from the camera, so the change is never seen.
-      const frontVisible = Math.cos(yaw) > 0;
-      if (st.pendingBack && frontVisible) {
-        showDesign("back", st.index);
-        st.pendingBack = false;
-      }
-      if (st.pendingFront && !frontVisible) {
-        showDesign("front", st.index);
-        st.pendingFront = false;
-      }
-      sway.current.rotation.y = yaw;
-      sway.current.rotation.x = -0.06 + Math.sin(e * 0.9) * 0.015;
-      sway.current.position.y = CARD_Y + Math.sin(e * 1.3) * 0.045;
+      st.phase = phase;
+    }
+
+    // Settle: a small damped overshoot after each turn, like a real floating object.
+    const settle = sinceTurn < 1.2 ? 0.06 * Math.exp(-5 * sinceTurn) * Math.sin(12 * sinceTurn) : 0;
+    // Idle float: two incommensurate sines so it never visibly repeats.
+    const bob = 0.03 * Math.sin(1.1 * e) + 0.012 * Math.sin(1.9 * e + 0.7);
+    const drift = 0.03 * Math.sin(0.6 * e + 1);
+    const roll = 0.012 * Math.sin(0.8 * e + 2);
+    // Through a turn the card lifts a little and banks into it.
+    const lift = 0.1 * turnEnv;
+
+    g.rotation.y = yaw + settle + drift;
+    g.rotation.x = -0.06 - 0.04 * turnEnv;
+    g.rotation.z = roll + 0.07 * turnEnv;
+    g.position.y = CARD_Y + bob + lift;
+    float.current.lift = Math.max(-1, Math.min(1, (bob + lift) / 0.14));
+
+    // A face only swaps while the camera cannot see it, wherever the camera is.
+    _normal.set(0, 0, 1).applyQuaternion(g.quaternion);
+    _toCam.copy(state.camera.position).sub(g.position);
+    const frontVisible = _normal.dot(_toCam) > 0;
+    if (st.pendingBack && frontVisible) {
+      showDesign("back", st.index);
+      st.pendingBack = false;
+    }
+    if (st.pendingFront && !frontVisible) {
+      showDesign("front", st.next);
+      st.pendingFront = false;
     }
   });
 
@@ -556,10 +641,20 @@ function Card({ finish }: { finish: StageFinish }) {
 }
 
 function Scene({ finish }: { finish: StageFinish }) {
+  const interact = useRef({ active: false, resumeAt: 0 });
+  const float = useRef({ lift: 0 });
   return (
     <>
-      <Card finish={finish} />
-      <MaglevBox />
+      {/* The executive office generated earlier with World Labs, blurred like a shallow depth of field. */}
+      <Environment
+        files={OFFICE_PANO}
+        background="only"
+        backgroundBlurriness={0.1}
+        backgroundIntensity={0.55}
+        backgroundRotation={[0, OFFICE_YAW, 0]}
+      />
+      <Card finish={finish} interact={interact} float={float} />
+      <MaglevBox float={float} />
       <directionalLight position={[-4, 6, 4]} intensity={0.7} />
       {/* the card's shadow on the disc, and the box's shadow on the table */}
       <ContactShadows position={[0, DISC_TOP + 0.003, 0]} opacity={0.5} scale={3.6} blur={1.8} far={2.8} color="#000" />
@@ -581,6 +676,13 @@ function Scene({ finish }: { finish: StageFinish }) {
         maxPolarAngle={1.6}
         enableDamping
         dampingFactor={0.06}
+        onStart={() => {
+          interact.current.active = true;
+        }}
+        onEnd={() => {
+          interact.current.active = false;
+          interact.current.resumeAt = performance.now() + 1200;
+        }}
       />
     </>
   );
