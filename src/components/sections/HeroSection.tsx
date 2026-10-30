@@ -62,25 +62,25 @@ function HeroMobile() {
         {/* CTA */}
         <motion.div {...fadeSlide(0.2)} className="mt-6 max-w-sm mx-auto">
           <div className="flex flex-col gap-3">
-            <Link
-              href="/products/metal-business-cards"
-              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
-            >
-              Order Now
-              <ArrowRight className="w-4 h-4" />
-            </Link>
             <a
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
             >
               Get Custom Quote
               <ArrowRight className="w-4 h-4" />
             </a>
+            <Link
+              href="/products/metal-business-cards"
+              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+            >
+              Order Now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
           <p className="mt-3 text-xs text-muted-foreground text-center">
-            From $250 · Shipping included · 11 colors
+            Shipping included · 11 colors
           </p>
         </motion.div>
 
@@ -170,25 +170,25 @@ function HeroDesktop() {
               className="mt-10"
             >
               <div className="flex flex-wrap items-center gap-4">
-                <Link
-                  href="/products/metal-business-cards"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
-                >
-                  Order Now
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
                 >
                   Get Custom Quote
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
+                <Link
+                  href="/products/metal-business-cards"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+                >
+                  Order Now
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                From $250 · Shipping included · 11 colors · ready in 10-14 days
+                Shipping included · 11 colors · ready in 10-14 days
               </p>
             </motion.div>
           </div>

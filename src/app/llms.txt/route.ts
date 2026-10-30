@@ -26,7 +26,7 @@ Bring your own items for laser engraving. Supported materials: metal (stainless 
 - **After ordering**: send the design to sales@laseryard.com (or the design team creates it); approve a digital proof and one engraved sample card before the full batch is produced
 - **Order tracking**: https://laseryard.com/track?order=LY-XXXX-XXXX
 - **Minimum order**: 15 cards for metal business cards
-- **Card pricing (all-in, worldwide shipping included)**: 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550
+- **Card pricing**: quoted per order by our team on WhatsApp (fastest way to get a price); packs of 15, 30, 50, 100 or 200 cards, worldwide shipping always included; standard packs can also be bought directly on the product page
 - **Payment**: card packs paid in full at checkout via Whop (all major cards); custom projects 50% deposit to start, balance before shipping
 - **Shipping**: Included in every card price — tracked worldwide delivery, 7-14 business days after dispatch
 - **Design formats accepted**: AI, EPS, PDF (vector), SVG, PNG (300+ DPI)
