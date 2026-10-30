@@ -21,17 +21,20 @@ export default function OfficeMotionLab() {
   const captureRef = useRef<() => void>(() => {});
   // `?look=jets` or `?look=marble` opens that look first; the panel can still switch.
   // `?world=<folder>` opens the Marble look on /worlds/<folder>/ (our generated offices).
+  // `&res=full` loads the ~2M-splat export instead of the 500k preview.
   const [params] = useState(() => {
     const sp = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
     const world = sp?.get("world")?.replace(/[^a-z0-9-]/gi, "") || "";
-    return { look: world ? "marble" : sp?.get("look"), world };
+    return { look: world ? "marble" : sp?.get("look"), world, full: sp?.get("res") === "full" };
   });
   const [lookOptions] = useState(() => {
     if (params.look === "jets") return [LOOK_LABEL.jets, LOOK_LABEL.madmen, LOOK_LABEL.marble];
     if (params.look === "marble") return [LOOK_LABEL.marble, LOOK_LABEL.madmen, LOOK_LABEL.jets];
     return LOOK_OPTIONS;
   });
-  const worldUrlDefault = params.world ? `/worlds/${params.world}/world-lowres.spz` : SAMPLE_SPLAT_URL;
+  const worldUrlDefault = params.world
+    ? `/worlds/${params.world}/${params.full ? "world.spz" : "world-lowres.spz"}`
+    : SAMPLE_SPLAT_URL;
   const panoDefault = params.world ? `/worlds/${params.world}/pano.png` : "";
   // `?post=0` starts with post-processing off (useful when debugging splats).
   const [postDefault] = useState(
