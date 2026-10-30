@@ -175,51 +175,9 @@ export default function GmbcHome() {
               pick.
             </p>
           </div>
-          <FinishCycler />
+          <FinishCycler stats={[["0.8", "mm solid aluminum"], ["11", "anodized finishes"], ["15+", "cards per pack"]]} />
         </section>
 
-        {/* Material */}
-        <section className="flex flex-col gap-10 px-5 pb-20 sm:px-8 lg:flex-row lg:items-center lg:gap-24 lg:px-20 lg:pb-32">
-          <div className="relative aspect-[596/448] w-full overflow-hidden lg:w-[596px] lg:shrink-0" style={{ background: "var(--g-surface)" }}>
-            <Image
-              src="/images/products/colors/gold.webp"
-              alt="Champagne gold metal business cards"
-              fill
-              sizes="(min-width: 1024px) 596px, 100vw"
-              className="object-cover"
-            />
-          </div>
-          <div className="flex max-w-[520px] flex-col items-start gap-8">
-            <H2>
-              Solid aluminum.
-              <br />
-              Laser engraved.
-            </H2>
-            <p className="max-w-[440px] text-[17px] leading-[1.6]" style={{ color: "var(--g-muted)" }}>
-              The laser cuts your logo and details into the anodized surface, so they can&apos;t rub off or fade. Each
-              card is 86 × 54 mm, the size of a paper card, and weighs about as much as a house key.
-            </p>
-            <dl className="flex flex-wrap gap-x-14 gap-y-6">
-              {[
-                ["0.8", "mm solid aluminum"],
-                ["11", "anodized finishes"],
-                ["15+", "cards per pack"],
-              ].map(([n, l]) => (
-                <div key={l} className="flex flex-col gap-2">
-                  <dt className="text-[44px] font-medium leading-none tracking-[-0.04em] lg:text-[48px]">{n}</dt>
-                  <dd className="text-[14px] leading-[18px]" style={{ color: "var(--g-muted)" }}>
-                    {l}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <a href="#finishes" className="g-btn g-btn-outline g-label">
-              Find your finish <Arrow />
-            </a>
-          </div>
-        </section>
-
-        {/* How to order */}
         <section id="how" className="flex scroll-mt-20 flex-col gap-10 px-5 pb-20 sm:px-8 lg:gap-12 lg:px-20 lg:pb-32">
           <div className="flex flex-col gap-4">
             <Eyebrow>How to order</Eyebrow>

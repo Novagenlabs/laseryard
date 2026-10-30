@@ -12,7 +12,9 @@ const HOLD_MS = 12000;
  * One large card photo that glides through all eleven finishes on its own.
  * Tapping a swatch holds that finish for a while, then the cycle resumes.
  */
-export function FinishCycler() {
+type Stat = [value: string, label: string];
+
+export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const holdTimer = useRef<number | null>(null);
@@ -56,6 +58,18 @@ export function FinishCycler() {
             {index + 1} / {CARD_COLORS.length} · {held ? "holding" : "changes every 3 s"}
           </span>
         </div>
+        {stats.length > 0 && (
+          <dl className="grid grid-cols-3 gap-4 px-5 py-5 lg:px-6" style={{ borderTop: "1px solid var(--g-line)" }}>
+            {stats.map(([n, l]) => (
+              <div key={l} className="flex flex-col gap-1.5">
+                <dt className="text-[32px] font-medium leading-none tracking-[-0.04em] lg:text-[40px]">{n}</dt>
+                <dd className="text-[13px] leading-[18px]" style={{ color: "var(--g-muted)" }}>
+                  {l}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </div>
 
       {/* Swatches */}
