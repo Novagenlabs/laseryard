@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment } from "@react-three/drei";
 import { Bloom, DepthOfField, EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
-import { DialRoot, useDialKit } from "dialkit";
+import { DialRoot, useDialKitController } from "dialkit";
 import "dialkit/styles.css";
 import { CardBox } from "./scene/CardBox";
 import { JetsRoom, MadMenRoom } from "./scene/Rooms";
@@ -20,18 +20,25 @@ type EnvPreset = (typeof ENVIRONMENTS)[number];
 export default function OfficeMotionLab() {
   const captureRef = useRef<() => void>(() => {});
   // `?look=jets` or `?look=marble` opens that look first; the panel can still switch.
+  // `?world=<folder>` opens the Marble look on /worlds/<folder>/ (our generated offices).
+  const [params] = useState(() => {
+    const sp = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const world = sp?.get("world")?.replace(/[^a-z0-9-]/gi, "") || "";
+    return { look: world ? "marble" : sp?.get("look"), world };
+  });
   const [lookOptions] = useState(() => {
-    const q = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("look") : null;
-    if (q === "jets") return [LOOK_LABEL.jets, LOOK_LABEL.madmen, LOOK_LABEL.marble];
-    if (q === "marble") return [LOOK_LABEL.marble, LOOK_LABEL.madmen, LOOK_LABEL.jets];
+    if (params.look === "jets") return [LOOK_LABEL.jets, LOOK_LABEL.madmen, LOOK_LABEL.marble];
+    if (params.look === "marble") return [LOOK_LABEL.marble, LOOK_LABEL.madmen, LOOK_LABEL.jets];
     return LOOK_OPTIONS;
   });
+  const worldUrlDefault = params.world ? `/worlds/${params.world}/world-lowres.spz` : SAMPLE_SPLAT_URL;
+  const panoDefault = params.world ? `/worlds/${params.world}/pano.png` : "";
   // `?post=0` starts with post-processing off (useful when debugging splats).
   const [postDefault] = useState(
     () => !(typeof window !== "undefined" && new URLSearchParams(window.location.search).get("post") === "0")
   );
 
-  const v = useDialKit(
+  const dial = useDialKitController(
     "Office lab",
     {
       look: { type: "select", options: lookOptions },
@@ -72,15 +79,15 @@ export default function OfficeMotionLab() {
       },
       world: {
         _collapsed: true,
-        url: SAMPLE_SPLAT_URL,
-        pano: "",
+        url: worldUrlDefault,
+        pano: panoDefault,
         flip: true,
-        center: true,
-        scale: [0.6, 0.05, 6, 0.01],
+        center: !params.world,
+        scale: [params.world ? 1 : 0.6, 0.05, 6, 0.01],
         yaw: [0, -180, 180, 1],
         x: [0, -6, 6, 0.01],
-        y: [0.8, -4, 4, 0.01],
-        z: [-0.6, -8, 8, 0.01],
+        y: [params.world ? 0 : 0.8, -4, 4, 0.01],
+        z: [params.world ? 0 : -0.6, -8, 8, 0.01],
       },
       post: {
         enabled: postDefault,
@@ -99,6 +106,18 @@ export default function OfficeMotionLab() {
       },
     }
   );
+  const v = dial.values;
+
+  // A `?world=` link always opens that world, even over values the panel
+  // persisted from an earlier session.
+  useEffect(() => {
+    if (!params.world) return;
+    dial.setValues({
+      look: LOOK_LABEL.marble,
+      world: { url: worldUrlDefault, pano: panoDefault, center: false, scale: 1, x: 0, y: 0, z: 0, yaw: 0 },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.world]);
 
   const look = v.look === LOOK_LABEL.jets ? "jets" : v.look === LOOK_LABEL.marble ? "marble" : "madmen";
   const usePano = look === "marble" && v.world.pano.trim().length > 0;

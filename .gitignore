@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# World Labs Marble exports for the office lab (tens of MB; served from object storage, not git)
+public/worlds/*/*.spz
+public/worlds/*/*.ply
+public/worlds/*/*.glb
+public/worlds/*/pano.*

@@ -49,6 +49,36 @@ export function MarbleWorld({
 }) {
   const [offset, setOffset] = useState<[number, number, number]>([0, 0, 0]);
   const [bounds, setBounds] = useState<{ center: THREE.Vector3; size: THREE.Vector3 } | null>(null);
+  // Marble worlds ship `semantics_metadata` (saved next to the splat as
+  // world.json by our generator): metric scale and the ground plane offset.
+  // With it, the world comes in at real-world size with its floor on y = 0.
+  const [metric, setMetric] = useState<{ scale: number; ground: number } | null>(null);
+  // Per-world placement saved in world.json once a world is aligned with the
+  // desk: { x, y, z, yaw } in metres/degrees, applied under the live dials.
+  const [placement, setPlacement] = useState<{ x: number; y: number; z: number; yaw: number }>({ x: 0, y: 0, z: 0, yaw: 0 });
+  useEffect(() => {
+    setMetric(null);
+    setPlacement({ x: 0, y: 0, z: 0, yaw: 0 });
+    const dir = url.replace(/[^/]*$/, "");
+    if (!dir || url.startsWith("http")) return;
+    let cancelled = false;
+    fetch(`${dir}world.json`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((meta) => {
+        if (cancelled || !meta) return;
+        const sm = meta.semantics_metadata;
+        if (sm && typeof sm.metric_scale_factor === "number") {
+          setMetric({ scale: sm.metric_scale_factor, ground: sm.ground_plane_offset ?? 0 });
+        }
+        const p = meta.placement;
+        if (p) setPlacement({ x: p.x ?? 0, y: p.y ?? 0, z: p.z ?? 0, yaw: p.yaw ?? 0 });
+        console.info("[marble] world.json", { semantics: sm, placement: p });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
 
   const args = useMemo(
     () =>
@@ -68,13 +98,26 @@ export function MarbleWorld({
   );
 
   useEffect(() => {
-    if (!bounds) return;
+    if (!bounds || metric) {
+      setOffset([0, 0, 0]);
+      return;
+    }
     setOffset(center ? [-bounds.center.x, -bounds.center.y, -bounds.center.z] : [0, 0, 0]);
-  }, [bounds, center]);
+  }, [bounds, center, metric]);
+
+  // metric_xyz = raw * scale; aligned = metric - (0, ground, 0), in Marble's own frame.
+  const metricScale = metric ? metric.scale : 1;
+  const metricOffset: [number, number, number] = metric ? [0, -metric.ground, 0] : [0, 0, 0];
 
   return (
-    <group position={position} rotation={[flip ? Math.PI : 0, THREE.MathUtils.degToRad(yawDeg), 0]} scale={scale}>
-      <splatMesh args={args} position={offset} />
+    <group position={position} rotation={[0, THREE.MathUtils.degToRad(yawDeg), 0]} scale={scale}>
+      <group position={[placement.x, placement.y, placement.z]} rotation={[0, THREE.MathUtils.degToRad(placement.yaw), 0]}>
+        <group rotation={[flip ? Math.PI : 0, 0, 0]}>
+          <group position={metricOffset} scale={metricScale}>
+            <splatMesh args={args} position={offset} />
+          </group>
+        </group>
+      </group>
     </group>
   );
 }

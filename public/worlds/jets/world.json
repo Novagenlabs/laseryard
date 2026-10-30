@@ -1,0 +1,10 @@
+{
+  "world_id": "b8b28ad0-0d8d-4f1a-bb66-96ebaa3dfe13",
+  "display_name": "GMBC Jet broker glass office",
+  "semantics_metadata": {
+    "metric_scale_factor": 2.012478828430176,
+    "ground_plane_offset": 1.287731647491455
+  },
+  "spz_keys": ["100k", "150k", "500k", "full_res"],
+  "placement": { "x": 0, "y": -0.22, "z": 0.5, "yaw": 0 }
+}
