@@ -99,7 +99,7 @@ export default function GmbcHome() {
         {/* Hero: full-bleed photograph, text on a gradient so it stays legible */}
         <section className="relative flex min-h-[640px] items-end overflow-hidden sm:min-h-[700px] lg:min-h-[780px] lg:items-center">
           <Image
-            src="/images/gmbc/hero-handoff-black.png"
+            src="/images/gmbc/hero-handoff-black-1536.png"
             alt="A hand passing a matte black laser-engraved metal business card to another person"
             fill
             priority

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "The business card people keep.",
     description:
       "Solid 0.8 mm anodized aluminum, laser engraved with your design. Eleven finishes. Packs from 15 cards, delivered worldwide.",
-    images: [{ url: "/images/gmbc/hero-handoff-black.png", width: 1200, height: 800 }],
+    images: [{ url: "/images/gmbc/hero-handoff-black-1536.png", width: 1536, height: 1024 }],
   },
   robots: { index: true, follow: true },
 };
