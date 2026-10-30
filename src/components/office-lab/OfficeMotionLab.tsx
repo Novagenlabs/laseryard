@@ -9,20 +9,26 @@ import { DialRoot, useDialKit } from "dialkit";
 import "dialkit/styles.css";
 import { CardBox } from "./scene/CardBox";
 import { JetsRoom, MadMenRoom } from "./scene/Rooms";
-import { BOX_POSITION, FINISHES, LOOK_LABEL } from "./scene/presets";
+import { MarbleWorld, PanoEnvironment, SparkSetup } from "./scene/MarbleWorld";
+import { BOX_POSITION, FINISHES, LOOK_LABEL, SAMPLE_SPLAT_URL } from "./scene/presets";
 
-const LOOK_OPTIONS = [LOOK_LABEL.madmen, LOOK_LABEL.jets];
+const LOOK_OPTIONS = [LOOK_LABEL.madmen, LOOK_LABEL.jets, LOOK_LABEL.marble];
 const FINISH_LABELS = FINISHES.map((f) => f.label);
 const ENVIRONMENTS = ["apartment", "city", "dawn", "sunset", "studio", "warehouse", "night", "lobby"] as const;
 type EnvPreset = (typeof ENVIRONMENTS)[number];
 
 export default function OfficeMotionLab() {
   const captureRef = useRef<() => void>(() => {});
-  // `?look=jets` opens the glass office first; the panel can still switch.
-  const [lookOptions] = useState(() =>
-    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("look") === "jets"
-      ? [LOOK_LABEL.jets, LOOK_LABEL.madmen]
-      : LOOK_OPTIONS
+  // `?look=jets` or `?look=marble` opens that look first; the panel can still switch.
+  const [lookOptions] = useState(() => {
+    const q = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("look") : null;
+    if (q === "jets") return [LOOK_LABEL.jets, LOOK_LABEL.madmen, LOOK_LABEL.marble];
+    if (q === "marble") return [LOOK_LABEL.marble, LOOK_LABEL.madmen, LOOK_LABEL.jets];
+    return LOOK_OPTIONS;
+  });
+  // `?post=0` starts with post-processing off (useful when debugging splats).
+  const [postDefault] = useState(
+    () => !(typeof window !== "undefined" && new URLSearchParams(window.location.search).get("post") === "0")
   );
 
   const v = useDialKit(
@@ -64,8 +70,20 @@ export default function OfficeMotionLab() {
         envIntensity: [0.45, 0, 2, 0.01],
         exposure: [1.0, 0.3, 2.2, 0.01],
       },
+      world: {
+        _collapsed: true,
+        url: SAMPLE_SPLAT_URL,
+        pano: "",
+        flip: true,
+        center: true,
+        scale: [0.6, 0.05, 6, 0.01],
+        yaw: [0, -180, 180, 1],
+        x: [0, -6, 6, 0.01],
+        y: [0.8, -4, 4, 0.01],
+        z: [-0.6, -8, 8, 0.01],
+      },
       post: {
-        enabled: true,
+        enabled: postDefault,
         depthOfField: true,
         bokeh: [2.4, 0, 6, 0.1],
         bloom: [0.12, 0, 1.5, 0.01],
@@ -82,7 +100,8 @@ export default function OfficeMotionLab() {
     }
   );
 
-  const look = v.look === LOOK_LABEL.jets ? "jets" : "madmen";
+  const look = v.look === LOOK_LABEL.jets ? "jets" : v.look === LOOK_LABEL.marble ? "marble" : "madmen";
+  const usePano = look === "marble" && v.world.pano.trim().length > 0;
 
   // Finish cycling: one card, colors gliding through all eleven finishes.
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -121,7 +140,9 @@ export default function OfficeMotionLab() {
         shadows
         dpr={[1, 1.75]}
         gl={{
-          antialias: true,
+          // Spark (Gaussian splats) requires antialias off; the composer's
+          // multisampling covers edges when post-processing is on.
+          antialias: false,
           preserveDrawingBuffer: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: v.light.exposure,
@@ -139,11 +160,42 @@ export default function OfficeMotionLab() {
           drift={v.camera.drift}
         />
         <Suspense fallback={null}>
-          <Environment preset={envPreset} environmentIntensity={v.light.envIntensity} />
-          {look === "madmen" ? (
-            <MadMenRoom sunIntensity={v.light.sun} sunColor={v.light.sunColor} blinds={v.light.blinds} lamp={v.light.lamp} />
+          {usePano ? (
+            <PanoEnvironment url={v.world.pano.trim()} intensity={v.light.envIntensity} />
           ) : (
-            <JetsRoom sunIntensity={v.light.sun} sunColor={v.light.sunColor} blinds={false} />
+            <Environment preset={envPreset} environmentIntensity={v.light.envIntensity} />
+          )}
+          {look === "madmen" && (
+            <MadMenRoom sunIntensity={v.light.sun} sunColor={v.light.sunColor} blinds={v.light.blinds} lamp={v.light.lamp} />
+          )}
+          {look === "jets" && <JetsRoom sunIntensity={v.light.sun} sunColor={v.light.sunColor} blinds={false} />}
+          {look === "marble" && (
+            <>
+              <SparkSetup />
+              <MarbleWorld
+                url={v.world.url.trim()}
+                position={[v.world.x, v.world.y, v.world.z]}
+                yawDeg={v.world.yaw}
+                scale={v.world.scale}
+                flip={v.world.flip}
+                center={v.world.center}
+              />
+              <directionalLight
+                position={[2.5, 3.2, 1.5]}
+                intensity={v.light.sun}
+                color={v.light.sunColor}
+                castShadow
+                shadow-mapSize-width={2048}
+                shadow-mapSize-height={2048}
+                shadow-bias={-0.0004}
+                shadow-camera-left={-1.5}
+                shadow-camera-right={1.5}
+                shadow-camera-top={1.5}
+                shadow-camera-bottom={-1.5}
+                shadow-camera-near={0.5}
+                shadow-camera-far={10}
+              />
+            </>
           )}
           <CardBox
             position={BOX_POSITION}

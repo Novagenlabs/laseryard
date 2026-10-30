@@ -17,13 +17,18 @@ export const FINISHES = [
 
 export type FinishId = (typeof FINISHES)[number]["id"];
 
-export const LOOKS = ["madmen", "jets"] as const;
+export const LOOKS = ["madmen", "jets", "marble"] as const;
 export type Look = (typeof LOOKS)[number];
 
 export const LOOK_LABEL: Record<Look, string> = {
   madmen: "Executive office, 1962",
   jets: "Jet broker, glass office",
+  marble: "Marble world (photoreal splat)",
 };
+
+// Public sample splat from World Labs' Spark docs, used only to prove the
+// pipeline until the real office worlds are exported from Marble.
+export const SAMPLE_SPLAT_URL = "https://sparkjs.dev/assets/splats/butterfly.spz";
 
 // Where the box sits on the desk and where the camera looks.
 export const DESK_TOP_Y = 0.76;

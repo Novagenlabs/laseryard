@@ -17,6 +17,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.8.2",
     "@react-three/postprocessing": "^3.2.2",
+    "@sparkjsdev/spark": "^2.4.0",
     "@whop/checkout": "^0.0.52",
     "@whop/sdk": "^0.0.35",
     "agentation": "^2.3.2",
