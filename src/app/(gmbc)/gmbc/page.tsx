@@ -111,9 +111,9 @@ export default function GmbcHome() {
             style={{ background: "linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.9) 100%)" }}
           />
           <div className="relative flex max-w-[760px] flex-col items-start gap-6 px-5 pb-16 pt-14 sm:px-8 lg:gap-7 lg:px-20 lg:py-[104px]">
-            <Eyebrow>Laser-engraved metal business cards</Eyebrow>
+            <Eyebrow>Laser-engraved, solid aluminum</Eyebrow>
             <h1 className="text-[44px] font-medium leading-[1.02] tracking-[-0.045em] sm:text-[60px] lg:text-[76px]">
-              The business card people keep.
+              World&apos;s best metal business card.
             </h1>
             <p className="max-w-[520px] text-[17px] leading-[1.6] sm:text-[19px]" style={{ color: "var(--g-muted)" }}>
               Solid 0.8 mm anodized aluminum, laser engraved with your design. Eleven finishes. Packs from 15 cards,
@@ -129,9 +129,6 @@ export default function GmbcHome() {
                 </a>
               </div>
               <HeroProof />
-              <span className="text-[13px] leading-[18px]" style={{ color: "var(--g-muted)" }}>
-                Quotes in minutes on WhatsApp · Nothing is engraved until you approve a sample card
-              </span>
             </div>
           </div>
         </section>

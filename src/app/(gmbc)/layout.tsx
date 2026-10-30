@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE,
     siteName: "Get Metal Business Cards",
-    title: "The business card people keep.",
+    title: "World's best metal business card.",
     description:
       "Solid 0.8 mm anodized aluminum, laser engraved with your design. Eleven finishes. Packs from 15 cards, delivered worldwide.",
     images: [{ url: "/images/gmbc/hero-handoff-black-1536.png", width: 1536, height: 1024 }],
