@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { CARD_COLORS } from "@/lib/constants";
 import { Arrow, WA_FINISH_URL } from "./shared";
+
+// Three.js only runs in the browser; the panel stays a quiet dark surface until it is ready.
+const CardStage3D = dynamic(() => import("./CardStage3D").then((m) => m.CardStage3D), { ssr: false });
 
 const EVERY_MS = 3000;
 const HOLD_MS = 12000;
@@ -17,6 +20,7 @@ type Stat = [value: string, label: string];
 export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
+  const [ready, setReady] = useState(false);
   const holdTimer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -38,19 +42,21 @@ export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
     <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
       {/* The card */}
       <div className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--g-surface)" }}>
-        <div className="relative aspect-[820/470] w-full overflow-hidden">
-          {CARD_COLORS.map((c, i) => (
-            <Image
-              key={c.id}
-              src={`/images/products/colors/${c.id}.webp`}
-              alt={`${c.label} metal business cards`}
-              fill
-              sizes="(min-width: 1024px) 820px, 100vw"
-              priority={i === 0}
-              className="object-cover transition-opacity duration-700 ease-out"
-              style={{ opacity: i === index ? 1 : 0 }}
-            />
-          ))}
+        <div
+          className="relative aspect-[820/470] w-full overflow-hidden"
+          style={{ background: "radial-gradient(70% 90% at 50% 42%, #2a2a2a 0%, var(--g-surface) 72%)" }}
+          role="img"
+          aria-label={`${current.label} metal business card`}
+        >
+          <div className="absolute inset-0 transition-opacity duration-700 ease-out" style={{ opacity: ready ? 1 : 0 }}>
+            <CardStage3D finish={current} onReady={() => setReady(true)} />
+          </div>
+          <span
+            className="g-label pointer-events-none absolute right-5 top-4 transition-opacity duration-700 lg:right-6"
+            style={{ color: "var(--g-muted)", opacity: ready ? 1 : 0 }}
+          >
+            Drag to turn
+          </span>
         </div>
         <div className="flex items-center justify-between px-5 py-4 lg:px-6">
           <span className="text-[17px] font-medium lg:text-[18px]">{current.label}</span>
