@@ -270,10 +270,8 @@ export default function GmbcHome() {
           className="flex flex-col gap-10 px-5 py-20 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-20 lg:py-[120px]"
           style={{ borderTop: "1px solid var(--g-line)" }}
         >
-          <h2 className="text-[48px] font-medium leading-[0.98] tracking-[-0.05em] sm:text-[72px] lg:text-[96px]">
-            You matter.
-            <br />
-            Your name, in metal.
+          <h2 className="text-[56px] font-medium leading-[0.95] tracking-[-0.05em] sm:text-[80px] lg:text-[112px]">
+            You matter, get Metal
           </h2>
           <div className="flex flex-col items-start gap-4 lg:items-end">
             <a href={WA_QUOTE_URL} target="_blank" rel="noopener noreferrer" className="g-btn g-btn-primary g-label">
