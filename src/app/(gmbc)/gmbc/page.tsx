@@ -113,7 +113,7 @@ export default function GmbcHome() {
           <div className="relative flex max-w-[760px] flex-col items-start gap-6 px-5 pb-16 pt-14 sm:px-8 lg:gap-7 lg:px-20 lg:py-[104px]">
             <Eyebrow>Laser-engraved, solid aluminum</Eyebrow>
             <h1 className="text-[44px] font-medium leading-[1.02] tracking-[-0.045em] sm:text-[60px] lg:text-[76px]">
-              World&apos;s best metal business card.
+              Metal business cards for people who matter.
             </h1>
             <p className="max-w-[520px] text-[17px] leading-[1.6] sm:text-[19px]" style={{ color: "var(--g-muted)" }}>
               Solid 0.8 mm anodized aluminum, laser engraved with your design. Eleven finishes. Packs from 15 cards,

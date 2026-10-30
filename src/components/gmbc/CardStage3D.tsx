@@ -171,7 +171,60 @@ function ring(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) 
   ctx.stroke();
 }
 
-/** Sample cards for the markets we sell into: the US, Germany, the Gulf and France. */
+const SERIF = "Georgia, 'Times New Roman', serif";
+
+/** Serif small caps: the first letter of each word tall, the rest smaller, all uppercase. */
+function smallCaps(ctx: CanvasRenderingContext2D, text: string, cx: number, y: number, big: number, small: number, spacing: number) {
+  const parts = [...text].map((ch, i) => ({ ch: ch.toUpperCase(), big: i === 0 || text[i - 1] === " " }));
+  let w = -spacing;
+  for (const p of parts) {
+    ctx.font = `600 ${p.big ? big : small}px ${SERIF}`;
+    w += ctx.measureText(p.ch).width + spacing;
+  }
+  let x = cx - w / 2;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  for (const p of parts) {
+    ctx.font = `600 ${p.big ? big : small}px ${SERIF}`;
+    ctx.fillText(p.ch, x, y);
+    x += ctx.measureText(p.ch).width + spacing;
+  }
+}
+
+/** A jet seen from above, nose up, about 240 units tall around the origin. */
+function jet(ctx: CanvasRenderingContext2D) {
+  ctx.beginPath();
+  ctx.moveTo(0, -120);
+  ctx.quadraticCurveTo(14, -100, 14, -40);
+  ctx.lineTo(14, 70);
+  ctx.quadraticCurveTo(12, 100, 6, 112);
+  ctx.lineTo(-6, 112);
+  ctx.quadraticCurveTo(-12, 100, -14, 70);
+  ctx.lineTo(-14, -40);
+  ctx.quadraticCurveTo(-14, -100, 0, -120);
+  ctx.fill();
+  for (const side of [1, -1]) {
+    ctx.beginPath();
+    ctx.moveTo(side * 13, -20);
+    ctx.lineTo(side * 120, 60);
+    ctx.lineTo(side * 120, 78);
+    ctx.lineTo(side * 13, 36);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(side * 8, 86);
+    ctx.lineTo(side * 52, 112);
+    ctx.lineTo(side * 52, 122);
+    ctx.lineTo(side * 6, 108);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(side > 0 ? 40 : -56, 20, 16, 44, 8);
+    ctx.fill();
+  }
+}
+
+/** Sample cards for the markets we sell into: the US, Germany, the Gulf, France and the UK. */
 const DESIGNS: Design[] = [
   {
     name: "Alex Carter · New York",
@@ -309,6 +362,36 @@ const DESIGNS: Design[] = [
       centered(ctx, "PARIS   ·   DEPUIS 1998", ART_H / 2 + 400, 20);
     },
   },
+  {
+    name: "The Jet Business · London",
+    front: (ctx) => {
+      ctx.save();
+      ctx.translate(1250, 300);
+      ctx.rotate(0.5);
+      ctx.scale(1.25, 1.25);
+      jet(ctx);
+      ctx.restore();
+      smallCaps(ctx, "The Jet", ART_W / 2, 600, 172, 130, 14);
+      smallCaps(ctx, "Business", ART_W / 2, 762, 172, 130, 14);
+      ctx.font = `700 54px ${FONT}`;
+      centered(ctx, "STEVE VARSANO", 876, 12);
+      ctx.font = `400 40px ${FONT}`;
+      centered(ctx, "25 Park Lane, London W1K 1RA", 956, 4);
+      centered(ctx, "+44 (0) 845 527 5595", 1016, 4);
+      centered(ctx, "US +1 917 414 1895", 1076, 4);
+      centered(ctx, "svp@thejetbusiness.com   |   www.thejetbusiness.com", 1150, 3);
+    },
+    back: (ctx) => {
+      ctx.save();
+      ctx.translate(ART_W / 2, ART_H / 2 - 60);
+      ctx.rotate(0.5);
+      ctx.scale(2.6, 2.6);
+      jet(ctx);
+      ctx.restore();
+      ctx.font = `400 46px ${FONT}`;
+      centered(ctx, "THEJETBUSINESS.COM", ART_H / 2 + 420, 18);
+    },
+  },
 ];
 
 /**
@@ -390,6 +473,51 @@ function makeLeatherTexture() {
 
 const OFFICE_PANO = "/images/gmbc/office-pano.jpg";
 const OFFICE_YAW = -2.45; // turns the desk and lamp behind the card
+
+/** Walnut: a warm base with wavy darker grain and a few pale streaks, tiling cleanly. */
+function makeWoodTexture() {
+  const s = 1024;
+  const c = document.createElement("canvas");
+  c.width = s;
+  c.height = s;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#4b2f1c";
+  ctx.fillRect(0, 0, s, s);
+  ctx.lineCap = "round";
+  for (let i = 0; i < 170; i++) {
+    const y0 = (i / 170) * s + (Math.random() - 0.5) * 8;
+    const dark = Math.random() < 0.8;
+    const a = dark ? 0.12 + Math.random() * 0.3 : 0.05 + Math.random() * 0.08;
+    ctx.strokeStyle = dark ? `rgba(28,14,6,${a})` : `rgba(150,100,60,${a})`;
+    ctx.lineWidth = 1 + Math.random() * 5;
+    const f = 1 + Math.floor(Math.random() * 2); // whole waves so the tile edges meet
+    const ph = Math.random() * Math.PI * 2;
+    ctx.beginPath();
+    for (let x = 0; x <= s; x += 16) {
+      const y = y0 + Math.sin((x / s) * Math.PI * 2 * f + ph) * 10;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(7, 3.5);
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/** An executive desk in card units (about 1.8 × 0.9 m), the box near its front edge. */
+function Desk() {
+  const wood = useMemo(() => makeWoodTexture(), []);
+  return (
+    <mesh position={[0, -0.06, 0.5]}>
+      <boxGeometry args={[70, 0.12, 35]} />
+      <meshStandardMaterial map={wood} roughness={0.3} metalness={0} />
+    </mesh>
+  );
+}
 
 function MaglevBox({ float }: { float: FloatRef }) {
   const ring = useRef<THREE.MeshStandardMaterial>(null);
@@ -655,10 +783,11 @@ function Scene({ finish }: { finish: StageFinish }) {
       />
       <Card finish={finish} interact={interact} float={float} />
       <MaglevBox float={float} />
+      <Desk />
       <directionalLight position={[-4, 6, 4]} intensity={0.7} />
       {/* the card's shadow on the disc, and the box's shadow on the table */}
       <ContactShadows position={[0, DISC_TOP + 0.003, 0]} opacity={0.5} scale={3.6} blur={1.8} far={2.8} color="#000" />
-      <ContactShadows position={[0, 0, 0]} opacity={0.7} scale={10} blur={2.4} far={1} color="#000" />
+      <ContactShadows position={[0, 0.002, 0]} opacity={0.7} scale={10} blur={2.4} far={1} color="#000" />
       <Environment resolution={512} environmentIntensity={0.9}>
         {/* overhead softbox: the long bright band across the face */}
         <Lightformer intensity={3} position={[0, 5, 0]} rotation-x={Math.PI / 2} scale={[12, 4, 1]} />
