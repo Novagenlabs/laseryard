@@ -60,7 +60,7 @@ function HeroMobile() {
         </motion.p>
 
         {/* CTA */}
-        <motion.div {...fadeSlide(0.2)} className="mt-6 max-w-sm mx-auto">
+        <motion.div {...fadeSlide(0.2)} className="mt-5 max-w-sm mx-auto">
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
             target="_blank"
@@ -72,12 +72,12 @@ function HeroMobile() {
           </a>
           <Link
             href="/products/metal-business-cards"
-            className="mt-3 inline-flex w-full items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             or order now
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-          <p className="mt-4 text-xs text-muted-foreground text-center">
+          <p className="mt-3 text-xs text-muted-foreground text-center">
             Shipping included · 11 colors
           </p>
         </motion.div>
@@ -112,14 +112,14 @@ function HeroDesktop() {
   return (
     <section className="relative bg-background overflow-hidden">
       <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-36 pb-16 lg:pt-40 lg:pb-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-start">
           {/* Left - Text Content */}
           <div className="max-w-xl">
             {/* Social Proof */}
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-3 mb-8"
+              className="flex items-center gap-3 mb-5"
             >
               <div className="flex -space-x-2">
                 {AVATAR_NAMES.map((name) => (
@@ -153,9 +153,9 @@ function HeroDesktop() {
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-8"
+              className="mt-5"
             >
-              <div className="w-20 h-px bg-border mb-6" />
+              <div className="w-20 h-px bg-border mb-4" />
               <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed">
                 Order in minutes. Laser-engraved with precision. Shipped worldwide.
               </p>
@@ -165,9 +165,9 @@ function HeroDesktop() {
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="mt-10"
+              className="mt-6"
             >
-              <div className="flex flex-col items-start gap-3">
+              <div className="flex flex-col items-start gap-2">
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
                   target="_blank"
@@ -185,7 +185,7 @@ function HeroDesktop() {
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-              <p className="mt-5 text-sm text-muted-foreground">
+              <p className="mt-3 text-sm text-muted-foreground">
                 Shipping included · 11 colors · ready in 10-14 days
               </p>
             </motion.div>
