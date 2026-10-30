@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FinishCycler } from "@/components/gmbc/FinishCycler";
+import { HeroProof } from "@/components/gmbc/HeroProof";
+import { StepArt, type StepArtKind } from "@/components/gmbc/StepArt";
 import { Arrow, INSTAGRAM_URL, WA_QUOTE_URL, Wordmark } from "@/components/gmbc/shared";
 
 // Get Metal Business Cards — single landing page, quote-first, no prices.
@@ -29,22 +31,10 @@ const FAQ = [
   },
 ];
 
-const STEPS = [
-  {
-    n: "01",
-    t: "Tell us what you need",
-    d: "Message us on WhatsApp with the finish, quantity and country you need. You'll have a quote back within minutes.",
-  },
-  {
-    n: "02",
-    t: "Approve your proof",
-    d: "Send your artwork or let us lay it out. You approve a digital proof, then a photo of one engraved card, before the batch runs.",
-  },
-  {
-    n: "03",
-    t: "We engrave and ship",
-    d: "Production takes 10 to 14 business days after approval, rush available. Tracked worldwide delivery is included in every quote.",
-  },
+const STEPS: { n: string; t: string; art: StepArtKind }[] = [
+  { n: "01", t: "Get your quote", art: "quote" },
+  { n: "02", t: "Approve your proof", art: "proof" },
+  { n: "03", t: "We engrave and ship", art: "ship" },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -138,6 +128,7 @@ export default function GmbcHome() {
                   See the finishes
                 </a>
               </div>
+              <HeroProof />
               <span className="text-[13px] leading-[18px]" style={{ color: "var(--g-muted)" }}>
                 Quotes in minutes on WhatsApp · Nothing is engraved until you approve a sample card
               </span>
@@ -179,22 +170,19 @@ export default function GmbcHome() {
         </section>
 
         <section id="how" className="flex scroll-mt-20 flex-col gap-10 px-5 pb-20 sm:px-8 lg:gap-12 lg:px-20 lg:pb-32">
-          <div className="flex flex-col gap-4">
-            <Eyebrow>How to order</Eyebrow>
-            <H2>Three messages, then it ships.</H2>
-          </div>
+          <H2>How to order</H2>
           <ol className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {STEPS.map((s) => (
-              <li key={s.n} className="flex flex-col gap-10 p-7 lg:p-8" style={{ background: "var(--g-surface)" }}>
+              <li
+                key={s.n}
+                className="flex flex-col gap-12 p-7 lg:gap-16 lg:p-8"
+                style={{ background: "var(--g-surface)" }}
+              >
                 <span className="g-label" style={{ color: "var(--g-accent)", letterSpacing: "0.14em" }}>
                   {s.n}
                 </span>
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-[22px] font-medium leading-7 tracking-[-0.02em]">{s.t}</h3>
-                  <p className="text-[16px] leading-[26px]" style={{ color: "var(--g-muted)" }}>
-                    {s.d}
-                  </p>
-                </div>
+                <StepArt kind={s.art} className="h-24 w-24 lg:h-28 lg:w-28" style={{ color: "var(--g-accent)" }} />
+                <h3 className="text-[24px] font-medium leading-7 tracking-[-0.02em] lg:text-[26px]">{s.t}</h3>
               </li>
             ))}
           </ol>
