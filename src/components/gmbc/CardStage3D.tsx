@@ -224,7 +224,40 @@ function jet(ctx: CanvasRenderingContext2D) {
   }
 }
 
-/** Sample cards for the markets we sell into: the US, Germany, the Gulf, France and the UK. */
+/** A band of chevrons pointing right: a stylised wing. */
+function chevrons(ctx: CanvasRenderingContext2D, x: number, y: number, count: number, w: number, h: number, gap: number) {
+  for (let i = 0; i < count; i++) {
+    const x0 = x + i * (w + gap);
+    ctx.beginPath();
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x0 + w, y);
+    ctx.lineTo(x0 + w + h / 2, y + h / 2);
+    ctx.lineTo(x0 + w, y + h);
+    ctx.lineTo(x0, y + h);
+    ctx.lineTo(x0 + h / 2, y + h / 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+/** A lightning bolt, about 300 units tall around the origin. */
+function bolt(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
+  const pts: [number, number][] = [
+    [-40, -150],
+    [60, -150],
+    [10, -30],
+    [80, -30],
+    [-60, 150],
+    [-20, 10],
+    [-90, 10],
+  ];
+  ctx.beginPath();
+  pts.forEach(([px, py], i) => (i === 0 ? ctx.moveTo(cx + px * s, cy + py * s) : ctx.lineTo(cx + px * s, cy + py * s)));
+  ctx.closePath();
+  ctx.fill();
+}
+
+/** Sample cards for the markets we sell into, from quiet to bold. */
 const DESIGNS: Design[] = [
   {
     name: "Alex Carter · New York",
@@ -392,6 +425,74 @@ const DESIGNS: Design[] = [
       centered(ctx, "THEJETBUSINESS.COM", ART_H / 2 + 420, 18);
     },
   },
+  {
+    name: "Skybridge Aviation · Miami",
+    front: (ctx) => {
+      chevrons(ctx, 196, 300, 3, 60, 200, 40);
+      ctx.font = `800 250px ${FONT}`;
+      drawSpaced(ctx, "SKYBRIDGE", 186, 760, 4);
+      ctx.font = `300 250px ${FONT}`;
+      drawSpaced(ctx, "AVIATION", 190, 980, 16);
+      ctx.font = `500 42px ${FONT}`;
+      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 200, 1110, 10);
+      ctx.font = `400 38px ${FONT}`;
+      ctx.textAlign = "left";
+      const r = "JAMES WHITFIELD   ·   SENIOR BROKER   ·   +1 305 000 0000";
+      drawSpaced(ctx, r, ART_W - 200 - measureSpaced(ctx, r, 6), 420, 6);
+    },
+    back: (ctx) => {
+      chevrons(ctx, 330, 360, 3, 160, 600, 120);
+      ctx.font = `500 44px ${FONT}`;
+      centered(ctx, "SKYBRIDGEAVIATION.COM", ART_H / 2 + 480, 16);
+    },
+  },
+  {
+    name: "Hartwell & Sons · London",
+    front: (ctx) => {
+      ctx.font = `700 980px ${SERIF}`;
+      ctx.textAlign = "left";
+      ctx.fillText("H", 150, 1010);
+      ctx.font = `600 150px ${SERIF}`;
+      drawSpaced(ctx, "HARTWELL", 960, 560, 12);
+      ctx.font = `400 110px ${SERIF}`;
+      drawSpaced(ctx, "& SONS", 964, 690, 14);
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(964, 750);
+      ctx.lineTo(1850, 750);
+      ctx.stroke();
+      ctx.font = `500 44px ${FONT}`;
+      drawSpaced(ctx, "FINE JEWELLERS SINCE 1884", 964, 830, 10);
+      ctx.font = `400 38px ${FONT}`;
+      drawSpaced(ctx, "12 NEW BOND STREET, LONDON W1S", 964, 1020, 5);
+      drawSpaced(ctx, "+44 20 7000 0000   ·   HARTWELLANDSONS.CO.UK", 964, 1090, 5);
+    },
+    back: (ctx) => {
+      ctx.font = `700 460px ${SERIF}`;
+      centered(ctx, "H&S", ART_H / 2 + 150, 10);
+      ctx.font = `400 44px ${FONT}`;
+      centered(ctx, "LONDON   ·   EST. 1884", ART_H / 2 + 430, 18);
+    },
+  },
+  {
+    name: "Volt Studio · Berlin",
+    front: (ctx) => {
+      ctx.font = `800 520px ${FONT}`;
+      centered(ctx, "VOLT", 760, 24);
+      bolt(ctx, 1740, 330, 0.75);
+      ctx.font = `500 46px ${FONT}`;
+      centered(ctx, "STUDIO FÜR DESIGN   ·   BERLIN", 880, 12);
+      ctx.font = `400 42px ${FONT}`;
+      drawSpaced(ctx, "MAXIMILIAN KRÜGER   ·   CREATIVE DIRECTOR", 200, 1120, 6);
+      const r = "VOLT.STUDIO";
+      drawSpaced(ctx, r, ART_W - 200 - measureSpaced(ctx, r, 6), 1120, 6);
+    },
+    back: (ctx) => {
+      bolt(ctx, ART_W / 2, ART_H / 2 - 40, 2.6);
+      ctx.font = `500 44px ${FONT}`;
+      centered(ctx, "VOLT.STUDIO   ·   BERLIN", ART_H / 2 + 480, 16);
+    },
+  },
 ];
 
 /**
@@ -472,52 +573,7 @@ function makeLeatherTexture() {
 }
 
 const OFFICE_PANO = "/images/gmbc/office-pano.jpg";
-const OFFICE_YAW = -2.45; // turns the desk and lamp behind the card
-
-/** Walnut: a warm base with wavy darker grain and a few pale streaks, tiling cleanly. */
-function makeWoodTexture() {
-  const s = 1024;
-  const c = document.createElement("canvas");
-  c.width = s;
-  c.height = s;
-  const ctx = c.getContext("2d")!;
-  ctx.fillStyle = "#4b2f1c";
-  ctx.fillRect(0, 0, s, s);
-  ctx.lineCap = "round";
-  for (let i = 0; i < 170; i++) {
-    const y0 = (i / 170) * s + (Math.random() - 0.5) * 8;
-    const dark = Math.random() < 0.8;
-    const a = dark ? 0.12 + Math.random() * 0.3 : 0.05 + Math.random() * 0.08;
-    ctx.strokeStyle = dark ? `rgba(28,14,6,${a})` : `rgba(150,100,60,${a})`;
-    ctx.lineWidth = 1 + Math.random() * 5;
-    const f = 1 + Math.floor(Math.random() * 2); // whole waves so the tile edges meet
-    const ph = Math.random() * Math.PI * 2;
-    ctx.beginPath();
-    for (let x = 0; x <= s; x += 16) {
-      const y = y0 + Math.sin((x / s) * Math.PI * 2 * f + ph) * 10;
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(7, 3.5);
-  tex.anisotropy = 8;
-  return tex;
-}
-
-/** An executive desk in card units (about 1.8 × 0.9 m), the box near its front edge. */
-function Desk() {
-  const wood = useMemo(() => makeWoodTexture(), []);
-  return (
-    <mesh position={[0, -0.06, 0.5]}>
-      <boxGeometry args={[70, 0.12, 35]} />
-      <meshStandardMaterial map={wood} roughness={0.3} metalness={0} />
-    </mesh>
-  );
-}
+const OFFICE_YAW = 1.19; // faces the desk: the box sits on it, the room rises behind
 
 function MaglevBox({ float }: { float: FloatRef }) {
   const ring = useRef<THREE.MeshStandardMaterial>(null);
@@ -777,32 +833,36 @@ function Scene({ finish }: { finish: StageFinish }) {
       <Environment
         files={OFFICE_PANO}
         background="only"
-        backgroundBlurriness={0.1}
+        backgroundBlurriness={0.06}
         backgroundIntensity={0.55}
         backgroundRotation={[0, OFFICE_YAW, 0]}
       />
       <Card finish={finish} interact={interact} float={float} />
       <MaglevBox float={float} />
-      <Desk />
-      <directionalLight position={[-4, 6, 4]} intensity={0.7} />
+      <directionalLight position={[-6, 6, 3]} intensity={0.9} color="#dfe9ff" />
+      <directionalLight position={[6, 3, -4]} intensity={0.6} color="#ffd2a0" />
       {/* the card's shadow on the disc, and the box's shadow on the table */}
       <ContactShadows position={[0, DISC_TOP + 0.003, 0]} opacity={0.5} scale={3.6} blur={1.8} far={2.8} color="#000" />
       <ContactShadows position={[0, 0.002, 0]} opacity={0.7} scale={10} blur={2.4} far={1} color="#000" />
       <Environment resolution={512} environmentIntensity={0.9}>
-        {/* overhead softbox: the long bright band across the face */}
-        <Lightformer intensity={3} position={[0, 5, 0]} rotation-x={Math.PI / 2} scale={[12, 4, 1]} />
-        {/* left and right strips give the long edges a highlight */}
-        <Lightformer intensity={1.6} position={[-6, 1, 2]} rotation-y={Math.PI / 2} scale={[8, 3, 1]} />
-        <Lightformer intensity={1.6} position={[6, 1, 2]} rotation-y={-Math.PI / 2} scale={[8, 3, 1]} color="#f6ecd6" />
+        {/* floor-to-ceiling glass on the left: tall, cool daylight */}
+        <Lightformer intensity={3.2} position={[-7, 3, 1]} rotation-y={Math.PI / 2} scale={[7, 9, 1]} color="#dfe9ff" />
+        {/* low sun over the city, from the right and slightly behind */}
+        <Lightformer intensity={2.4} position={[6, 2.5, -3]} rotation-y={-Math.PI / 2} scale={[3, 3, 1]} color="#ffd2a0" />
+        {/* a modest cool ceiling so the top edges still read */}
+        <Lightformer intensity={1.2} position={[0, 5, 0]} rotation-x={Math.PI / 2} scale={[12, 4, 1]} color="#eef2ff" />
         {/* soft front fill so the face is never black */}
-        <Lightformer intensity={0.7} position={[0, 0.5, 7]} rotation-y={Math.PI} scale={[10, 5, 1]} />
+        <Lightformer intensity={0.5} position={[0, 0.5, 7]} rotation-y={Math.PI} scale={[10, 5, 1]} />
       </Environment>
       <OrbitControls
-        target={[0, 1.55, 0]}
+        target={[0, 3.0, 0]}
         enablePan={false}
         enableZoom={false}
-        minPolarAngle={1.0}
-        maxPolarAngle={1.6}
+        // A narrow orbit keeps the box seated on the desk in the panorama behind it.
+        minPolarAngle={1.18}
+        maxPolarAngle={1.33}
+        minAzimuthAngle={-0.25}
+        maxAzimuthAngle={0.35}
         enableDamping
         dampingFactor={0.06}
         onStart={() => {
@@ -835,7 +895,7 @@ export function CardStage3D({ finish, onReady }: { finish: StageFinish; onReady?
     <div ref={wrap} className="h-full w-full">
       <Canvas
         frameloop={onScreen ? "always" : "demand"}
-        camera={{ position: [0.7, 3.2, 12.2], fov: 26 }}
+        camera={{ position: [0.6, 7.0, 12.2], fov: 36 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
