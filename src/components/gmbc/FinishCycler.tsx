@@ -58,11 +58,8 @@ export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
             Drag to turn
           </span>
         </div>
-        <div className="flex items-center justify-between px-5 py-4 lg:px-6">
+        <div className="flex items-center px-5 py-4 lg:px-6">
           <span className="text-[17px] font-medium lg:text-[18px]">{current.label}</span>
-          <span className="g-label" style={{ color: "var(--g-muted)" }}>
-            {index + 1} / {CARD_COLORS.length} · {held ? "holding" : "changes every 3 s"}
-          </span>
         </div>
         {stats.length > 0 && (
           <dl className="grid grid-cols-3 gap-4 px-5 py-5 lg:px-6" style={{ borderTop: "1px solid var(--g-line)" }}>

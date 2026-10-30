@@ -28,36 +28,31 @@ function luminance(hex: string) {
  */
 function surfaceFor(id: string, swatch: string) {
   const engrave = luminance(swatch) > 0.3 ? "#585858" : "#e4e4e4";
-  if (id === "silver") return { metalness: 1, roughness: 0.22, engrave: "#4a4a4a" };
-  if (id === "gold") return { metalness: 1, roughness: 0.25, engrave: "#5a5247" };
-  if (id === "black") return { metalness: 0.9, roughness: 0.34, engrave };
-  return { metalness: 0.8, roughness: 0.3, engrave };
+  if (id === "silver") return { metalness: 1, roughness: 0.46, engrave: "#4a4a4a" };
+  if (id === "gold") return { metalness: 1, roughness: 0.5, engrave: "#5a5247" };
+  if (id === "black") return { metalness: 0.9, roughness: 0.62, engrave };
+  return { metalness: 0.8, roughness: 0.56, engrave };
 }
 
-/** Fine horizontal streaks: the brushed grain under an anodized layer. */
-function makeBrushedTexture() {
-  const s = 1024;
+/** Fine, direction-free speckle: the sandblasted grain of a matte anodized surface. */
+function makeMatteGrainTexture() {
+  const s = 512;
   const c = document.createElement("canvas");
   c.width = s;
   c.height = s;
   const ctx = c.getContext("2d")!;
-  ctx.fillStyle = "#9c9c9c";
-  ctx.fillRect(0, 0, s, s);
-  for (let i = 0; i < 7000; i++) {
-    const x = Math.random() * s;
-    const y = Math.random() * s;
-    const len = 40 + Math.random() * 320;
-    const v = Math.floor(110 + Math.random() * 120);
-    ctx.strokeStyle = `rgba(${v},${v},${v},${0.2 + Math.random() * 0.45})`;
-    ctx.lineWidth = 1 + Math.random();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + len, y + (Math.random() - 0.5) * 1.5);
-    ctx.stroke();
+  const img = ctx.createImageData(s, s);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 200 + Math.floor(Math.random() * 55);
+    img.data[i] = v;
+    img.data[i + 1] = v;
+    img.data[i + 2] = v;
+    img.data[i + 3] = 255;
   }
+  ctx.putImageData(img, 0, 0);
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(0.3, 0.3);
+  tex.repeat.set(0.5, 0.5);
   tex.anisotropy = 8;
   return tex;
 }
@@ -189,14 +184,14 @@ function makeBackTexture() {
 function Card({ finish }: { finish: StageFinish }) {
   const sway = useRef<THREE.Group>(null);
   const body = useMemo(() => {
-    const grain = makeBrushedTexture();
+    const grain = makeMatteGrainTexture();
     return new THREE.MeshStandardMaterial({
       color: new THREE.Color(finish.swatch),
       metalness: 0.8,
-      roughness: 0.3,
+      roughness: 0.56,
       roughnessMap: grain,
       bumpMap: grain,
-      bumpScale: 0.0015,
+      bumpScale: 0.0005,
     });
     // The material is created once; useFrame eases it toward each new finish.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -230,7 +225,7 @@ function Card({ finish }: { finish: StageFinish }) {
     return g;
   }, []);
 
-  const target = useRef({ color: new THREE.Color(finish.swatch), engrave: new THREE.Color("#e6e6e6"), metalness: 0.8, roughness: 0.3 });
+  const target = useRef({ color: new THREE.Color(finish.swatch), engrave: new THREE.Color("#e6e6e6"), metalness: 0.8, roughness: 0.56 });
   useEffect(() => {
     const s = surfaceFor(finish.id, finish.swatch);
     target.current.color.set(finish.swatch);
