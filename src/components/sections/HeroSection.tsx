@@ -61,25 +61,23 @@ function HeroMobile() {
 
         {/* CTA */}
         <motion.div {...fadeSlide(0.2)} className="mt-6 max-w-sm mx-auto">
-          <div className="flex flex-col gap-3">
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
-            >
-              Get Custom Quote
-              <ArrowRight className="w-4 h-4" />
-            </a>
-            <Link
-              href="/products/metal-business-cards"
-              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
-            >
-              Order Now
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground text-center">
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
+          >
+            Get Custom Quote
+            <ArrowRight className="w-4 h-4" />
+          </a>
+          <Link
+            href="/products/metal-business-cards"
+            className="mt-3 inline-flex w-full items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            or order now
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+          <p className="mt-4 text-xs text-muted-foreground text-center">
             Shipping included · 11 colors
           </p>
         </motion.div>
@@ -169,7 +167,7 @@ function HeroDesktop() {
               transition={{ duration: 0.5, delay: 0.45 }}
               className="mt-10"
             >
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-col items-start gap-3">
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
                   target="_blank"
@@ -181,13 +179,13 @@ function HeroDesktop() {
                 </a>
                 <Link
                   href="/products/metal-business-cards"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+                  className="group inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Order Now
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  or order now
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="mt-5 text-sm text-muted-foreground">
                 Shipping included · 11 colors · ready in 10-14 days
               </p>
             </motion.div>
