@@ -181,7 +181,7 @@ export default function GmbcHome() {
                 <span className="g-label" style={{ color: "var(--g-accent)", letterSpacing: "0.14em" }}>
                   {s.n}
                 </span>
-                <StepArt kind={s.art} className="h-24 w-24 lg:h-28 lg:w-28" style={{ color: "var(--g-accent)" }} />
+                <StepArt kind={s.art} className="h-28 w-28 lg:h-36 lg:w-36" style={{ color: "var(--g-accent)" }} />
                 <h3 className="text-[24px] font-medium leading-7 tracking-[-0.02em] lg:text-[26px]">{s.t}</h3>
               </li>
             ))}
