@@ -16,28 +16,34 @@ const BEVEL = 0.004;
 // Engraving planes sit just above the bevelled faces, otherwise the body hides them.
 const FACE = D / 2 + BEVEL + 0.002;
 
+function luminance(hex: string) {
+  const c = new THREE.Color(hex);
+  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+}
+
 /**
  * How each anodized finish behaves under light. The laser cuts through the
- * dye to a white undercoat, so engraving reads white on every finish; silver
- * has no coat and shows dark.
+ * dye to a white undercoat, so engraving reads white on dark finishes; on
+ * light dyes and on bare silver it reads dark.
  */
-function surfaceFor(id: string) {
-  if (id === "silver") return { metalness: 1, roughness: 0.46, engrave: "#262626" };
-  if (id === "gold") return { metalness: 1, roughness: 0.5, engrave: "#f4f4f4" };
-  if (id === "black") return { metalness: 0.9, roughness: 0.62, engrave: "#f4f4f4" };
-  return { metalness: 0.8, roughness: 0.56, engrave: "#f4f4f4" };
+function surfaceFor(id: string, swatch: string) {
+  const engrave = id === "silver" || luminance(swatch) > 0.5 ? "#262626" : "#f4f4f4";
+  if (id === "silver") return { metalness: 1, roughness: 0.46, engrave };
+  if (id === "gold") return { metalness: 1, roughness: 0.5, engrave };
+  if (id === "black") return { metalness: 0.9, roughness: 0.62, engrave };
+  return { metalness: 0.8, roughness: 0.56, engrave };
 }
 
 /** Fine, direction-free speckle: the sandblasted grain of a matte anodized surface. */
 function makeMatteGrainTexture() {
-  const s = 512;
+  const s = 256;
   const c = document.createElement("canvas");
   c.width = s;
   c.height = s;
   const ctx = c.getContext("2d")!;
   const img = ctx.createImageData(s, s);
   for (let i = 0; i < img.data.length; i += 4) {
-    const v = 200 + Math.floor(Math.random() * 55);
+    const v = 150 + Math.floor(Math.random() * 105);
     img.data[i] = v;
     img.data[i + 1] = v;
     img.data[i + 2] = v;
@@ -654,7 +660,7 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
       roughness: 0.56,
       roughnessMap: grain,
       bumpMap: grain,
-      bumpScale: 0.0005,
+      bumpScale: 0.0014,
     });
     // The material is created once; useFrame eases it toward each new finish.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -700,7 +706,7 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
 
   const target = useRef({ color: new THREE.Color(finish.swatch), engrave: new THREE.Color("#f4f4f4"), metalness: 0.8, roughness: 0.56 });
   useEffect(() => {
-    const s = surfaceFor(finish.id);
+    const s = surfaceFor(finish.id, finish.swatch);
     target.current.color.set(finish.swatch);
     target.current.engrave.set(s.engrave);
     target.current.metalness = s.metalness;
