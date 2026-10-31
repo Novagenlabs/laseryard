@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, OrbitControls, RoundedBox } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, MeshReflectorMaterial, OrbitControls, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 
 export type StageFinish = { id: string; label: string; swatch: string };
@@ -16,22 +16,16 @@ const BEVEL = 0.004;
 // Engraving planes sit just above the bevelled faces, otherwise the body hides them.
 const FACE = D / 2 + BEVEL + 0.002;
 
-function luminance(hex: string) {
-  const c = new THREE.Color(hex);
-  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
-}
-
 /**
- * How each anodized finish behaves under light. Silver and gold read as bare
- * metal. The laser exposes raw aluminum, which looks bright against dark dyes
- * and dull against pale ones, so the engraving tone follows the swatch.
+ * How each anodized finish behaves under light. The laser cuts through the
+ * dye to a white undercoat, so engraving reads white on every finish; silver
+ * has no coat and shows dark.
  */
-function surfaceFor(id: string, swatch: string) {
-  const engrave = luminance(swatch) > 0.3 ? "#585858" : "#e4e4e4";
-  if (id === "silver") return { metalness: 1, roughness: 0.46, engrave: "#4a4a4a" };
-  if (id === "gold") return { metalness: 1, roughness: 0.5, engrave: "#5a5247" };
-  if (id === "black") return { metalness: 0.9, roughness: 0.62, engrave };
-  return { metalness: 0.8, roughness: 0.56, engrave };
+function surfaceFor(id: string) {
+  if (id === "silver") return { metalness: 1, roughness: 0.46, engrave: "#262626" };
+  if (id === "gold") return { metalness: 1, roughness: 0.5, engrave: "#f4f4f4" };
+  if (id === "black") return { metalness: 0.9, roughness: 0.62, engrave: "#f4f4f4" };
+  return { metalness: 0.8, roughness: 0.56, engrave: "#f4f4f4" };
 }
 
 /** Fine, direction-free speckle: the sandblasted grain of a matte anodized surface. */
@@ -575,6 +569,32 @@ function makeLeatherTexture() {
 const OFFICE_PANO = "/images/gmbc/office-nyc-pano.jpg";
 const OFFICE_YAW = 1.38; // faces the desk and the Empire State Building beyond it
 
+/**
+ * The desk the box stands on, matched to the dark lacquer desk in the panorama.
+ * It mirrors the box, the card and the skyline, and its far edge lands just
+ * below the panorama desk's far edge so the two read as one surface.
+ */
+function DeskTop() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 7.5]}>
+      <planeGeometry args={[60, 25]} />
+      <MeshReflectorMaterial
+        blur={[320, 90]}
+        resolution={768}
+        mixBlur={1}
+        mixStrength={2.2}
+        roughness={0.55}
+        depthScale={1.1}
+        minDepthThreshold={0.4}
+        maxDepthThreshold={1.4}
+        color="#0a0a0b"
+        metalness={0.6}
+        mirror={0.55}
+      />
+    </mesh>
+  );
+}
+
 function MaglevBox({ float }: { float: FloatRef }) {
   const ring = useRef<THREE.MeshStandardMaterial>(null);
   const lamp = useRef<THREE.PointLight>(null);
@@ -650,9 +670,9 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
         alphaMap: tex,
         transparent: true,
         depthWrite: false,
-        color: new THREE.Color("#e6e6e6"),
-        metalness: 1,
-        roughness: 0.22,
+        color: new THREE.Color("#f4f4f4"),
+        metalness: 0.1,
+        roughness: 0.55,
       });
     return { front: mk(designTextures[0].front), back: mk(designTextures[0].back) };
   }, [designTextures]);
@@ -678,9 +698,9 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
     return g;
   }, []);
 
-  const target = useRef({ color: new THREE.Color(finish.swatch), engrave: new THREE.Color("#e6e6e6"), metalness: 0.8, roughness: 0.56 });
+  const target = useRef({ color: new THREE.Color(finish.swatch), engrave: new THREE.Color("#f4f4f4"), metalness: 0.8, roughness: 0.56 });
   useEffect(() => {
-    const s = surfaceFor(finish.id, finish.swatch);
+    const s = surfaceFor(finish.id);
     target.current.color.set(finish.swatch);
     target.current.engrave.set(s.engrave);
     target.current.metalness = s.metalness;
@@ -833,26 +853,28 @@ function Scene({ finish }: { finish: StageFinish }) {
       <Environment
         files={OFFICE_PANO}
         background="only"
-        backgroundBlurriness={0.06}
+        backgroundBlurriness={0.04}
         backgroundIntensity={0.75}
         backgroundRotation={[0, OFFICE_YAW, 0]}
       />
       <Card finish={finish} interact={interact} float={float} />
       <MaglevBox float={float} />
-      <directionalLight position={[-6, 6, 3]} intensity={0.9} color="#dfe9ff" />
-      <directionalLight position={[6, 3, -4]} intensity={0.6} color="#ffd2a0" />
+      <DeskTop />
+      <directionalLight position={[-6, 6, 3]} intensity={1.4} color="#dfe9ff" />
+      <directionalLight position={[6, 3, -4]} intensity={0.8} color="#ffd2a0" />
+      <directionalLight position={[0, 4, 10]} intensity={0.8} color="#ffffff" />
       {/* the card's shadow on the disc, and the box's shadow on the table */}
       <ContactShadows position={[0, DISC_TOP + 0.003, 0]} opacity={0.5} scale={3.6} blur={1.8} far={2.8} color="#000" />
       <ContactShadows position={[0, 0.002, 0]} opacity={0.7} scale={10} blur={2.4} far={1} color="#000" />
-      <Environment resolution={512} environmentIntensity={0.9}>
+      <Environment resolution={512} environmentIntensity={1.35}>
         {/* floor-to-ceiling glass on the left: tall, cool daylight */}
-        <Lightformer intensity={3.2} position={[-7, 3, 1]} rotation-y={Math.PI / 2} scale={[7, 9, 1]} color="#dfe9ff" />
+        <Lightformer intensity={4.5} position={[-7, 3, 1]} rotation-y={Math.PI / 2} scale={[7, 9, 1]} color="#dfe9ff" />
         {/* low sun over the city, from the right and slightly behind */}
         <Lightformer intensity={2.4} position={[6, 2.5, -3]} rotation-y={-Math.PI / 2} scale={[3, 3, 1]} color="#ffd2a0" />
         {/* a modest cool ceiling so the top edges still read */}
-        <Lightformer intensity={1.2} position={[0, 5, 0]} rotation-x={Math.PI / 2} scale={[12, 4, 1]} color="#eef2ff" />
+        <Lightformer intensity={1.8} position={[0, 5, 0]} rotation-x={Math.PI / 2} scale={[12, 4, 1]} color="#eef2ff" />
         {/* soft front fill so the face is never black */}
-        <Lightformer intensity={0.5} position={[0, 0.5, 7]} rotation-y={Math.PI} scale={[10, 5, 1]} />
+        <Lightformer intensity={1.2} position={[0, 0.5, 7]} rotation-y={Math.PI} scale={[10, 5, 1]} />
       </Environment>
       <OrbitControls
         target={[0, 2.3, 0]}
