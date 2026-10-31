@@ -27,7 +27,7 @@ export default function CustomEngravingPage() {
           ]),
         ]}
       />
-      {/* Spacer for fixed header + announcement bar */}
+      {/* Spacer for the fixed header */}
       <div className="pt-32" />
       <CustomEngravingSection />
       <CTABanner />

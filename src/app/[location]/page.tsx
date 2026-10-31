@@ -155,7 +155,7 @@ export default async function LocationPage({ params }: Props) {
                 Premium laser-engraved 0.8mm anodized aluminum business cards
                 in 11 colors, delivered to {country.name} with shipping
                 included. Heavy, cold to the touch, and impossible to throw
-                away — from $250 for 15 cards.
+                away — packs from 15 cards.
               </p>
               <p className="text-muted-foreground">
                 We serve {country.cities.join(", ")}, and everywhere in between.

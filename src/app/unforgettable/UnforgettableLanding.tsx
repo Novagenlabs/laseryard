@@ -41,7 +41,7 @@ export function UnforgettableLanding() {
                   </Link>
                 </div>
                 <p className="text-[11px] text-muted-foreground/50 mt-4 text-center lg:text-left tracking-wide">
-                  From $250 for 15 cards · Shipping included · 10-14 day production
+                  Packs from 15 cards · Shipping included · 10-14 day production
                 </p>
               </ScrollReveal>
             </div>
