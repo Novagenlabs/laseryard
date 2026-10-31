@@ -272,10 +272,10 @@ const DESIGNS: Design[] = [
       ctx.textBaseline = "alphabetic";
       ctx.font = `500 150px ${FONT}`;
       drawSpaced(ctx, "ALEX CARTER", 196, 740, 34);
-      ctx.font = `400 60px ${FONT}`;
-      drawSpaced(ctx, "FOUNDER & CEO", 200, 850, 24);
-      ctx.font = `400 54px ${FONT}`;
-      drawSpaced(ctx, "+1 212 000 0000   ·   CARTERHOLDINGS.COM", 200, 1110, 9);
+      ctx.font = `400 68px ${FONT}`;
+      drawSpaced(ctx, "FOUNDER & CEO", 200, 856, 24);
+      ctx.font = `400 62px ${FONT}`;
+      drawSpaced(ctx, "+1 212 000 0000   ·   CARTERHOLDINGS.COM", 200, 1110, 8);
       const size = 86;
       const gap = 22;
       const ox = ART_W - 200 - size * 2 - gap;
@@ -308,15 +308,15 @@ const DESIGNS: Design[] = [
   {
     name: "Lukas Brandt · München",
     front: (ctx) => {
-      ctx.font = `400 46px ${FONT}`;
-      drawSpaced(ctx, "DIPL.-ING.", 200, 470, 14);
+      ctx.font = `400 56px ${FONT}`;
+      drawSpaced(ctx, "DIPL.-ING.", 200, 466, 14);
       ctx.font = `500 130px ${FONT}`;
       drawSpaced(ctx, "LUKAS BRANDT", 196, 600, 26);
-      ctx.font = `400 54px ${FONT}`;
-      drawSpaced(ctx, "GESCHÄFTSFÜHRER", 200, 690, 22);
-      ctx.font = `400 48px ${FONT}`;
-      drawSpaced(ctx, "BRANDT MASCHINENBAU GMBH   ·   MÜNCHEN", 200, 1040, 8);
-      drawSpaced(ctx, "+49 89 1234 5678   ·   BRANDT-MB.DE", 200, 1120, 8);
+      ctx.font = `400 64px ${FONT}`;
+      drawSpaced(ctx, "GESCHÄFTSFÜHRER", 200, 696, 22);
+      ctx.font = `400 58px ${FONT}`;
+      drawSpaced(ctx, "BRANDT MASCHINENBAU GMBH   ·   MÜNCHEN", 200, 1030, 6);
+      drawSpaced(ctx, "+49 89 1234 5678   ·   BRANDT-MB.DE", 200, 1120, 6);
       ctx.lineWidth = 8;
       reticle(ctx, 1760, 400, 110);
     },
@@ -337,14 +337,14 @@ const DESIGNS: Design[] = [
     front: (ctx) => {
       ctx.font = `500 104px ${FONT}`;
       drawSpaced(ctx, "KHALID AL-MANSOURI", 196, 640, 18);
-      ctx.font = `400 54px ${FONT}`;
-      drawSpaced(ctx, "MANAGING PARTNER", 200, 730, 22);
-      ctx.font = `400 48px ${FONT}`;
-      drawSpaced(ctx, "AL MANSOURI CAPITAL   ·   DUBAI", 200, 1040, 8);
-      drawSpaced(ctx, "+971 4 000 0000   ·   ALMANSOURI.AE", 200, 1120, 8);
+      ctx.font = `400 64px ${FONT}`;
+      drawSpaced(ctx, "MANAGING PARTNER", 200, 736, 22);
+      ctx.font = `400 58px ${FONT}`;
+      drawSpaced(ctx, "AL MANSOURI CAPITAL   ·   DUBAI", 200, 1030, 6);
+      drawSpaced(ctx, "+971 4 000 0000   ·   ALMANSOURI.AE", 200, 1120, 6);
       // The Arabic name is one run so the letters join.
       ctx.save();
-      ctx.font = `500 84px ${ARABIC_FONT}`;
+      ctx.font = `500 96px ${ARABIC_FONT}`;
       ctx.direction = "rtl";
       ctx.textAlign = "right";
       ctx.fillText("خالد المنصوري", ART_W - 200, 400);
@@ -370,11 +370,11 @@ const DESIGNS: Design[] = [
     front: (ctx) => {
       ctx.font = `300 120px ${FONT}`;
       drawSpaced(ctx, "ÉLODIE MARCHAND", 196, 620, 30);
-      ctx.font = `400 54px ${FONT}`;
-      drawSpaced(ctx, "DIRECTRICE ARTISTIQUE", 200, 710, 22);
-      ctx.font = `400 48px ${FONT}`;
-      drawSpaced(ctx, "MAISON MARCHAND   ·   PARIS", 200, 1040, 8);
-      drawSpaced(ctx, "+33 1 42 00 00 00   ·   MAISONMARCHAND.FR", 200, 1120, 8);
+      ctx.font = `400 64px ${FONT}`;
+      drawSpaced(ctx, "DIRECTRICE ARTISTIQUE", 200, 716, 22);
+      ctx.font = `400 58px ${FONT}`;
+      drawSpaced(ctx, "MAISON MARCHAND   ·   PARIS", 200, 1030, 6);
+      drawSpaced(ctx, "+33 1 42 00 00 00   ·   MAISONMARCHAND.FR", 200, 1120, 6);
       ctx.lineWidth = 5;
       ring(ctx, 1760, 360, 120);
       ring(ctx, 1760, 360, 100);
@@ -406,13 +406,12 @@ const DESIGNS: Design[] = [
       ctx.restore();
       smallCaps(ctx, "The Jet", ART_W / 2, 600, 172, 130, 14);
       smallCaps(ctx, "Business", ART_W / 2, 762, 172, 130, 14);
-      ctx.font = `700 54px ${FONT}`;
-      centered(ctx, "STEVE VARSANO", 876, 12);
-      ctx.font = `400 40px ${FONT}`;
-      centered(ctx, "25 Park Lane, London W1K 1RA", 956, 4);
-      centered(ctx, "+44 (0) 845 527 5595", 1016, 4);
-      centered(ctx, "US +1 917 414 1895", 1076, 4);
-      centered(ctx, "svp@thejetbusiness.com   |   www.thejetbusiness.com", 1150, 3);
+      ctx.font = `700 66px ${FONT}`;
+      centered(ctx, "STEVE VARSANO", 880, 12);
+      ctx.font = `400 50px ${FONT}`;
+      centered(ctx, "25 Park Lane, London W1K 1RA", 960, 3);
+      centered(ctx, "+44 (0) 845 527 5595   ·   US +1 917 414 1895", 1030, 3);
+      centered(ctx, "svp@thejetbusiness.com   |   www.thejetbusiness.com", 1110, 2);
     },
     back: (ctx) => {
       ctx.save();
@@ -433,9 +432,9 @@ const DESIGNS: Design[] = [
       drawSpaced(ctx, "SKYBRIDGE", 186, 760, 4);
       ctx.font = `300 250px ${FONT}`;
       drawSpaced(ctx, "AVIATION", 190, 980, 16);
-      ctx.font = `500 42px ${FONT}`;
-      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 200, 1110, 10);
-      ctx.font = `400 38px ${FONT}`;
+      ctx.font = `500 54px ${FONT}`;
+      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 200, 1110, 8);
+      ctx.font = `400 44px ${FONT}`;
       ctx.textAlign = "left";
       const r = "JAMES WHITFIELD   ·   SENIOR BROKER   ·   +1 305 000 0000";
       drawSpaced(ctx, r, ART_W - 200 - measureSpaced(ctx, r, 6), 420, 6);
@@ -461,11 +460,12 @@ const DESIGNS: Design[] = [
       ctx.moveTo(964, 750);
       ctx.lineTo(1850, 750);
       ctx.stroke();
-      ctx.font = `500 44px ${FONT}`;
-      drawSpaced(ctx, "FINE JEWELLERS SINCE 1884", 964, 830, 10);
-      ctx.font = `400 38px ${FONT}`;
-      drawSpaced(ctx, "12 NEW BOND STREET, LONDON W1S", 964, 1020, 5);
-      drawSpaced(ctx, "+44 20 7000 0000   ·   HARTWELLANDSONS.CO.UK", 964, 1090, 5);
+      ctx.font = `500 54px ${FONT}`;
+      drawSpaced(ctx, "FINE JEWELLERS SINCE 1884", 964, 836, 8);
+      ctx.font = `400 46px ${FONT}`;
+      drawSpaced(ctx, "12 NEW BOND STREET, LONDON W1S", 964, 980, 4);
+      drawSpaced(ctx, "+44 20 7000 0000", 964, 1050, 4);
+      drawSpaced(ctx, "HARTWELLANDSONS.CO.UK", 964, 1120, 4);
     },
     back: (ctx) => {
       ctx.font = `700 460px ${SERIF}`;
@@ -480,10 +480,10 @@ const DESIGNS: Design[] = [
       ctx.font = `800 520px ${FONT}`;
       centered(ctx, "VOLT", 760, 24);
       bolt(ctx, 1740, 330, 0.75);
-      ctx.font = `500 46px ${FONT}`;
-      centered(ctx, "STUDIO FÜR DESIGN   ·   BERLIN", 880, 12);
-      ctx.font = `400 42px ${FONT}`;
-      drawSpaced(ctx, "MAXIMILIAN KRÜGER   ·   CREATIVE DIRECTOR", 200, 1120, 6);
+      ctx.font = `500 56px ${FONT}`;
+      centered(ctx, "STUDIO FÜR DESIGN   ·   BERLIN", 886, 12);
+      ctx.font = `400 50px ${FONT}`;
+      drawSpaced(ctx, "MAXIMILIAN KRÜGER   ·   CREATIVE DIRECTOR", 200, 1120, 5);
       const r = "VOLT.STUDIO";
       drawSpaced(ctx, r, ART_W - 200 - measureSpaced(ctx, r, 6), 1120, 6);
     },
@@ -572,7 +572,8 @@ function makeLeatherTexture() {
   return tex;
 }
 
-const OFFICE_PANO = "/images/gmbc/office-nyc-pano.jpg";
+const OFFICE_PANO_4K = "/images/gmbc/office-nyc-pano-4k.jpg";
+const OFFICE_PANO_2K = "/images/gmbc/office-nyc-pano-2k.jpg";
 const OFFICE_YAW = 1.38; // faces the desk and the Empire State Building beyond it
 
 /**
@@ -853,13 +854,18 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
 function Scene({ finish }: { finish: StageFinish }) {
   const interact = useRef({ active: false, resumeAt: 0 });
   const float = useRef({ lift: 0 });
+  // The camera only ever sees a 36° slice, so the panorama needs real resolution behind the card.
+  const pano = useMemo(
+    () => (typeof window !== "undefined" && window.innerWidth < 900 ? OFFICE_PANO_2K : OFFICE_PANO_4K),
+    [],
+  );
   return (
     <>
       {/* The executive office generated earlier with World Labs, blurred like a shallow depth of field. */}
       <Environment
-        files={OFFICE_PANO}
+        files={pano}
         background="only"
-        backgroundBlurriness={0.04}
+        backgroundBlurriness={0}
         backgroundIntensity={0.75}
         backgroundRotation={[0, OFFICE_YAW, 0]}
       />
@@ -923,7 +929,7 @@ export function CardStage3D({ finish, onReady }: { finish: StageFinish; onReady?
     <div ref={wrap} className="h-full w-full">
       <Canvas
         frameloop={onScreen ? "always" : "demand"}
-        camera={{ position: [0.6, 4.9, 12.2], fov: 36 }}
+        camera={{ position: [0.46, 4.28, 9.3], fov: 36 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
