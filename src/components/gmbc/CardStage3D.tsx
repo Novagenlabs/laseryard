@@ -279,7 +279,7 @@ const DESIGNS: Design[] = [
       const size = 86;
       const gap = 22;
       const ox = ART_W - 200 - size * 2 - gap;
-      const oy = 1000 - size;
+      const oy = 300;
       ctx.lineWidth = 10;
       for (let i = 0; i < 4; i++) {
         const x = ox + (i % 2) * (size + gap);
@@ -432,12 +432,10 @@ const DESIGNS: Design[] = [
       drawSpaced(ctx, "SKYBRIDGE", 186, 760, 4);
       ctx.font = `300 250px ${FONT}`;
       drawSpaced(ctx, "AVIATION", 190, 980, 16);
-      ctx.font = `500 54px ${FONT}`;
-      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 200, 1110, 8);
+      ctx.font = `500 50px ${FONT}`;
+      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 200, 1050, 8);
       ctx.font = `400 44px ${FONT}`;
-      ctx.textAlign = "left";
-      const r = "JAMES WHITFIELD   ·   SENIOR BROKER   ·   +1 305 000 0000";
-      drawSpaced(ctx, r, ART_W - 200 - measureSpaced(ctx, r, 6), 420, 6);
+      drawSpaced(ctx, "JAMES WHITFIELD   ·   SENIOR BROKER   ·   +1 305 000 0000", 200, 1130, 6);
     },
     back: (ctx) => {
       chevrons(ctx, 330, 360, 3, 160, 600, 120);

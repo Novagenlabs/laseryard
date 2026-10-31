@@ -8,8 +8,11 @@ import { Arrow, WA_FINISH_URL } from "./shared";
 // Three.js only runs in the browser; the panel stays a quiet dark surface until it is ready.
 const CardStage3D = dynamic(() => import("./CardStage3D").then((m) => m.CardStage3D), { ssr: false });
 
-const EVERY_MS = 3000;
+// Left alone, the card alternates the two hero finishes; a tap holds any finish for a while.
+const EVERY_MS = 4400;
 const HOLD_MS = 12000;
+const BLACK = CARD_COLORS.findIndex((c) => c.id === "black");
+const SILVER = CARD_COLORS.findIndex((c) => c.id === "silver");
 
 /**
  * One large card photo that glides through all eleven finishes on its own.
@@ -25,7 +28,7 @@ export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
 
   useEffect(() => {
     if (held) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % CARD_COLORS.length), EVERY_MS);
+    const id = window.setInterval(() => setIndex((i) => (i === BLACK ? SILVER : BLACK)), EVERY_MS);
     return () => window.clearInterval(id);
   }, [held]);
 
@@ -85,7 +88,7 @@ export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
             Pick a finish
           </span>
           <p className="text-[15px] leading-6" style={{ color: "var(--g-muted)" }}>
-            The card cycles through every finish on its own. Tap one to hold it.
+            The card alternates black and silver on its own. Tap any finish to hold it.
           </p>
         </div>
         <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 lg:grid-cols-4" role="group" aria-label="Finishes">
