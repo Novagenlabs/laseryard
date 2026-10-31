@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, MeshReflectorMaterial, OrbitControls, RoundedBox } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, MeshReflectorMaterial, OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
 export type StageFinish = { id: string; label: string; swatch: string };
@@ -572,9 +572,7 @@ function makeLeatherTexture() {
   return tex;
 }
 
-const OFFICE_PANO_4K = "/images/gmbc/office-nyc-pano-4k.jpg";
-const OFFICE_PANO_2K = "/images/gmbc/office-nyc-pano-2k.jpg";
-const OFFICE_YAW = 1.38; // faces the desk and the Empire State Building beyond it
+const OFFICE_VIEW = "/images/gmbc/office-nyc-view.jpg";
 
 /**
  * The desk the box stands on, matched to the dark lacquer desk in the panorama.
@@ -598,6 +596,21 @@ function DeskTop() {
         metalness={0.6}
         mirror={0.55}
       />
+    </mesh>
+  );
+}
+
+/**
+ * The office behind the card: a single sharp view of the Manhattan corner
+ * office on a far plane. The camera only orbits a few degrees, so a plane
+ * reads like the room, and the desk still mirrors it.
+ */
+function OfficeView() {
+  const map = useTexture(OFFICE_VIEW);
+  return (
+    <mesh position={[0, -3.6, -40]}>
+      <planeGeometry args={[86, 57.3]} />
+      <meshBasicMaterial map={map} toneMapped={false} color="#d8d8d8" />
     </mesh>
   );
 }
@@ -854,28 +867,16 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
 function Scene({ finish }: { finish: StageFinish }) {
   const interact = useRef({ active: false, resumeAt: 0 });
   const float = useRef({ lift: 0 });
-  // The camera only ever sees a 36° slice, so the panorama needs real resolution behind the card.
-  const pano = useMemo(
-    () => (typeof window !== "undefined" && window.innerWidth < 900 ? OFFICE_PANO_2K : OFFICE_PANO_4K),
-    [],
-  );
   return (
     <>
-      {/* The executive office generated earlier with World Labs, blurred like a shallow depth of field. */}
-      <Environment
-        files={pano}
-        background="only"
-        backgroundBlurriness={0}
-        backgroundIntensity={0.75}
-        backgroundRotation={[0, OFFICE_YAW, 0]}
-      />
+      <OfficeView />
       <Card finish={finish} interact={interact} float={float} />
       <MaglevBox float={float} />
       <DeskTop />
       <directionalLight position={[-6, 6, 3]} intensity={1.4} color="#dfe9ff" />
       <directionalLight position={[6, 3, -4]} intensity={0.8} color="#ffd2a0" />
       <directionalLight position={[0, 4, 10]} intensity={0.8} color="#ffffff" />
-      {/* the card's shadow on the disc, and the box's shadow on the table */}
+      {/* the card's shadow on the disc, and the box's shadow on the desk */}
       <ContactShadows position={[0, DISC_TOP + 0.003, 0]} opacity={0.5} scale={3.6} blur={1.8} far={2.8} color="#000" />
       <ContactShadows position={[0, 0.002, 0]} opacity={0.7} scale={10} blur={2.4} far={1} color="#000" />
       <Environment resolution={512} environmentIntensity={1.35}>
@@ -892,7 +893,7 @@ function Scene({ finish }: { finish: StageFinish }) {
         target={[0, 2.3, 0]}
         enablePan={false}
         enableZoom={false}
-        // A narrow orbit keeps the box seated on the desk in the panorama behind it.
+        // A narrow orbit keeps the box seated on the desk against the office view behind it.
         minPolarAngle={1.3}
         maxPolarAngle={1.42}
         minAzimuthAngle={-0.25}
