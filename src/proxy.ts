@@ -3,17 +3,22 @@ import { NextResponse, type NextRequest } from "next/server";
 /**
  * Host-based routing for the Get Metal Business Cards sub-brand.
  *
- * getmetalbusinesscards.laseryard.com (and later its own domain) serves the
+ * getmetalcards.laseryard.com (and later its own domain) serves the
  * pages under /gmbc without the prefix showing in the address bar. On the main
  * domain, /gmbc redirects to the sub-brand host so the page has one canonical
  * home. Static assets and API routes pass through untouched.
  */
-const GMBC_HOSTS = ["getmetalbusinesscards.laseryard.com", "getmetalbusinesscards.com", "www.getmetalbusinesscards.com"];
-const GMBC_CANONICAL = "https://getmetalbusinesscards.laseryard.com";
+const GMBC_HOSTS = [
+  "getmetalcards.laseryard.com",
+  "getmetalbusinesscards.laseryard.com",
+  "getmetalbusinesscards.com",
+  "www.getmetalbusinesscards.com",
+];
+const GMBC_CANONICAL = "https://getmetalcards.laseryard.com";
 
 function isGmbcHost(host: string) {
   const h = host.toLowerCase().split(":")[0];
-  return GMBC_HOSTS.includes(h) || h.startsWith("getmetalbusinesscards.");
+  return GMBC_HOSTS.includes(h) || h.startsWith("getmetalbusinesscards.") || h.startsWith("getmetalcards.");
 }
 
 export function proxy(request: NextRequest) {

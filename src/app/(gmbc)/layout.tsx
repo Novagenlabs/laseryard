@@ -4,7 +4,7 @@ import "../globals.css";
 import "./gmbc.css";
 
 // Root layout for the Get Metal Business Cards sub-brand. Served on
-// getmetalbusinesscards.laseryard.com via src/proxy.ts. Deliberately carries
+// getmetalcards.laseryard.com via src/proxy.ts. Deliberately carries
 // none of the parent company's chrome, analytics or copy.
 
 const outfit = Outfit({
@@ -13,7 +13,7 @@ const outfit = Outfit({
   weight: ["400", "500"],
 });
 
-const SITE = "https://getmetalbusinesscards.laseryard.com";
+const SITE = "https://getmetalcards.laseryard.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
