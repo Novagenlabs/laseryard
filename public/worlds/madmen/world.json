@@ -1,0 +1,10 @@
+{
+  "world_id": "a05f12c3-e3d5-4889-ac96-2a5c3a9fc3aa",
+  "display_name": "GMBC Executive office 1962",
+  "semantics_metadata": {
+    "metric_scale_factor": 1.2195134162902832,
+    "ground_plane_offset": 1.3917397260665894
+  },
+  "spz_keys": ["100k", "150k", "500k", "full_res"],
+  "placement": { "x": 0.35, "y": -0.02, "z": 1.2, "yaw": 0 }
+}

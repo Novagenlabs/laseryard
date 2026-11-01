@@ -1,0 +1,73 @@
+/* Get Metal Business Cards — dark anodized theme (from the Paper design tokens). */
+.gmbc {
+  --g-bg: #0a0a0a;
+  --g-surface: #141414;
+  --g-raised: #1c1c1c;
+  --g-line: #32342e;
+  --g-text: #eeede7;
+  --g-muted: #a3a49b;
+  --g-accent: #d1c8af;
+
+  background: var(--g-bg);
+  color: var(--g-text);
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+.gmbc ::selection {
+  background: var(--g-accent);
+  color: var(--g-bg);
+}
+
+/* Small uppercase tracked label, used for eyebrows, buttons and nav. */
+.g-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.g-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  transition: opacity 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+.g-btn-primary {
+  background: var(--g-text);
+  color: var(--g-bg);
+}
+.g-btn-primary:hover {
+  opacity: 0.9;
+}
+.g-btn-outline {
+  border: 1px solid var(--g-line);
+  color: var(--g-text);
+}
+.g-btn-outline:hover {
+  border-color: var(--g-muted);
+}
+
+/* Native FAQ disclosure. */
+.g-faq summary {
+  list-style: none;
+  cursor: pointer;
+}
+.g-faq summary::-webkit-details-marker {
+  display: none;
+}
+.g-faq details[open] .g-plus {
+  transform: rotate(45deg);
+}
+.g-plus {
+  transition: transform 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gmbc * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

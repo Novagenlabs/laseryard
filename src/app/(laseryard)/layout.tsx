@@ -12,7 +12,7 @@ import {
   websiteSchema,
 } from "@/lib/schema";
 import { Agentation } from "agentation";
-import "./globals.css";
+import "../globals.css";
 
 const poppins = Poppins({
   variable: "--font-poppins",
