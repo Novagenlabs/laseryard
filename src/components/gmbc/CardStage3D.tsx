@@ -165,12 +165,6 @@ function reticle(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numbe
   ctx.fill();
 }
 
-function ring(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.stroke();
-}
-
 const SERIF = "Georgia, 'Times New Roman', serif";
 
 /** Serif small caps: the first letter of each word tall, the rest smaller, all uppercase. */
@@ -258,237 +252,154 @@ function bolt(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) 
 }
 
 /** Sample cards for the markets we sell into, from quiet to bold. */
+/**
+ * Sample cards, set the way the best minimalist typographic cards are: one
+ * element carries each face, one or two lines of small tracked capitals say
+ * the rest, and the metal does the talking. Coordinates are 2048 × 1325.
+ */
 const DESIGNS: Design[] = [
   {
     name: "Alex Carter · New York",
     front: (ctx) => {
-      ctx.lineWidth = 9;
-      ring(ctx, 312, 392, 112);
-      ctx.font = `500 96px ${FONT}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("AC", 312, 398);
-      ctx.textAlign = "left";
-      ctx.textBaseline = "alphabetic";
-      ctx.font = `500 150px ${FONT}`;
-      drawSpaced(ctx, "ALEX CARTER", 196, 740, 34);
-      ctx.font = `400 68px ${FONT}`;
-      drawSpaced(ctx, "FOUNDER & CEO", 200, 856, 24);
-      ctx.font = `400 62px ${FONT}`;
-      drawSpaced(ctx, "+1 212 000 0000   ·   CARTERHOLDINGS.COM", 200, 1110, 8);
-      const size = 86;
-      const gap = 22;
-      const ox = ART_W - 200 - size * 2 - gap;
-      const oy = 300;
-      ctx.lineWidth = 10;
-      for (let i = 0; i < 4; i++) {
-        const x = ox + (i % 2) * (size + gap);
-        const y = oy + Math.floor(i / 2) * (size + gap);
-        ctx.beginPath();
-        ctx.roundRect(x, y, size, size, 16);
-        ctx.stroke();
-        if (i !== 3) {
-          ctx.beginPath();
-          ctx.roundRect(x + 26, y + 26, size - 52, size - 52, 6);
-          ctx.fill();
-        }
-      }
+      ctx.font = `500 76px ${FONT}`;
+      centered(ctx, "ALEX CARTER", 640, 34);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(ART_W / 2 - 70, 712);
+      ctx.lineTo(ART_W / 2 + 70, 712);
+      ctx.stroke();
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "FOUNDER & CEO   ·   CARTER HOLDINGS", 800, 12);
     },
     back: (ctx) => {
-      ctx.lineWidth = 9;
-      ring(ctx, ART_W / 2, ART_H / 2 - 40, 230);
-      ctx.font = `500 200px ${FONT}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("AC", ART_W / 2, ART_H / 2 - 30);
-      ctx.font = `400 50px ${FONT}`;
-      centered(ctx, "CARTER HOLDINGS   ·   NEW YORK", ART_H / 2 + 330, 22);
+      ctx.font = `300 380px ${FONT}`;
+      centered(ctx, "AC", ART_H / 2 + 120, 10);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "carterholdings.com", 1120, 6);
     },
   },
   {
     name: "Lukas Brandt · München",
     front: (ctx) => {
+      ctx.lineWidth = 6;
+      reticle(ctx, 1790, 320, 54);
+      ctx.font = `500 124px ${FONT}`;
+      drawSpaced(ctx, "Lukas Brandt", 236, 900, 6);
       ctx.font = `400 56px ${FONT}`;
-      drawSpaced(ctx, "DIPL.-ING.", 200, 466, 14);
-      ctx.font = `500 130px ${FONT}`;
-      drawSpaced(ctx, "LUKAS BRANDT", 196, 600, 26);
-      ctx.font = `400 64px ${FONT}`;
-      drawSpaced(ctx, "GESCHÄFTSFÜHRER", 200, 696, 22);
-      ctx.font = `400 58px ${FONT}`;
-      drawSpaced(ctx, "BRANDT MASCHINENBAU GMBH   ·   MÜNCHEN", 200, 1030, 6);
-      drawSpaced(ctx, "+49 89 1234 5678   ·   BRANDT-MB.DE", 200, 1120, 6);
-      ctx.lineWidth = 8;
-      reticle(ctx, 1760, 400, 110);
+      drawSpaced(ctx, "DIPL.-ING.   ·   GESCHÄFTSFÜHRER", 244, 990, 10);
     },
     back: (ctx) => {
-      ctx.font = `700 230px ${FONT}`;
-      centered(ctx, "BRANDT", ART_H / 2 + 60, 40);
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(ART_W / 2 - 420, ART_H / 2 + 150);
-      ctx.lineTo(ART_W / 2 + 420, ART_H / 2 + 150);
-      ctx.stroke();
-      ctx.font = `400 50px ${FONT}`;
-      centered(ctx, "MASCHINENBAU   ·   SEIT 1962", ART_H / 2 + 240, 20);
+      ctx.font = `500 88px ${FONT}`;
+      centered(ctx, "BRANDT", ART_H / 2 + 20, 40);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "MASCHINENBAU GMBH   ·   MÜNCHEN", ART_H / 2 + 120, 10);
     },
   },
   {
     name: "Khalid Al-Mansouri · Dubai",
     front: (ctx) => {
-      ctx.font = `500 104px ${FONT}`;
-      drawSpaced(ctx, "KHALID AL-MANSOURI", 196, 640, 18);
-      ctx.font = `400 64px ${FONT}`;
-      drawSpaced(ctx, "MANAGING PARTNER", 200, 736, 22);
-      ctx.font = `400 58px ${FONT}`;
-      drawSpaced(ctx, "AL MANSOURI CAPITAL   ·   DUBAI", 200, 1030, 6);
-      drawSpaced(ctx, "+971 4 000 0000   ·   ALMANSOURI.AE", 200, 1120, 6);
-      // The Arabic name is one run so the letters join.
       ctx.save();
-      ctx.font = `500 96px ${ARABIC_FONT}`;
-      ctx.direction = "rtl";
-      ctx.textAlign = "right";
-      ctx.fillText("خالد المنصوري", ART_W - 200, 400);
-      ctx.restore();
-      ctx.lineWidth = 7;
-      eightPointStar(ctx, 1760, 980, 70);
-    },
-    back: (ctx) => {
-      ctx.lineWidth = 8;
-      eightPointStar(ctx, ART_W / 2, ART_H / 2 - 40, 210);
-      ctx.lineWidth = 4;
-      eightPointStar(ctx, ART_W / 2, ART_H / 2 - 40, 130);
-      ctx.save();
-      ctx.font = `500 74px ${ARABIC_FONT}`;
+      ctx.font = `500 110px ${ARABIC_FONT}`;
       ctx.direction = "rtl";
       ctx.textAlign = "center";
-      ctx.fillText("المنصوري كابيتال", ART_W / 2, ART_H / 2 + 340);
+      ctx.fillText("خالد المنصوري", ART_W / 2, 560);
       ctx.restore();
+      ctx.font = `500 66px ${FONT}`;
+      centered(ctx, "KHALID AL-MANSOURI", 690, 22);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "MANAGING PARTNER   ·   AL MANSOURI CAPITAL", 790, 10);
+    },
+    back: (ctx) => {
+      ctx.lineWidth = 6;
+      eightPointStar(ctx, ART_W / 2, ART_H / 2 - 60, 130);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "almansouri.ae", 1120, 6);
     },
   },
   {
     name: "Élodie Marchand · Paris",
     front: (ctx) => {
-      ctx.font = `300 120px ${FONT}`;
-      drawSpaced(ctx, "ÉLODIE MARCHAND", 196, 620, 30);
-      ctx.font = `400 64px ${FONT}`;
-      drawSpaced(ctx, "DIRECTRICE ARTISTIQUE", 200, 716, 22);
-      ctx.font = `400 58px ${FONT}`;
-      drawSpaced(ctx, "MAISON MARCHAND   ·   PARIS", 200, 1030, 6);
-      drawSpaced(ctx, "+33 1 42 00 00 00   ·   MAISONMARCHAND.FR", 200, 1120, 6);
-      ctx.lineWidth = 5;
-      ring(ctx, 1760, 360, 120);
-      ring(ctx, 1760, 360, 100);
-      ctx.font = `300 96px ${FONT}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("MM", 1760, 366);
+      ctx.font = `300 150px ${FONT}`;
+      centered(ctx, "Élodie Marchand", 680, 4);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "MAISON MARCHAND   —   PARIS", 790, 20);
     },
     back: (ctx) => {
-      ctx.lineWidth = 5;
-      ring(ctx, ART_W / 2, ART_H / 2 - 30, 300);
-      ring(ctx, ART_W / 2, ART_H / 2 - 30, 276);
-      ctx.font = `300 230px ${FONT}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("MM", ART_W / 2, ART_H / 2 - 20);
-      ctx.font = `400 46px ${FONT}`;
-      centered(ctx, "PARIS   ·   DEPUIS 1998", ART_H / 2 + 400, 20);
+      ctx.font = `300 340px ${FONT}`;
+      centered(ctx, "MM", ART_H / 2 + 110, 6);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "maisonmarchand.fr", 1120, 6);
     },
   },
   {
     name: "The Jet Business · London",
     front: (ctx) => {
       ctx.save();
-      ctx.translate(1250, 300);
+      ctx.translate(ART_W / 2, 400);
       ctx.rotate(0.5);
-      ctx.scale(1.25, 1.25);
+      ctx.scale(0.7, 0.7);
       jet(ctx);
       ctx.restore();
-      smallCaps(ctx, "The Jet", ART_W / 2, 600, 172, 130, 14);
-      smallCaps(ctx, "Business", ART_W / 2, 762, 172, 130, 14);
-      ctx.font = `700 66px ${FONT}`;
-      centered(ctx, "STEVE VARSANO", 880, 12);
-      ctx.font = `400 50px ${FONT}`;
-      centered(ctx, "25 Park Lane, London W1K 1RA", 960, 3);
-      centered(ctx, "+44 (0) 845 527 5595   ·   US +1 917 414 1895", 1030, 3);
-      centered(ctx, "svp@thejetbusiness.com   |   www.thejetbusiness.com", 1110, 2);
+      smallCaps(ctx, "The Jet Business", ART_W / 2, 700, 112, 86, 10);
+      ctx.font = `700 54px ${FONT}`;
+      centered(ctx, "STEVE VARSANO", 800, 10);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "+44 (0) 845 527 5595   ·   thejetbusiness.com", 890, 3);
     },
     back: (ctx) => {
       ctx.save();
-      ctx.translate(ART_W / 2, ART_H / 2 - 60);
+      ctx.translate(ART_W / 2, ART_H / 2 - 40);
       ctx.rotate(0.5);
-      ctx.scale(2.6, 2.6);
+      ctx.scale(1.6, 1.6);
       jet(ctx);
       ctx.restore();
-      ctx.font = `400 46px ${FONT}`;
-      centered(ctx, "THEJETBUSINESS.COM", ART_H / 2 + 420, 18);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "thejetbusiness.com", 1120, 6);
     },
   },
   {
     name: "Skybridge Aviation · Miami",
     front: (ctx) => {
-      chevrons(ctx, 196, 300, 3, 60, 200, 40);
-      ctx.font = `800 250px ${FONT}`;
-      drawSpaced(ctx, "SKYBRIDGE", 186, 760, 4);
-      ctx.font = `300 250px ${FONT}`;
-      drawSpaced(ctx, "AVIATION", 190, 980, 16);
-      ctx.font = `500 50px ${FONT}`;
-      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 200, 1050, 8);
-      ctx.font = `400 44px ${FONT}`;
-      drawSpaced(ctx, "JAMES WHITFIELD   ·   SENIOR BROKER   ·   +1 305 000 0000", 200, 1130, 6);
+      chevrons(ctx, 240, 290, 1, 38, 110, 0);
+      ctx.font = `500 120px ${FONT}`;
+      drawSpaced(ctx, "Skybridge Aviation", 232, 900, 4);
+      ctx.font = `400 56px ${FONT}`;
+      drawSpaced(ctx, "AIRCRAFT SALES & ACQUISITIONS   ·   MIAMI", 244, 990, 10);
     },
     back: (ctx) => {
-      chevrons(ctx, 330, 360, 3, 160, 600, 120);
-      ctx.font = `500 44px ${FONT}`;
-      centered(ctx, "SKYBRIDGEAVIATION.COM", ART_H / 2 + 480, 16);
+      chevrons(ctx, ART_W / 2 - 160, ART_H / 2 - 160, 3, 50, 220, 60);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "skybridgeaviation.com", 1120, 6);
     },
   },
   {
     name: "Hartwell & Sons · London",
     front: (ctx) => {
-      ctx.font = `700 980px ${SERIF}`;
-      ctx.textAlign = "left";
-      ctx.fillText("H", 150, 1010);
-      ctx.font = `600 150px ${SERIF}`;
-      drawSpaced(ctx, "HARTWELL", 960, 560, 12);
-      ctx.font = `400 110px ${SERIF}`;
-      drawSpaced(ctx, "& SONS", 964, 690, 14);
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(964, 750);
-      ctx.lineTo(1850, 750);
-      ctx.stroke();
-      ctx.font = `500 54px ${FONT}`;
-      drawSpaced(ctx, "FINE JEWELLERS SINCE 1884", 964, 836, 8);
-      ctx.font = `400 46px ${FONT}`;
-      drawSpaced(ctx, "12 NEW BOND STREET, LONDON W1S", 964, 980, 4);
-      drawSpaced(ctx, "+44 20 7000 0000", 964, 1050, 4);
-      drawSpaced(ctx, "HARTWELLANDSONS.CO.UK", 964, 1120, 4);
+      ctx.font = `600 140px ${SERIF}`;
+      centered(ctx, "Hartwell & Sons", 660, 4);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "FINE JEWELLERS   ·   BOND STREET   ·   SINCE 1884", 770, 12);
     },
     back: (ctx) => {
-      ctx.font = `700 460px ${SERIF}`;
-      centered(ctx, "H&S", ART_H / 2 + 150, 10);
-      ctx.font = `400 44px ${FONT}`;
-      centered(ctx, "LONDON   ·   EST. 1884", ART_H / 2 + 430, 18);
+      ctx.font = `600 420px ${SERIF}`;
+      centered(ctx, "H", ART_H / 2 + 140, 0);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "hartwellandsons.co.uk", 1120, 6);
     },
   },
   {
     name: "Volt Studio · Berlin",
     front: (ctx) => {
-      ctx.font = `800 520px ${FONT}`;
-      centered(ctx, "VOLT", 760, 24);
-      bolt(ctx, 1740, 330, 0.75);
-      ctx.font = `500 56px ${FONT}`;
-      centered(ctx, "STUDIO FÜR DESIGN   ·   BERLIN", 886, 12);
-      ctx.font = `400 50px ${FONT}`;
-      drawSpaced(ctx, "MAXIMILIAN KRÜGER   ·   CREATIVE DIRECTOR", 200, 1120, 5);
-      const r = "VOLT.STUDIO";
-      drawSpaced(ctx, r, ART_W - 200 - measureSpaced(ctx, r, 6), 1120, 6);
+      bolt(ctx, 268, 330, 0.36);
+      ctx.font = `800 220px ${FONT}`;
+      drawSpaced(ctx, "volt", 224, 900, 2);
+      ctx.font = `400 56px ${FONT}`;
+      drawSpaced(ctx, "STUDIO FÜR DESIGN   ·   BERLIN", 244, 990, 10);
     },
     back: (ctx) => {
-      bolt(ctx, ART_W / 2, ART_H / 2 - 40, 2.6);
-      ctx.font = `500 44px ${FONT}`;
-      centered(ctx, "VOLT.STUDIO   ·   BERLIN", ART_H / 2 + 480, 16);
+      bolt(ctx, ART_W / 2, ART_H / 2 - 50, 1.3);
+      ctx.font = `400 56px ${FONT}`;
+      centered(ctx, "volt.studio", 1120, 6);
     },
   },
 ];
