@@ -46,7 +46,7 @@ export function FinishCycler({ stats = [] }: { stats?: Stat[] }) {
       {/* The card */}
       <div className="flex min-w-0 flex-1 flex-col" style={{ background: "var(--g-surface)" }}>
         <div
-          className="relative aspect-[820/470] w-full overflow-hidden"
+          className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[820/470]"
           style={{ background: "radial-gradient(70% 90% at 50% 42%, #2a2a2a 0%, var(--g-surface) 72%)" }}
           role="img"
           aria-label={`${current.label} metal business card`}

@@ -76,10 +76,10 @@ export default function GmbcHome() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <a href={WA_QUOTE_URL} target="_blank" rel="noopener noreferrer" className="g-btn g-btn-outline g-label hidden !px-[18px] !py-[13px] sm:inline-flex">
+          <a href={WA_QUOTE_URL} target="_blank" rel="noopener noreferrer" className="g-btn g-btn-outline g-label max-md:!hidden !px-[18px] !py-[13px]">
             WhatsApp
           </a>
-          <a href={WA_QUOTE_URL} target="_blank" rel="noopener noreferrer" className="g-btn g-btn-primary g-label !px-[18px] !py-[13px]">
+          <a href={WA_QUOTE_URL} target="_blank" rel="noopener noreferrer" className="g-btn g-btn-primary g-label whitespace-nowrap !px-4 !py-3 sm:!px-[18px] sm:!py-[13px]">
             Get a quote <Arrow />
           </a>
         </div>
@@ -94,12 +94,21 @@ export default function GmbcHome() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[70%_center]"
+            className="object-cover object-[62%_center] sm:object-[70%_center]"
           />
-          {/* Left-to-right wash for the copy, bottom wash so the strip below lands on black */}
+          {/* Phones: top-to-bottom wash with the photo showing above the copy */}
           <div
             aria-hidden
-            className="absolute inset-0"
+            className="absolute inset-0 sm:hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.35) 30%, rgba(10,10,10,0.9) 62%, rgba(10,10,10,0.98) 100%)",
+            }}
+          />
+          {/* Wider screens: left-to-right wash for the copy, bottom wash so the strip below lands on black */}
+          <div
+            aria-hidden
+            className="absolute inset-0 hidden sm:block"
             style={{
               background:
                 "linear-gradient(90deg, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.88) 32%, rgba(10,10,10,0.45) 58%, rgba(10,10,10,0.08) 100%)",
@@ -110,9 +119,9 @@ export default function GmbcHome() {
             className="absolute inset-x-0 bottom-0 h-40"
             style={{ background: "linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.9) 100%)" }}
           />
-          <div className="relative flex max-w-[760px] flex-col items-start gap-6 px-5 pb-16 pt-14 sm:px-8 lg:gap-7 lg:px-20 lg:py-[104px]">
+          <div className="relative flex max-w-[760px] flex-col items-start gap-5 px-5 pb-12 pt-[300px] sm:gap-6 sm:px-8 sm:pb-16 sm:pt-14 lg:gap-7 lg:px-20 lg:py-[104px]">
             <Eyebrow>Laser-engraved, solid aluminum</Eyebrow>
-            <h1 className="text-[44px] font-medium leading-[1.02] tracking-[-0.045em] sm:text-[60px] lg:text-[76px]">
+            <h1 className="text-[40px] font-medium leading-[1.02] tracking-[-0.045em] sm:text-[60px] lg:text-[76px]">
               Metal business cards for people who matter.
             </h1>
             <p className="max-w-[520px] text-[17px] leading-[1.6] sm:text-[19px]" style={{ color: "var(--g-muted)" }}>
@@ -172,14 +181,14 @@ export default function GmbcHome() {
             {STEPS.map((s) => (
               <li
                 key={s.n}
-                className="flex flex-col gap-12 p-7 lg:gap-16 lg:p-8"
+                className="grid grid-cols-[auto_1fr] items-center gap-x-5 gap-y-1 p-5 md:flex md:flex-col md:items-start md:gap-12 md:p-7 lg:gap-16 lg:p-8"
                 style={{ background: "var(--g-surface)" }}
               >
-                <span className="g-label" style={{ color: "var(--g-accent)", letterSpacing: "0.14em" }}>
+                <StepArt kind={s.art} className="row-span-2 h-20 w-20 md:order-2 md:h-28 md:w-28 lg:h-36 lg:w-36" style={{ color: "var(--g-accent)" }} />
+                <span className="g-label md:order-1" style={{ color: "var(--g-accent)", letterSpacing: "0.14em" }}>
                   {s.n}
                 </span>
-                <StepArt kind={s.art} className="h-28 w-28 lg:h-36 lg:w-36" style={{ color: "var(--g-accent)" }} />
-                <h3 className="text-[24px] font-medium leading-7 tracking-[-0.02em] lg:text-[26px]">{s.t}</h3>
+                <h3 className="text-[22px] font-medium leading-7 tracking-[-0.02em] md:order-3 md:text-[24px] lg:text-[26px]">{s.t}</h3>
               </li>
             ))}
           </ol>
@@ -213,7 +222,7 @@ export default function GmbcHome() {
           className="flex flex-col gap-10 px-5 py-20 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-20 lg:py-[120px]"
           style={{ borderTop: "1px solid var(--g-line)" }}
         >
-          <h2 className="text-[56px] font-medium leading-[0.95] tracking-[-0.05em] sm:text-[80px] lg:text-[112px]">
+          <h2 className="text-[48px] font-medium leading-[0.95] tracking-[-0.05em] sm:text-[80px] lg:text-[112px]">
             You matter, get Metal
           </h2>
           <div className="flex flex-col items-start gap-4 lg:items-end">
@@ -236,7 +245,7 @@ export default function GmbcHome() {
               You matter, get Metal
             </p>
           </div>
-          <div className="flex gap-16 lg:gap-24">
+          <div className="flex gap-10 sm:gap-16 lg:gap-24">
             <div className="flex flex-col gap-4">
               <span className="g-label text-[11px]" style={{ color: "var(--g-muted)", letterSpacing: "0.14em" }}>
                 Explore

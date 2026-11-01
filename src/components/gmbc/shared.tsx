@@ -20,7 +20,7 @@ export function Wordmark({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-3 ${className}`}>
       <span className="block h-[14px] w-[22px] shrink-0" style={{ background: "var(--g-accent)" }} aria-hidden />
-      <span className="text-[13px] font-medium uppercase tracking-[0.14em]" style={{ color: "var(--g-text)" }}>
+      <span className="whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.14em] sm:text-[13px]" style={{ color: "var(--g-text)" }}>
         Get Metal Business Cards
       </span>
     </span>

@@ -1,8 +1,17 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, MeshReflectorMaterial, OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  ContactShadows,
+  Environment,
+  Lightformer,
+  MeshReflectorMaterial,
+  OrbitControls,
+  PerspectiveCamera,
+  RoundedBox,
+  useTexture,
+} from "@react-three/drei";
 import * as THREE from "three";
 
 export type StageFinish = { id: string; label: string; swatch: string };
@@ -489,12 +498,13 @@ const OFFICE_VIEW = "/images/gmbc/office-nyc-view.jpg";
  * below the panorama desk's far edge so the two read as one surface.
  */
 function DeskTop() {
+  const width = useThree((s) => s.size.width);
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 7.5]}>
       <planeGeometry args={[60, 25]} />
       <MeshReflectorMaterial
         blur={[320, 90]}
-        resolution={768}
+        resolution={width < 640 ? 512 : 768}
         mixBlur={1}
         mixStrength={2.2}
         roughness={0.55}
@@ -776,8 +786,10 @@ function Card({ finish, interact, float }: { finish: StageFinish; interact: Inte
 function Scene({ finish }: { finish: StageFinish }) {
   const interact = useRef({ active: false, resumeAt: 0 });
   const float = useRef({ lift: 0 });
+  const aspect = useThree((s) => s.viewport.aspect);
   return (
     <>
+      <PerspectiveCamera makeDefault position={[0.46, 4.28, 9.3]} fov={aspect < 1 ? 46 : 36} />
       <OfficeView />
       <Card finish={finish} interact={interact} float={float} />
       <MaglevBox float={float} />
@@ -839,8 +851,7 @@ export function CardStage3D({ finish, onReady }: { finish: StageFinish; onReady?
     <div ref={wrap} className="h-full w-full">
       <Canvas
         frameloop={onScreen ? "always" : "demand"}
-        camera={{ position: [0.46, 4.28, 9.3], fov: 36 }}
-        dpr={[1, 1.75]}
+        dpr={[1, 1.6]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
         onCreated={() => onReady?.()}
