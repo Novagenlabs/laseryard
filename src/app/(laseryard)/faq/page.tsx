@@ -124,7 +124,7 @@ const faqCategories = [
       },
       {
         q: "Do you offer volume discounts?",
-        a: "Yes — the per-card price drops as the pack grows, across 15, 30, 50, 100 and 200 cards, all with worldwide shipping included. Message us on WhatsApp for a quote, or pick a pack on the product page. Need more than 200? Contact us for a custom quote.",
+        a: "Yes — the per-card price drops as the pack grows across 15, 30 and 50 cards, all with worldwide shipping included. Orders of 100 or 200 cards, and anything larger, are priced by custom quote. Message us on WhatsApp for a quote.",
       },
     ],
   },

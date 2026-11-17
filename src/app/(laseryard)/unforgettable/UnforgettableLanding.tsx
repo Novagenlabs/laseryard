@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { Star, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { TESTIMONIALS } from "@/lib/constants";
+import { TESTIMONIALS, WHATSAPP_NUMBER } from "@/lib/constants";
+
+const QUOTE_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Hi! I'd like a custom quote for metal business cards."
+)}`;
 
 export function UnforgettableLanding() {
   return (
@@ -32,13 +35,15 @@ export function UnforgettableLanding() {
 
               <ScrollReveal delay={0.15}>
                 <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                  <Link
-                    href="/products/metal-business-cards"
+                  <a
+                    href={QUOTE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
                   >
-                    Order Your Cards
+                    Get Custom Quote
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  </a>
                 </div>
                 <p className="text-[11px] text-muted-foreground/50 mt-4 text-center lg:text-left tracking-wide">
                   Packs from 15 cards · Shipping included · 10-14 day production
@@ -242,16 +247,18 @@ export function UnforgettableLanding() {
               Your next meeting starts differently
             </h2>
             <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-              Order online in minutes, or get in touch and we&apos;ll answer
-              any question within the hour.
+              Message us on WhatsApp for your quote. We&apos;ll answer any
+              question within the hour.
             </p>
-            <Link
-              href="/products/metal-business-cards"
+            <a
+              href={QUOTE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-medium text-base hover:opacity-90 transition-opacity"
             >
-              Start Your Order
+              Get Custom Quote
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
           </ScrollReveal>
         </div>
       </section>

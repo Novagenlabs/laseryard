@@ -6,7 +6,7 @@ import { productSchema, breadcrumbSchema } from "@/lib/schema";
 export const metadata: Metadata = {
   title: "BE UNFORGETTABLE | Metal Business Cards",
   description:
-    "Premium matte-black metal business cards with laser-cut engraving. Credit-card sized. Impossible to throw away. Order yours today.",
+    "Premium matte-black metal business cards with laser-cut engraving. Credit-card sized. Impossible to throw away. Get a custom quote today.",
   alternates: { canonical: "/unforgettable" },
   openGraph: {
     title: "BE UNFORGETTABLE | Laser Yard Metal Business Cards",
