@@ -3,7 +3,6 @@ import {
   TESTIMONIAL_STATS,
   COUNTRIES,
   WHATSAPP_NUMBER,
-  CARD_PRICING,
 } from "@/lib/constants";
 
 const BASE_URL = SITE_CONFIG.url;
@@ -131,18 +130,15 @@ export function productSchema(opts: {
   image: string;
   material?: string;
   url: string;
-  // Metal card pages carry the pack price range + included shipping so the
-  // product is eligible for price rich results.
+  // Metal card pages advertise included worldwide shipping. Prices are
+  // deliberately NOT published in structured data: pricing is quoted by the
+  // team on WhatsApp (the product page's checkout is the only place they show).
   metalCards?: boolean;
 }) {
-  const cardPrices = Object.values(CARD_PRICING["0.8mm"].prices);
   const offers = opts.metalCards
     ? {
-        "@type": "AggregateOffer",
-        lowPrice: Math.min(...cardPrices),
-        highPrice: Math.max(...cardPrices),
+        "@type": "Offer",
         priceCurrency: "USD",
-        offerCount: cardPrices.length,
         availability: "https://schema.org/InStock",
         url: `${BASE_URL}${opts.url}`,
         shippingDetails: {

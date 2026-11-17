@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Star } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import Link from "next/link";
 import Avatar from "boring-avatars";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
@@ -60,27 +59,18 @@ function HeroMobile() {
         </motion.p>
 
         {/* CTA */}
-        <motion.div {...fadeSlide(0.2)} className="mt-6 max-w-sm mx-auto">
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/products/metal-business-cards"
-              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
-            >
-              Order Now
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
-            >
-              Get Custom Quote
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
+        <motion.div {...fadeSlide(0.2)} className="mt-5 max-w-sm mx-auto">
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 px-6 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
+          >
+            Get Custom Quote
+            <ArrowRight className="w-4 h-4" />
+          </a>
           <p className="mt-3 text-xs text-muted-foreground text-center">
-            From $250 · Shipping included · 11 colors
+            Shipping included · 11 colors
           </p>
         </motion.div>
 
@@ -113,15 +103,15 @@ function HeroDesktop() {
 
   return (
     <section className="relative bg-background overflow-hidden">
-      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-36 pb-16 lg:pt-40 lg:pb-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      <div className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-28 pb-16 lg:pt-28 lg:pb-20">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-start">
           {/* Left - Text Content */}
           <div className="max-w-xl">
             {/* Social Proof */}
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-3 mb-8"
+              className="flex items-center gap-3 mb-5"
             >
               <div className="flex -space-x-2">
                 {AVATAR_NAMES.map((name) => (
@@ -155,9 +145,9 @@ function HeroDesktop() {
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-8"
+              className="mt-5"
             >
-              <div className="w-20 h-px bg-border mb-6" />
+              <div className="w-20 h-px bg-border mb-4" />
               <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed">
                 Order in minutes. Laser-engraved with precision. Shipped worldwide.
               </p>
@@ -167,28 +157,21 @@ function HeroDesktop() {
             <motion.div
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="mt-10"
+              className="mt-6"
             >
-              <div className="flex flex-wrap items-center gap-4">
-                <Link
-                  href="/products/metal-business-cards"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
-                >
-                  Order Now
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+              <div className="flex flex-col items-start gap-2">
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'm interested in ordering metal business cards. Can you help me with pricing?")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-foreground text-foreground font-semibold text-base hover:bg-foreground/5 transition-colors"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
                 >
                   Get Custom Quote
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">
-                From $250 · Shipping included · 11 colors · ready in 10-14 days
+              <p className="mt-3 text-sm text-muted-foreground">
+                Shipping included · 11 colors · ready in 10-14 days
               </p>
             </motion.div>
           </div>

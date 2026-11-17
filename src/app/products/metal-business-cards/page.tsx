@@ -28,7 +28,7 @@ function findColorPhotos(): ColorPhotos {
 export const metadata: Metadata = {
   title: "Premium Metal Business Cards",
   description:
-    "Premium laser-engraved metal business cards in 0.8mm anodized aluminum. 11 colors including matte black, silver, and gold. From $250 for 15 cards, worldwide shipping included.",
+    "Premium laser-engraved metal business cards in 0.8mm anodized aluminum. 11 colors including matte black, silver, and gold. Packs from 15 cards, worldwide shipping included.",
   alternates: { canonical: "/products/metal-business-cards" },
 };
 

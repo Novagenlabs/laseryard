@@ -29,7 +29,7 @@ const steps = [
     icon: Upload,
     title: "Order & Send Your Design",
     description:
-      "Pick your color and quantity on the product page and check out — shipping is included in every price. Then send your design (AI, EPS, PDF vector, or high-resolution PNG) to sales@laseryard.com. Don't have one? Our team can create it — free with orders of 30+ cards, or a flat $50 on the 15-card pack.",
+      "Pick your color and quantity on the product page and check out — shipping is included in every price. Then send your design (AI, EPS, PDF vector, or high-resolution PNG) to sales@laseryard.com. Don't have one? Our team can create it — free with orders of 30+ cards, or a small flat fee on the 15-card pack.",
     details: [
       "Vector files preferred (AI, EPS, PDF)",
       "PNG at minimum 300 DPI",
@@ -102,7 +102,7 @@ export default function ProcessPage() {
             steps: [
               {
                 name: "Submit Your Design",
-                text: "Send your design via WhatsApp or email. We accept AI, EPS, PDF (vector), SVG, and high-resolution PNG files. Our team can also create the design — free with orders of 30+ cards, or a flat $50 on the 15-card pack.",
+                text: "Send your design via WhatsApp or email. We accept AI, EPS, PDF (vector), SVG, and high-resolution PNG files. Our team can also create the design — free with orders of 30+ cards, or a small flat fee on the 15-card pack.",
               },
               {
                 name: "Review & Approve",

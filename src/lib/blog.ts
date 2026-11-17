@@ -176,7 +176,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         heading: "The math",
-        body: "Say a metal card order of 30 cards costs $450, shipping included. If even one of those cards leads to a single new client, the card paid for itself many times over. Compare that to $30 for 500 paper cards where maybe 5% get kept. The effective reach is similar, but the impression quality is on a completely different level.",
+        body: "Say you order a pack of 30 metal cards, shipping included. If even one of those cards leads to a single new client, the whole order paid for itself many times over. Compare that to $30 for 500 paper cards where maybe 5% get kept. The effective reach is similar, but the impression quality is on a completely different level.",
       },
       {
         heading: "The honest answer",

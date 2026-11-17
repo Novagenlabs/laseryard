@@ -7,7 +7,7 @@ import { ScrollReveal } from "@/components/animations/ScrollReveal";
 const features = [
   { title: "11 anodized colors", subtitle: "Matte black to champagne gold." },
   { title: "0.8mm anodized aluminum", subtitle: "Real metal you can feel." },
-  { title: "From $250 for 15 cards", subtitle: "One price, no surprises." },
+  { title: "Packs from 15 cards", subtitle: "Shipping included, no surprises." },
   { title: "10-14 day production", subtitle: "Rush production available." },
   { title: "Laser-engraved", subtitle: "Consistent quality every time." },
   { title: "Ships worldwide", subtitle: "Shipping included in every price." },

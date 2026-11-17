@@ -33,16 +33,21 @@ import {
   type PendingCheckout,
 } from "@/components/payments/CardsCheckout";
 import {
-  CARD_PRICING,
   CARD_QUANTITIES,
   CARD_COLORS,
   DESIGN_FEE_USD,
+  WEBSITE_PACK_PRICES,
   designIncluded,
+  isWebsiteQuantity,
   WHATSAPP_NUMBER,
   type CardQuantity,
   type CardColor,
 } from "@/lib/constants";
-import { trackBeginCheckout, trackViewProduct } from "@/lib/analytics";
+import {
+  trackBeginCheckout,
+  trackViewProduct,
+  trackWhatsAppClick,
+} from "@/lib/analytics";
 
 const specs = [
   { label: "Material", value: "Premium Anodized Aluminum" },
@@ -240,10 +245,12 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
   const emailRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // The sticky order bar only shows while the in-page checkout button is
+  // The sticky order bar only shows while the in-page button block is
   // scrolled out of view — once the real button is visible, the bar slides
   // away. Starts "visible" so the bar doesn't flash in before the first check.
-  const ctaRef = useRef<HTMLButtonElement>(null);
+  // The ref sits on the block, not the button, because the button changes
+  // between checkout and custom quote with the selected pack.
+  const ctaRef = useRef<HTMLDivElement>(null);
   const [ctaVisible, setCtaVisible] = useState(true);
   useEffect(() => {
     const el = ctaRef.current;
@@ -272,11 +279,20 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
   );
 
   useEffect(() => {
-    trackViewProduct("Metal Business Cards", CARD_PRICING["0.8mm"].prices[15]);
+    trackViewProduct("Metal Business Cards", WEBSITE_PACK_PRICES[15]);
   }, []);
 
-  const pricing = CARD_PRICING["0.8mm"];
-  const cardsSubtotal = pricing.prices[selectedQuantity];
+  // Packs of 100 and 200 are sold by custom quote: the page shows no price
+  // for them and sends the customer to WhatsApp instead of the checkout.
+  const quoteOnly = !isWebsiteQuantity(selectedQuantity);
+  const cardsSubtotal = isWebsiteQuantity(selectedQuantity)
+    ? WEBSITE_PACK_PRICES[selectedQuantity]
+    : 0;
+  const quoteUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `Hi! I'd like a custom quote for ${selectedQuantity} metal business cards (0.8mm, ${selectedColor.label}).`
+  )}`;
+  const trackQuote = () =>
+    trackWhatsAppClick(`product-quote-${selectedQuantity}`);
   const freeDesign = designIncluded(selectedQuantity);
   const designFee = !freeDesign && wantsDesignService ? DESIGN_FEE_USD : 0;
   const total = cardsSubtotal + designFee;
@@ -289,6 +305,7 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
   // Creates the server-priced Whop session, then hands off to the checkout
   // page so the customer sees their summary next to Whop's form.
   const proceedToCheckout = async () => {
+    if (quoteOnly) return;
     setCheckoutError("");
     if (!delivery) {
       setCheckoutError("Select your delivery destination first.");
@@ -530,21 +547,36 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                     {CARD_QUANTITIES.map((qty) => (
                       <button
                         key={qty}
+                        type="button"
                         onClick={() => setSelectedQuantity(qty)}
+                        aria-pressed={selectedQuantity === qty}
+                        aria-label={
+                          isWebsiteQuantity(qty)
+                            ? `${qty} cards`
+                            : `${qty} cards, by custom quote`
+                        }
                         className={cn(
-                          "relative px-1 py-3 sm:p-3 rounded-xl border-2 text-center transition-all",
+                          "relative flex flex-col items-center justify-center gap-0.5 px-1 py-3 sm:p-3 rounded-xl border-2 text-center transition-all",
                           selectedQuantity === qty
                             ? "border-foreground bg-foreground/5"
                             : "border-border hover:border-foreground/30"
                         )}
                       >
-                        <p className="font-semibold text-sm sm:text-base">{qty}</p>
+                        <span className="font-semibold text-sm sm:text-base">
+                          {qty}
+                        </span>
+                        {!isWebsiteQuantity(qty) && (
+                          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                            Quote
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    All prices include worldwide shipping. Need a different
-                    quantity or something custom?{" "}
+                    Packs of 15, 30 and 50 include worldwide shipping in the
+                    price. Packs of 100 and 200 are by custom quote. Need a
+                    different quantity or something custom?{" "}
                     <a
                       href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'd like a custom quote for metal business cards.")}`}
                       target="_blank"
@@ -620,115 +652,153 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                   )}
                 </div>
 
-                {/* Delivery */}
-                <div ref={deliveryRef}>
-                  <ShippingEstimator onDeliveryChange={handleDeliveryChange} />
-                </div>
-
-                {/* Contact details */}
-                <div className="p-5 rounded-xl bg-card border border-border">
-                  <label className="text-sm font-medium mb-3 block">
-                    Your Email
-                  </label>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <input
-                      ref={emailRef}
-                      className={inputCls}
-                      type="email"
-                      placeholder="Email *"
-                      autoComplete="email"
-                      value={ship.email}
-                      onChange={setShipField("email")}
-                    />
-                    <input
-                      className={inputCls}
-                      type="tel"
-                      placeholder="Phone (optional, for the courier)"
-                      autoComplete="tel"
-                      value={ship.phone}
-                      onChange={setShipField("phone")}
-                    />
+                {/* Delivery, contact and summary belong to the packs sold on the
+                    site. They are hidden, not unmounted, for the quote packs, so
+                    the chosen destination and email are still there afterwards. */}
+                <div className={cn("space-y-8", quoteOnly && "hidden")}>
+                  {/* Delivery */}
+                  <div ref={deliveryRef}>
+                    <ShippingEstimator onDeliveryChange={handleDeliveryChange} />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    For your order confirmation and tracking link. Your name
-                    and delivery address are entered once, on the secure
-                    checkout page.
-                  </p>
-                </div>
 
-                {/* Order Summary */}
-                <div className="p-6 rounded-xl bg-card border border-border space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">
-                      {selectedQuantity} cards · {selectedColor.label} (0.8mm)
-                    </span>
-                    <span className="font-semibold">
-                      {formatUsd(cardsSubtotal)}
-                    </span>
+                  {/* Contact details */}
+                  <div className="p-5 rounded-xl bg-card border border-border">
+                    <label className="text-sm font-medium mb-3 block">
+                      Your Email
+                    </label>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <input
+                        ref={emailRef}
+                        className={inputCls}
+                        type="email"
+                        placeholder="Email *"
+                        autoComplete="email"
+                        value={ship.email}
+                        onChange={setShipField("email")}
+                      />
+                      <input
+                        className={inputCls}
+                        type="tel"
+                        placeholder="Phone (optional, for the courier)"
+                        autoComplete="tel"
+                        value={ship.phone}
+                        onChange={setShipField("phone")}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      For your order confirmation and tracking link. Your name
+                      and delivery address are entered once, on the secure
+                      checkout page.
+                    </p>
                   </div>
-                  {designFee > 0 && (
+
+                  {/* Order Summary */}
+                  <div className="p-6 rounded-xl bg-card border border-border space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">
-                        Design service
+                        {selectedQuantity} cards · {selectedColor.label} (0.8mm)
                       </span>
                       <span className="font-semibold">
-                        {formatUsd(designFee)}
+                        {formatUsd(cardsSubtotal)}
                       </span>
                     </div>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">
-                      {delivery
-                        ? `Delivery to ${delivery.destination}`
-                        : "Worldwide delivery"}
-                    </span>
-                    <span className="font-semibold text-gold">Included</span>
+                    {designFee > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">
+                          Design service
+                        </span>
+                        <span className="font-semibold">
+                          {formatUsd(designFee)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">
+                        {delivery
+                          ? `Delivery to ${delivery.destination}`
+                          : "Worldwide delivery"}
+                      </span>
+                      <span className="font-semibold text-gold">Included</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-4 border-t border-border">
+                      <span className="font-semibold">Total</span>
+                      <span className="font-semibold text-lg">
+                        {formatUsd(total)}
+                      </span>
+                    </div>
+                    {!delivery && (
+                      <p className="text-sm text-muted-foreground">
+                        Select your delivery destination above to check out.
+                      </p>
+                    )}
                   </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-border">
-                    <span className="font-semibold">Total</span>
-                    <span className="font-semibold text-lg">
-                      {formatUsd(total)}
-                    </span>
-                  </div>
-                  {!delivery && (
-                    <p className="text-sm text-muted-foreground">
-                      Select your delivery destination above to check out.
-                    </p>
-                  )}
                 </div>
 
-                {/* CTA */}
-                <div className="space-y-3">
-                  <button
-                    ref={ctaRef}
-                    onClick={proceedToCheckout}
-                    disabled={checkingOut}
-                    className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity disabled:opacity-60"
-                  >
-                    {checkingOut ? (
-                      <>
-                        <Loader2 className="size-5 animate-spin" />
-                        Preparing…
-                      </>
-                    ) : (
-                      <>
-                        Proceed to checkout · {formatUsd(total)}
-                        <ArrowRight className="size-5" />
-                      </>
-                    )}
-                  </button>
-                  {checkoutError && (
-                    <p className="text-sm text-red-500">{checkoutError}</p>
+                {/* Quote packs: no price, the order is priced on WhatsApp */}
+                {quoteOnly && (
+                  <div className="p-6 rounded-xl bg-card border border-border space-y-4">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-muted-foreground">
+                        {selectedQuantity} cards · {selectedColor.label} (0.8mm)
+                      </span>
+                      <span className="font-semibold whitespace-nowrap">
+                        Custom quote
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground pt-4 border-t border-border">
+                      Packs of {selectedQuantity} cards are priced by quote. Send
+                      us your order on WhatsApp and we will price it for you.
+                    </p>
+                  </div>
+                )}
+
+                {/* CTA: checkout for the packs sold on the site, a WhatsApp
+                    quote for the packs sold by quote */}
+                <div ref={ctaRef} className="space-y-3">
+                  {quoteOnly ? (
+                    <a
+                      href={quoteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={trackQuote}
+                      className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity"
+                    >
+                      Get Custom Quote
+                      <ArrowRight className="size-5" />
+                    </a>
+                  ) : (
+                    <>
+                      <button
+                        onClick={proceedToCheckout}
+                        disabled={checkingOut}
+                        className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity disabled:opacity-60"
+                      >
+                        {checkingOut ? (
+                          <>
+                            <Loader2 className="size-5 animate-spin" />
+                            Preparing…
+                          </>
+                        ) : (
+                          <>
+                            Proceed to checkout · {formatUsd(total)}
+                            <ArrowRight className="size-5" />
+                          </>
+                        )}
+                      </button>
+                      {checkoutError && (
+                        <p className="text-sm text-red-500">{checkoutError}</p>
+                      )}
+                      <a
+                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (0.8mm, ${selectedColor.label}). Can you help me with pricing and the design process?`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
+                      >
+                        Need a custom quote? Chat on WhatsApp
+                        <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    </>
                   )}
-                  <a
-                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'm interested in ordering ${selectedQuantity} metal business cards (0.8mm, ${selectedColor.label}). Can you help me with pricing and the design process?`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all group"
-                  >
-                    Need a custom quote? Chat on WhatsApp
-                    <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </a>
                 </div>
               </div>
             </ScrollReveal>
@@ -806,39 +876,61 @@ export function ProductPage({ colorPhotos = {} }: { colorPhotos?: ColorPhotos })
                 ? "design service"
                 : freeDesign
                   ? "design included"
-                  : "your own design"}{" "}
-              · shipping included
+                  : "your own design"}
+              {quoteOnly ? "" : " · shipping included"}
             </p>
             <p className="leading-tight">
-              <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-muted-foreground mr-2">
-                Total
-              </span>
-              <span className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-3xl">
-                {formatUsd(total)}
-              </span>
+              {quoteOnly ? (
+                <span className="font-[family-name:var(--font-montserrat)] font-bold text-xl sm:text-3xl">
+                  Custom quote
+                </span>
+              ) : (
+                <>
+                  <span className="text-xs sm:text-sm uppercase tracking-[0.18em] text-muted-foreground mr-2">
+                    Total
+                  </span>
+                  <span className="font-[family-name:var(--font-montserrat)] font-bold text-2xl sm:text-3xl">
+                    {formatUsd(total)}
+                  </span>
+                </>
+              )}
             </p>
-            {checkoutError && (
+            {!quoteOnly && checkoutError && (
               <p className="text-sm text-red-500 mt-1">{checkoutError}</p>
             )}
           </div>
-          <button
-            onClick={proceedToCheckout}
-            disabled={checkingOut}
-            className="flex-shrink-0 inline-flex items-center justify-center gap-2 py-3.5 sm:py-4 px-5 sm:px-9 rounded-full bg-foreground text-background font-semibold text-sm sm:text-lg hover:opacity-90 transition-opacity disabled:opacity-60"
-          >
-            {checkingOut ? (
-              <>
-                <Loader2 className="size-5 animate-spin" />
-                Preparing…
-              </>
-            ) : (
-              <>
-                <span className="sm:hidden">Checkout</span>
-                <span className="hidden sm:inline">Proceed to checkout</span>
-                <ArrowRight className="size-5" />
-              </>
-            )}
-          </button>
+          {quoteOnly ? (
+            <a
+              href={quoteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={trackQuote}
+              className="flex-shrink-0 inline-flex items-center justify-center gap-2 py-3.5 sm:py-4 px-5 sm:px-9 rounded-full bg-foreground text-background font-semibold text-sm sm:text-lg hover:opacity-90 transition-opacity"
+            >
+              <span className="sm:hidden">Get quote</span>
+              <span className="hidden sm:inline">Get Custom Quote</span>
+              <ArrowRight className="size-5" />
+            </a>
+          ) : (
+            <button
+              onClick={proceedToCheckout}
+              disabled={checkingOut}
+              className="flex-shrink-0 inline-flex items-center justify-center gap-2 py-3.5 sm:py-4 px-5 sm:px-9 rounded-full bg-foreground text-background font-semibold text-sm sm:text-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+            >
+              {checkingOut ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Preparing…
+                </>
+              ) : (
+                <>
+                  <span className="sm:hidden">Checkout</span>
+                  <span className="hidden sm:inline">Proceed to checkout</span>
+                  <ArrowRight className="size-5" />
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </>
