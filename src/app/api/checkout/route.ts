@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { whop, WHOP_COMPANY_ID, WHOP_PRODUCT_ID } from "@/lib/whop";
 import {
   CARD_COLORS,
-  CARD_PRICING,
   CARD_QUANTITIES,
   DESIGN_FEE_USD,
+  WEBSITE_PACK_PRICES,
   designIncluded,
-  type CardQuantity,
+  isWebsiteQuantity,
 } from "@/lib/constants";
 
 /**
  * Website checkout. The browser sends what the customer chose; the price is
- * computed HERE from the lineup in constants.ts, so a tampered request can
- * never buy cards for an arbitrary amount. Contact details ride along in the
+ * computed HERE from the website lineup in constants.ts, so a tampered request
+ * can never buy cards for an arbitrary amount. Packs of 100 and 200 are sold by
+ * custom quote, so this route refuses them. Contact details ride along in the
  * Whop metadata; the delivery address is collected by Whop's checkout page
  * (product setting collect_shipping_address) and both become the order when
  * the payment webhook fires — the same path Yara's orders take.
@@ -33,6 +34,15 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    if (!isWebsiteQuantity(quantity)) {
+      return NextResponse.json(
+        {
+          error:
+            "Packs of 100 and 200 cards are by custom quote. Message us on WhatsApp and we will price your order.",
+        },
+        { status: 400 }
+      );
+    }
     const color = CARD_COLORS.find(
       (c) => c.label === m.color || c.id === m.color
     );
@@ -45,8 +55,7 @@ export async function POST(request: NextRequest) {
 
     const wantsDesign = m.designService === "paid";
     const designFee = wantsDesign && !designIncluded(quantity) ? DESIGN_FEE_USD : 0;
-    const amount =
-      CARD_PRICING["0.8mm"].prices[quantity as CardQuantity] + designFee;
+    const amount = WEBSITE_PACK_PRICES[quantity] + designFee;
 
     const ship = {
       name: str(m.customerName, 120),

@@ -170,13 +170,6 @@ export default async function LocationPage({ params }: Props) {
                 message={`Hi! I'm in ${country.name} and interested in ordering metal business cards. Can you help me with pricing and shipping?`}
                 trackingLabel={`location-${country.slug}`}
               />
-              <Link
-                href="/products/metal-business-cards"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border text-foreground font-medium text-sm hover:border-foreground/30 transition-colors group"
-              >
-                Order Your Cards
-                <ArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
             </div>
           </ScrollReveal>
         </div>

@@ -7,7 +7,6 @@ import {
   ccFor,
 } from "@/lib/email-template";
 import {
-  CARD_PRICING,
   CARD_QUANTITIES,
   DESIGN_FEE_USD,
   SITE_CONFIG,
@@ -15,6 +14,7 @@ import {
   type CardQuantity,
   type CardThickness,
 } from "@/lib/constants";
+import { CARD_PRICING } from "@/lib/card-pricing";
 
 /**
  * Checkout link generator for the Yara ElevenLabs agent.

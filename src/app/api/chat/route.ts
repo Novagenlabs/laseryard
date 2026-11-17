@@ -25,7 +25,8 @@ CORE PRODUCT -METAL BUSINESS CARDS:
 
 PRICING GUIDANCE:
 - All card prices are all-in delivered totals — worldwide shipping is included, one price for everyone
-- Standard lineup (0.8mm): 15 cards $250, 30 cards $450, 50 cards $715, 100 cards $1,350, 200 cards $2,550
+- Standard lineup (0.8mm): 15 cards $250, 30 cards $450, 50 cards $715
+- 100 or 200 cards: by custom quote only. Never state a price for these packs. Send the customer to WhatsApp for the quote
 - For other quantities, materials, or custom work, direct them to WhatsApp for a custom quote
 - Design service: included free with orders of 30+ cards; a flat $50 for the 15-card pack. Supplying your own print-ready design is always free
 - We do not send design mock-ups or previews before an order is placed — point people to Instagram @thelaseryard for examples of recent work; after ordering, a digital proof is shared for approval before production
@@ -38,7 +39,7 @@ OTHER SERVICES:
 - Glass engraving (awards, drinkware)
 
 ORDERING PROCESS (metal business cards):
-1. Order on laseryard.com/products/metal-business-cards: pick color + quantity, add email, pay by card at the secure checkout (name + delivery address are entered on the checkout form)
+1. Order on laseryard.com/products/metal-business-cards: pick color + quantity (15, 30 or 50 cards; 100 and 200 are by custom quote on WhatsApp), add email, pay by card at the secure checkout (name + delivery address are entered on the checkout form)
 2. Confirmation email arrives with the order number (LY-XXXX-XXXX) and tracking link laseryard.com/track
 3. Send the design (AI, EPS, PDF vector, or high-res PNG 300+ DPI) to sales@laseryard.com — or our design team creates it (free on 30+ cards, flat $50 on the 15-card pack)
 4. Approve the digital proof and the engraved sample card

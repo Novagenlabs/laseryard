@@ -22,25 +22,33 @@ export const WHATSAPP_MESSAGES = {
     "Hi! I'm interested in your laser engraving services.",
 };
 
-// Metal business card pricing.
-// Quantities outside this table (or other materials/finishes) get a custom quote on WhatsApp.
+// Metal business card lineup.
+// Quantities outside this list (or other materials/finishes) get a custom quote on WhatsApp.
 // 2026-09-07: 0.4mm retired — the lineup is 0.8mm only, with a 15-card entry pack.
 export const CARD_QUANTITIES = [15, 30, 50, 100, 200] as const;
 export type CardQuantity = (typeof CARD_QUANTITIES)[number];
 export type CardThickness = "0.8mm";
 
-// All-in delivered totals in USD — worldwide shipping is included in every
-// price (same numbers the WhatsApp agent quotes). The 15-card pack does not
-// include the design service (flat DESIGN_FEE_USD when we create the design);
-// orders of 30+ cards include design free.
-export const CARD_PRICING: Record<
-  CardThickness,
-  { label: string; prices: Record<CardQuantity, number> }
-> = {
-  "0.8mm": {
-    label: "Premium",
-    prices: { 15: 250, 30: 450, 50: 715, 100: 1350, 200: 2550 },
-  },
+// 2026-11-17: packs of 100 and 200 cards are sold by custom quote. The website
+// shows no price for them and cannot check them out. Their prices live in
+// card-pricing.ts, which only server code imports, so they never reach the
+// browser.
+export const WEBSITE_QUANTITIES = [15, 30, 50] as const;
+export type WebsiteQuantity = (typeof WEBSITE_QUANTITIES)[number];
+export const isWebsiteQuantity = (
+  quantity: number
+): quantity is WebsiteQuantity =>
+  (WEBSITE_QUANTITIES as readonly number[]).includes(quantity);
+
+// All-in delivered totals in USD for the packs sold on the website — worldwide
+// shipping is included in every price (same numbers the WhatsApp agent
+// quotes). The 15-card pack does not include the design service (flat
+// DESIGN_FEE_USD when we create the design); orders of 30+ cards include
+// design free.
+export const WEBSITE_PACK_PRICES: Record<WebsiteQuantity, number> = {
+  15: 250,
+  30: 450,
+  50: 715,
 };
 
 // Flat design-service fee (USD) on the 15-card pack; design is included free
@@ -296,7 +304,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is the minimum order quantity?",
     answer:
-      "Our minimum order is 15 cards, with worldwide shipping included in every pack price. Packs go up to 200 cards and the per-card price drops as you go — message us on WhatsApp for a quote. Need more than 200? Contact us for a custom quote.",
+      "Our minimum order is 15 cards. Packs of 15, 30 and 50 cards have set prices with worldwide shipping included. Orders of 100 or 200 cards, and anything larger, are priced by custom quote — message us on WhatsApp.",
   },
   {
     question: "Can I add NFC to my cards?",

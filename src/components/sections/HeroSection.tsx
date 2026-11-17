@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Star } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import Link from "next/link";
 import Avatar from "boring-avatars";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
@@ -70,13 +69,6 @@ function HeroMobile() {
             Get Custom Quote
             <ArrowRight className="w-4 h-4" />
           </a>
-          <Link
-            href="/products/metal-business-cards"
-            className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            or order now
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
           <p className="mt-3 text-xs text-muted-foreground text-center">
             Shipping included · 11 colors
           </p>
@@ -177,13 +169,6 @@ function HeroDesktop() {
                   Get Custom Quote
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
-                <Link
-                  href="/products/metal-business-cards"
-                  className="group inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  or order now
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </Link>
               </div>
               <p className="mt-3 text-sm text-muted-foreground">
                 Shipping included · 11 colors · ready in 10-14 days
